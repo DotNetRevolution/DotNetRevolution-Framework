@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D65E8739-5F05-46D9-8B5E-47008F848257}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DotNetRevolution.Core</RootNamespace>
+    <AssemblyName>DotNetRevolution.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <CodeContractsAssemblyMode>1</CodeContractsAssemblyMode>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
+    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
+    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
+    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
+    <CodeContractsRuntimeSkipQuantifiers>False</CodeContractsRuntimeSkipQuantifiers>
+    <CodeContractsRunCodeAnalysis>True</CodeContractsRunCodeAnalysis>
+    <CodeContractsNonNullObligations>True</CodeContractsNonNullObligations>
+    <CodeContractsBoundsObligations>True</CodeContractsBoundsObligations>
+    <CodeContractsArithmeticObligations>True</CodeContractsArithmeticObligations>
+    <CodeContractsEnumObligations>True</CodeContractsEnumObligations>
+    <CodeContractsRedundantAssumptions>True</CodeContractsRedundantAssumptions>
+    <CodeContractsAssertsToContractsCheckBox>True</CodeContractsAssertsToContractsCheckBox>
+    <CodeContractsRedundantTests>True</CodeContractsRedundantTests>
+    <CodeContractsMissingPublicRequiresAsWarnings>True</CodeContractsMissingPublicRequiresAsWarnings>
+    <CodeContractsMissingPublicEnsuresAsWarnings>True</CodeContractsMissingPublicEnsuresAsWarnings>
+    <CodeContractsInferRequires>False</CodeContractsInferRequires>
+    <CodeContractsInferEnsures>False</CodeContractsInferEnsures>
+    <CodeContractsInferEnsuresAutoProperties>False</CodeContractsInferEnsuresAutoProperties>
+    <CodeContractsInferObjectInvariants>False</CodeContractsInferObjectInvariants>
+    <CodeContractsSuggestAssumptions>True</CodeContractsSuggestAssumptions>
+    <CodeContractsSuggestAssumptionsForCallees>True</CodeContractsSuggestAssumptionsForCallees>
+    <CodeContractsSuggestRequires>True</CodeContractsSuggestRequires>
+    <CodeContractsNecessaryEnsures>True</CodeContractsNecessaryEnsures>
+    <CodeContractsSuggestObjectInvariants>True</CodeContractsSuggestObjectInvariants>
+    <CodeContractsSuggestReadonly>True</CodeContractsSuggestReadonly>
+    <CodeContractsRunInBackground>False</CodeContractsRunInBackground>
+    <CodeContractsShowSquigglies>True</CodeContractsShowSquigglies>
+    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
+    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
+    <CodeContractsCustomRewriterAssembly />
+    <CodeContractsCustomRewriterClass />
+    <CodeContractsLibPaths />
+    <CodeContractsExtraRewriteOptions />
+    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsSQLServerOption />
+    <CodeContractsBaseLineFile />
+    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
+    <CodeContractsFailBuildOnWarnings>True</CodeContractsFailBuildOnWarnings>
+    <CodeContractsBeingOptimisticOnExternal>False</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
+    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
+    <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Base\Disposable.cs" />
+    <Compile Include="Command\CodeContract\CommandAwareFactoryContract.cs" />
+    <Compile Include="Command\CodeContract\CommandCatalogContract.cs" />
+    <Compile Include="Command\CodeContract\CommandDispatcherContract.cs" />
+    <Compile Include="Command\CodeContract\CommandEntryContract.cs" />
+    <Compile Include="Command\CodeContract\CommandHandlerContract.cs" />
+    <Compile Include="Command\CommandCatalog.cs" />
+    <Compile Include="Command\CommandDispatcher.cs" />
+    <Compile Include="Command\CommandEntry.cs" />
+    <Compile Include="Command\CommandHandler.cs" />
+    <Compile Include="Command\CommandHandlingException.cs" />
+    <Compile Include="Command\ICommandAwareFactory.cs" />
+    <Compile Include="Command\ICommandCatalog.cs" />
+    <Compile Include="Command\ICommandDispatcher.cs" />
+    <Compile Include="Command\ICommandEntry.cs" />
+    <Compile Include="Command\ICommandHandler.cs" />
+    <Compile Include="Domain\ActionDomainEventHandler.cs" />
+    <Compile Include="Domain\AggregateRoot.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventCatalogContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventDispatcherContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventEntryContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventEntryRegistrationContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventHandlerContract.cs" />
+    <Compile Include="Domain\DomainEventCatalog.cs" />
+    <Compile Include="Domain\DomainEventDispatcher.cs" />
+    <Compile Include="Domain\DomainEventEnlistmentNotification.cs" />
+    <Compile Include="Domain\DomainEventEntry.cs" />
+    <Compile Include="Domain\DomainEventEntryRegistration.cs" />
+    <Compile Include="Domain\DomainEventHandler.cs" />
+    <Compile Include="Domain\DomainEventHandlingException.cs" />
+    <Compile Include="Domain\DomainException.cs" />
+    <Compile Include="Domain\EntityCollection.cs" />
+    <Compile Include="Domain\Identity.cs" />
+    <Compile Include="Domain\IDomainEventCatalog.cs" />
+    <Compile Include="Domain\IDomainEventDispatcher.cs" />
+    <Compile Include="Domain\IDomainEventEntry.cs" />
+    <Compile Include="Domain\IDomainEventEntryRegistration.cs" />
+    <Compile Include="Domain\IDomainEventHandler.cs" />
+    <Compile Include="Domain\NullDomainEventDispatcher.cs" />
+    <Compile Include="Domain\SequentialGuid.cs" />
+    <Compile Include="Domain\ValueObject.cs" />
+    <Compile Include="Extension\DictionaryExtension.ToString.cs" />
+    <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
+    <Compile Include="Helper\BooleanHelper.cs" />
+    <Compile Include="Helper\DictionaryHelper.cs" />
+    <Compile Include="Helper\TypeHelper.cs" />
+    <Compile Include="Logging\CodeContract\LogEntryLevelManagerContract.cs" />
+    <Compile Include="Logging\CodeContract\LoggerContract.cs" />
+    <Compile Include="Logging\CodeContract\LoggerFactoryContract.cs" />
+    <Compile Include="Logging\ColoredConsoleLogger.cs" />
+    <Compile Include="Logging\ConsoleLogger.cs" />
+    <Compile Include="Logging\EmptyLogger.cs" />
+    <Compile Include="Logging\ILogEntryLevelManager.cs" />
+    <Compile Include="Logging\ILogger.cs" />
+    <Compile Include="Logging\ILoggerFactory.cs" />
+    <Compile Include="Logging\LogEntryContext.cs" />
+    <Compile Include="Logging\LogEntryLevel.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Logging\NullLoggerException.cs" />
+    <Compile Include="Logging\TemporaryConsoleColor.cs" />
+    <Compile Include="Messaging\CodeContract\MessageCatalogContract.cs" />
+    <Compile Include="Messaging\CodeContract\MessageDispatcherContract.cs" />
+    <Compile Include="Messaging\CodeContract\MessageEntryContract.cs" />
+    <Compile Include="Messaging\CodeContract\MessageHandlerContract.cs" />
+    <Compile Include="Messaging\IMessageCatalog.cs" />
+    <Compile Include="Messaging\IMessageDispatcher.cs" />
+    <Compile Include="Messaging\IMessageEntry.cs" />
+    <Compile Include="Messaging\IMessageHandler.cs" />
+    <Compile Include="Messaging\MessageCatalog.cs" />
+    <Compile Include="Messaging\MessageDispatcher.cs" />
+    <Compile Include="Messaging\MessageEntry.cs" />
+    <Compile Include="Messaging\MessageHandler.cs" />
+    <Compile Include="Messaging\MessageHandlingException.cs" />
+    <Compile Include="Messaging\ProcessCommandMessage.cs" />
+    <Compile Include="Messaging\ProcessCommandMessageHandler.cs" />
+    <Compile Include="Messaging\ProcessDomainEventMessage.cs" />
+    <Compile Include="Messaging\ProcessDomainEventMessageHandler.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\CodeContract\QueryCatalogContract.cs" />
+    <Compile Include="Query\CodeContract\QueryDispatcherContract.cs" />
+    <Compile Include="Query\CodeContract\QueryEntryContract.cs" />
+    <Compile Include="Query\CodeContract\QueryHandlerContract.cs" />
+    <Compile Include="Query\IQueryCatalog.cs" />
+    <Compile Include="Query\IQueryDispatcher.cs" />
+    <Compile Include="Query\IQueryEntry.cs" />
+    <Compile Include="Query\IQueryHandler.cs" />
+    <Compile Include="Query\QueryCatalog.cs" />
+    <Compile Include="Query\QueryDispatcher.cs" />
+    <Compile Include="Query\QueryEntry.cs" />
+    <Compile Include="Query\QueryHandler.cs" />
+    <Compile Include="Query\QueryHandlingException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Transactions" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
