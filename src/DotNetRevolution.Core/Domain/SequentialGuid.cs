@@ -39,7 +39,6 @@ namespace DotNetRevolution.Core.Domain
             Array.Copy(msecsArray, msecsArray.Length - 4, guidArray, guidArray.Length - 4, 4);
 
             var result = new Guid(guidArray);
-
             Contract.Assume(result != Guid.Empty);
 
             return result;

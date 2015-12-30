@@ -124,7 +124,6 @@ namespace DotNetRevolution.Core.Domain
 
             // create handler
             handler = CreateHandler(entry.DomainEventHandlerType);
-
             Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry

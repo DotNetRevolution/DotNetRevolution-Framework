@@ -13,7 +13,6 @@ namespace DotNetRevolution.Core.Messaging
             get
             {
                 var result = _entries[messageType];
-
                 Contract.Assume(result != null);
 
                 return result;

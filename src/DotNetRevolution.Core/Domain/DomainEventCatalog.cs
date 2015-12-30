@@ -21,7 +21,6 @@ namespace DotNetRevolution.Core.Domain
                 lock (_entries)
                 {
                     var result = _entries[domainEventType];
-
                     Contract.Assume(result != null);
 
                     return result.AsReadOnly();

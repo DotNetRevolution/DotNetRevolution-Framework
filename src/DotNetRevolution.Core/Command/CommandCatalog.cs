@@ -19,7 +19,6 @@ namespace DotNetRevolution.Core.Command
             get
             {
                 var result = _entries[commandType];
-
                 Contract.Assume(result != null);
 
                 return result;

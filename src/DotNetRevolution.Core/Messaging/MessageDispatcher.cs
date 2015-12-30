@@ -16,8 +16,7 @@ namespace DotNetRevolution.Core.Messaging
         
         public void Dispatch(object message)
         {
-            var correlationId = Guid.NewGuid().ToString();
-            
+            var correlationId = Guid.NewGuid().ToString();            
             Contract.Assume(!string.IsNullOrWhiteSpace(correlationId));
 
             Dispatch(message, correlationId);
@@ -65,7 +64,6 @@ namespace DotNetRevolution.Core.Messaging
 
             // create handler
             handler = CreateHandler(entry.MessageHandlerType);
-
             Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry

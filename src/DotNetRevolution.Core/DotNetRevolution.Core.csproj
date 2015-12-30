@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
@@ -55,7 +55,7 @@
     <CodeContractsCustomRewriterClass />
     <CodeContractsLibPaths />
     <CodeContractsExtraRewriteOptions />
-    <CodeContractsExtraAnalysisOptions />
+    <CodeContractsExtraAnalysisOptions>-show unreached </CodeContractsExtraAnalysisOptions>
     <CodeContractsSQLServerOption />
     <CodeContractsBaseLineFile />
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
@@ -63,7 +63,7 @@
     <CodeContractsFailBuildOnWarnings>True</CodeContractsFailBuildOnWarnings>
     <CodeContractsBeingOptimisticOnExternal>False</CodeContractsBeingOptimisticOnExternal>
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
-    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
+    <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
@@ -170,6 +170,13 @@
     <Compile Include="Query\QueryEntry.cs" />
     <Compile Include="Query\QueryHandler.cs" />
     <Compile Include="Query\QueryHandlingException.cs" />
+    <Compile Include="Session\CodeContract\SessionContract.cs" />
+    <Compile Include="Session\CodeContract\SessionManagerContract.cs" />
+    <Compile Include="Session\GuidSessionManager.cs" />
+    <Compile Include="Session\ISession.cs" />
+    <Compile Include="Session\ISessionManager.cs" />
+    <Compile Include="Session\NullSessionManagerException.cs" />
+    <Compile Include="Session\Session.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

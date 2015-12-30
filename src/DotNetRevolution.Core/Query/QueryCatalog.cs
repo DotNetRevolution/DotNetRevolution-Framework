@@ -13,7 +13,6 @@ namespace DotNetRevolution.Core.Query
             get
             {
                 var result = Entries[queryType];
-
                 Contract.Assume(result != null);
 
                 return result;

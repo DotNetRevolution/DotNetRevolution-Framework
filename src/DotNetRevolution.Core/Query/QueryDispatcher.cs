@@ -56,7 +56,6 @@ namespace DotNetRevolution.Core.Query
 
             // create handler
             handler = CreateHandler(entry.QueryHandlerType);
-
             Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry

@@ -56,7 +56,6 @@ namespace DotNetRevolution.Core.Command
 
             // create handler
             handler = CreateHandler(entry.CommandHandlerType);
-
             Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry
