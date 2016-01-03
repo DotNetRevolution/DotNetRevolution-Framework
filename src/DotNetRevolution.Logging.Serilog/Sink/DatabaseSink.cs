@@ -16,7 +16,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
     public class DatabaseSink : PeriodicBatchingSink
     {
         private static readonly List<string> IgnoreProperties;
-        private const string TableName = "log.ApplicationEntry";
+        private const string TableName = "log.Entry";
 
         private readonly string _connectionString;
         private readonly DataTable _eventsTable;
@@ -237,8 +237,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             eventsTable.Columns.Add(new DataColumn
             {
                 DataType = typeof(string),
-                ColumnName = "SessionId",
-                AllowDBNull = true
+                ColumnName = "SessionId"
             });
 
             eventsTable.Columns.Add(new DataColumn

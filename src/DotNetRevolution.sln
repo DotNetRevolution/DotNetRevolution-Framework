@@ -7,6 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core", "Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Logging.Serilog", "DotNetRevolution.Logging.Serilog\DotNetRevolution.Logging.Serilog.csproj", "{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logging", "Logging", "{17FFDA9B-6DB6-4E7E-AA9F-0824E4504032}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DotNetRevolution.Logging.Database", "DotNetRevolution.Logging.Database\DotNetRevolution.Logging.Database.sqlproj", "{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ninject", "Ninject", "{7F327415-88E2-4E71-92FC-D0844EC6C5CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Ninject.Serilog", "DotNetRevolution.Ninject.Serilog\DotNetRevolution.Ninject.Serilog.csproj", "{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +29,23 @@ Global
 		{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414} = {17FFDA9B-6DB6-4E7E-AA9F-0824E4504032}
+		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52} = {17FFDA9B-6DB6-4E7E-AA9F-0824E4504032}
+		{CD62BDB8-85E8-4EAD-B269-BC2A407415C3} = {7F327415-88E2-4E71-92FC-D0844EC6C5CA}
 	EndGlobalSection
 EndGlobal
