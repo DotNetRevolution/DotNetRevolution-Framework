@@ -10,7 +10,7 @@ namespace DotNetRevolution.Core.Domain
         
         public ActionDomainEventHandler(Action<TDomainEvent> action)
         {
-            Contract.Requires(action != null, "action");
+            Contract.Requires(action != null);
 
             _action = action;
         }

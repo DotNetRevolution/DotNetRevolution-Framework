@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Domain
 
         private Identity(Guid id)
         {
-            Contract.Requires(id != Guid.Empty, "Invalid identity");
+            Contract.Requires(id != Guid.Empty);
 
             _id = id;
         }

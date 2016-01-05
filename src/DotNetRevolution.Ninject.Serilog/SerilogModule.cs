@@ -20,15 +20,13 @@ namespace DotNetRevolution.Ninject.Serilog
         public SerilogModule(string serilogLogFilePath,
                              LogEventLevel defaultMinimumLevel)
         {
-            Contract.Requires(serilogLogFilePath != null);
-            Contract.Requires(serilogLogFilePath.Length > 0);
+            Contract.Requires(!string.IsNullOrWhiteSpace(serilogLogFilePath));
 
             _defaultMinimumLevel = defaultMinimumLevel;
 
-            // send Serilog errors to console
-            SelfLog.Out = new StreamWriter(Path.Combine(serilogLogFilePath, string.Format("Serilog-Error-{0}.log", Guid.NewGuid())), true);
+            SetSerilogInternalLogger(serilogLogFilePath);
         }
-
+        
         public override void Load()
         {
             // used to dynamically adjust the log entry level at runtime
@@ -79,6 +77,18 @@ namespace DotNetRevolution.Ninject.Serilog
             Contract.Assume(bindingMethod != null);
 
             bindingMethod.WhenParentNamed(MainLoggerFactoryName);
+        }
+
+        private static void SetSerilogInternalLogger(string serilogLogFilePath)
+        {
+            Contract.Requires(serilogLogFilePath != null);
+
+            var path = Path.Combine(serilogLogFilePath, string.Format("Serilog-Error-{0}.log", Guid.NewGuid()));
+
+            Contract.Assume(!string.IsNullOrWhiteSpace(path));
+
+            // send Serilog errors to console
+            SelfLog.Out = new StreamWriter(path, true);
         }
     }
 }

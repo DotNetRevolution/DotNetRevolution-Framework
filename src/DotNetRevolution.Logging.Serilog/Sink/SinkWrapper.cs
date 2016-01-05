@@ -12,7 +12,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
 
         public SinkWrapper(ILogEventSink sink, LogEventLevel logEventLevel)
         {
-            Contract.Requires(sink != null, "sink");
+            Contract.Requires(sink != null);
 
             Sink = sink;
             LogEventLevel = logEventLevel;

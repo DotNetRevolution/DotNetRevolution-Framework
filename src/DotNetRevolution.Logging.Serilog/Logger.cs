@@ -14,7 +14,7 @@ namespace DotNetRevolution.Logging.Serilog
 
         public Logger(ISeriLogger logger)
         {
-            Contract.Requires(logger != null, "logger");
+            Contract.Requires(logger != null);
 
             _logger = logger;
         }

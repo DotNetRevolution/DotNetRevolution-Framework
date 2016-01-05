@@ -18,8 +18,7 @@ namespace DotNetRevolution.Core.Logging.CodeContract
 
         public void SetLogEntryLevel(LogLevel logLevel, LogEntryLevel logEntryLevel, string context)
         {
-            Contract.Requires(context != null);
-            Contract.Requires(context.Length > 0);
+            Contract.Requires(!string.IsNullOrWhiteSpace(context));
 
             throw new NotImplementedException();
         }

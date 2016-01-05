@@ -30,8 +30,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         public DatabaseSink(string connectionString)
             : base(50, TimeSpan.FromSeconds(5))
         {
-            Contract.Requires(connectionString != null);
-            Contract.Requires(connectionString.Length > 0);
+            Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
 
             _connectionString = connectionString;
 

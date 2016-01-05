@@ -11,10 +11,8 @@ namespace DotNetRevolution.Logging.Serilog.Helper
         {
             Contract.Requires(smtpSection != null);
             Contract.Requires(smtpSection.Network != null);
-            Contract.Requires(subject != null);
-            Contract.Requires(subject.Length > 0);
-            Contract.Requires(toEmail != null);
-            Contract.Requires(toEmail.Length > 0);
+            Contract.Requires(!string.IsNullOrWhiteSpace(subject));
+            Contract.Requires(!string.IsNullOrWhiteSpace(toEmail));
             Contract.Ensures(Contract.Result<EmailConnectionInfo>() != null);
 
             var info = new EmailConnectionInfo

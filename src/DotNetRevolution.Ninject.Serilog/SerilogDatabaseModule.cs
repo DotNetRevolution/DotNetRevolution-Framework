@@ -13,9 +13,8 @@ namespace DotNetRevolution.Ninject.Serilog
 
         public SerilogDatabaseModule(string connectionString,
                                      LogEventLevel defaultMinimumLevel)
-        {            
-            Contract.Requires(connectionString != null);
-            Contract.Requires(connectionString.Length > 0);
+        {
+            Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
 
             _defaultMinimumLevel = defaultMinimumLevel;
             _connectionString = connectionString;            
