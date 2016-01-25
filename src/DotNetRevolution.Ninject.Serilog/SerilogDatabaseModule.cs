@@ -1,6 +1,5 @@
 ﻿using DotNetRevolution.Logging.Serilog.Sink;
 using Ninject.Modules;
-using Ninject.Syntax;
 using Serilog.Events;
 using System.Diagnostics.Contracts;
 

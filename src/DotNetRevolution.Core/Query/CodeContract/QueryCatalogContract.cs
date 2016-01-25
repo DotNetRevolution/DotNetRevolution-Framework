@@ -11,7 +11,6 @@ namespace DotNetRevolution.Core.Query.CodeContract
             get 
             {
                 Contract.Requires(queryType != null);
-                Contract.Ensures(Contract.Result<IQueryEntry>() != null);
 
                 throw new NotImplementedException();
             }
@@ -20,6 +19,7 @@ namespace DotNetRevolution.Core.Query.CodeContract
         public void Add(IQueryEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(this[entry.QueryType] != null);
         }
     }
 }

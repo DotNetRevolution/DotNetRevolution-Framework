@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Transactions;
 
 namespace DotNetRevolution.Core.Domain
 {
@@ -19,18 +18,7 @@ namespace DotNetRevolution.Core.Domain
         
         public void Publish(object domainEvent)
         {
-            // get current transaction
-            var transaction = Transaction.Current;
-
-            // check for a transaction
-            if (transaction == null)
-            {
-                // no transaction, raise event and return
-                PublishEvent(domainEvent);
-                return;
-            }
-
-            transaction.EnlistVolatile(new DomainEventEnlistmentNotification(this, domainEvent), EnlistmentOptions.None);
+            HandlePublishEvent(domainEvent);
         }
         
         public void PublishAll(IEnumerable<object> domainEvents)
@@ -43,14 +31,7 @@ namespace DotNetRevolution.Core.Domain
                 Publish(domainEvent);
             }
         }
-
-        internal void PublishEvent(object domainEvent)
-        {
-            Contract.Requires(domainEvent != null);
-
-            HandlePublishEvent(domainEvent);
-        }
-
+        
         private void HandlePublishEvent(object domainEvent)
         {
             Contract.Requires(domainEvent != null);
@@ -68,7 +49,7 @@ namespace DotNetRevolution.Core.Domain
                     // no entries, try base type if any
                     continue;
                 }
-
+                
                 Contract.Assume(entries != null);
 
                 var exceptions = new List<Exception>();

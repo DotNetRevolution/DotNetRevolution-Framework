@@ -7,8 +7,10 @@ namespace DotNetRevolution.Core.Session
 {
     [ContractClass(typeof(SessionManagerContract))]
     public interface ISessionManager
-    {
-        IReadOnlyCollection<ISession> Sessions { get; }
+    {        
+        IReadOnlyCollection<ISession> Sessions { [Pure] get; }
+                
+        ISession this[string identity] { [Pure] get; }
 
         void Add(ISession session);
         void Remove(ISession session);

@@ -27,6 +27,8 @@ namespace DotNetRevolution.Core.Query
         public void Add(IQueryEntry entry)
         {
             Entries.Add(entry.QueryType, entry);
+
+            Contract.Assume(this[entry.QueryType] != null);
         }
 
         [ContractInvariantMethod]

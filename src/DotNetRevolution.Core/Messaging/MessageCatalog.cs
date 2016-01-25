@@ -27,6 +27,8 @@ namespace DotNetRevolution.Core.Messaging
         public void Add(IMessageEntry entry)
         {
             _entries.Add(entry.MessageType, entry);
+
+            Contract.Assume(this[entry.MessageType] != null);
         }
 
         [ContractInvariantMethod]

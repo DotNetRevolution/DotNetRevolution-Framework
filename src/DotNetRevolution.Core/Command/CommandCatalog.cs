@@ -33,6 +33,8 @@ namespace DotNetRevolution.Core.Command
         public void Add(ICommandEntry entry)
         {
             _entries.Add(entry.CommandType, entry);
+
+            Contract.Assume(this[entry.CommandType] != null);
         }
 
         [ContractInvariantMethod]

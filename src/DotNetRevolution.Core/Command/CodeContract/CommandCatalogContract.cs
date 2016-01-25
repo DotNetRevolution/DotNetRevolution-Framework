@@ -22,7 +22,6 @@ namespace DotNetRevolution.Core.Command.CodeContract
             get
             {
                 Contract.Requires(commandType != null);
-                Contract.Ensures(Contract.Result<ICommandEntry>() != null);
 
                 throw new NotImplementedException();
             }
@@ -31,6 +30,7 @@ namespace DotNetRevolution.Core.Command.CodeContract
         public void Add(ICommandEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(this[entry.CommandType] != null);         
         }
     }
 }

@@ -72,7 +72,8 @@ namespace DotNetRevolution.Core.Domain
 
                 if (_entries.TryGetValue(domainEventType, out eventEntries))
                 {
-                    Contract.Assume(eventEntries != null && Contract.ForAll(eventEntries, entry => entry != null));
+                    Contract.Assume(eventEntries != null);
+                    Contract.Assume(Contract.ForAll(eventEntries, entry => entry != null));
 
                     entries = eventEntries.AsReadOnly();
                     return true;
@@ -91,7 +92,8 @@ namespace DotNetRevolution.Core.Domain
 
             if (_entries.TryGetValue(entry.DomainEventType, out domainEventEntries))
             {
-                Contract.Assume(domainEventEntries != null && Contract.ForAll(domainEventEntries, eventEntry => eventEntry != null));
+                Contract.Assume(domainEventEntries != null);
+                Contract.Assume(Contract.ForAll(domainEventEntries, eventEntry => eventEntry != null));
 
                 domainEventEntries.Add(entry);
                 return;

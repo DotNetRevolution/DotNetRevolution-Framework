@@ -7,9 +7,8 @@ namespace DotNetRevolution.Core.Command
     [ContractClass(typeof(CommandAwareFactoryContract<>))]
     public interface ICommandAwareFactory<out T>
         where T : class
-    {
-        [Pure]
-        Type Type { get; }
+    {        
+        Type Type { [Pure] get; }
 
         T Create(object command);
     }

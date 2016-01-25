@@ -11,7 +11,7 @@ namespace DotNetRevolution.Core.Session.CodeContract
         {
             get
             {
-                Contract.Ensures(Contract.Result<string>() != null);
+                Contract.Ensures(!string.IsNullOrWhiteSpace(Contract.Result<string>()));
 
                 throw new NotImplementedException();
             }

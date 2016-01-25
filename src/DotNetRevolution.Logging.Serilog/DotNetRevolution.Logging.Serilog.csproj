@@ -57,13 +57,13 @@
     <CodeContractsCustomRewriterClass />
     <CodeContractsLibPaths />
     <CodeContractsExtraRewriteOptions />
-    <CodeContractsExtraAnalysisOptions>-show unreached </CodeContractsExtraAnalysisOptions>
+    <CodeContractsExtraAnalysisOptions>-show unreached</CodeContractsExtraAnalysisOptions>
     <CodeContractsSQLServerOption />
     <CodeContractsBaseLineFile />
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
     <CodeContractsSkipAnalysisIfCannotConnectToCache>False</CodeContractsSkipAnalysisIfCannotConnectToCache>
     <CodeContractsFailBuildOnWarnings>True</CodeContractsFailBuildOnWarnings>
-    <CodeContractsBeingOptimisticOnExternal>True</CodeContractsBeingOptimisticOnExternal>
+    <CodeContractsBeingOptimisticOnExternal>False</CodeContractsBeingOptimisticOnExternal>
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
@@ -81,8 +81,6 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeContract\SerilogLogEntryLevelManagerContract.cs" />
-    <Compile Include="Enricher\HttpContextUserNameEnricher.cs" />
-    <Compile Include="Enricher\WebEnricher.cs" />
     <Compile Include="Extension\LogEntryLevelExtension.ToLogEventLevel.cs" />
     <Compile Include="Extension\LogEventLevelExtension.ToLogEntryLevel.cs" />
     <Compile Include="Helper\SerilogSmtpHelper.cs" />
@@ -117,7 +115,6 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

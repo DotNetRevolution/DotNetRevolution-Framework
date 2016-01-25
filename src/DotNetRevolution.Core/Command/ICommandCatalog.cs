@@ -8,11 +8,9 @@ namespace DotNetRevolution.Core.Command
     [ContractClass(typeof(CommandCatalogContract))]
     public interface ICommandCatalog
     {
-        [Pure]
-        IReadOnlyCollection<Type> CommandTypes { get; }
-
-        [Pure]
-        ICommandEntry this[Type commandType] { get; }
+        IReadOnlyCollection<Type> CommandTypes { [Pure] get; }
+        
+        ICommandEntry this[Type commandType] { [Pure] get; }
 
         void Add(ICommandEntry entry);
     }

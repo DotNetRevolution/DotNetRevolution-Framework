@@ -1,9 +1,9 @@
-﻿using System.Web;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 using System.Diagnostics.Contracts;
+using System.Web;
 
-namespace DotNetRevolution.Logging.Serilog.Enricher
+namespace DotNetRevolution.Logging.Serilog.Web.Enricher
 {
     public class HttpContextUserNameEnricher : ILogEventEnricher
     {
@@ -13,14 +13,9 @@ namespace DotNetRevolution.Logging.Serilog.Enricher
         {
             Contract.Assume(propertyFactory != null);
             Contract.Assume(logEvent != null);
+            Contract.Assume(HttpContext.Current?.User != null);
 
-            var httpContext = HttpContext.Current;
-            Contract.Assume(httpContext != null);
-
-            var user = httpContext.User;
-            Contract.Assume(user != null);
-
-            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(PropertyName, user.Identity.Name));
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(PropertyName, HttpContext.Current.User.Identity.Name));
         }
     }
 }

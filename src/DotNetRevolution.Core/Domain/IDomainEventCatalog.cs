@@ -7,12 +7,10 @@ namespace DotNetRevolution.Core.Domain
 {
     [ContractClass(typeof(DomainEventCatalogContract))]
     public interface IDomainEventCatalog
-    {
-        [Pure]
-        IReadOnlyCollection<Type> DomainEventTypes { get; }
-
-        [Pure]
-        IReadOnlyCollection<IDomainEventEntry> this[Type domainEventType] { get; }
+    {        
+        IReadOnlyCollection<Type> DomainEventTypes { [Pure] get; }
+                
+        IReadOnlyCollection<IDomainEventEntry> this[Type domainEventType] { [Pure] get; }
 
         IDomainEventEntryRegistration Add(IDomainEventEntry entry);
 

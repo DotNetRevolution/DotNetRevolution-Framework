@@ -20,6 +20,7 @@ namespace DotNetRevolution.Core.Command
             {
                 // get entry
                 var entry = _catalog[command.GetType()];
+                Contract.Assume(entry != null);
                 
                 // get a command handler
                 var handler = GetHandler(entry);
@@ -37,6 +38,7 @@ namespace DotNetRevolution.Core.Command
         protected virtual ICommandHandler CreateHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
 
             return (ICommandHandler) Activator.CreateInstance(handlerType);
         }
@@ -44,6 +46,7 @@ namespace DotNetRevolution.Core.Command
         private ICommandHandler GetHandler(ICommandEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
 
             // get handler from entry
             var handler = entry.CommandHandler;
@@ -56,7 +59,6 @@ namespace DotNetRevolution.Core.Command
 
             // create handler
             handler = CreateHandler(entry.CommandHandlerType);
-            Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry
             if (handler.Reusable)

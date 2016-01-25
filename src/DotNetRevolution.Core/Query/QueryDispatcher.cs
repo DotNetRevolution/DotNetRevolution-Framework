@@ -20,7 +20,8 @@ namespace DotNetRevolution.Core.Query
             {
                 // get entry
                 var entry = _catalog[query.GetType()];
-                
+                Contract.Assume(entry != null);
+
                 // get a query handler
                 var handler = GetHandler(entry);
 
@@ -37,6 +38,7 @@ namespace DotNetRevolution.Core.Query
         protected virtual IQueryHandler CreateHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
 
             return (IQueryHandler) Activator.CreateInstance(handlerType);
         }
@@ -44,6 +46,7 @@ namespace DotNetRevolution.Core.Query
         private IQueryHandler GetHandler(IQueryEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
 
             // get handler from entry
             var handler = entry.QueryHandler;
@@ -56,7 +59,6 @@ namespace DotNetRevolution.Core.Query
 
             // create handler
             handler = CreateHandler(entry.QueryHandlerType);
-            Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry
             if (handler.Reusable)

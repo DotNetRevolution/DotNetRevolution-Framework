@@ -42,7 +42,9 @@ namespace DotNetRevolution.Core.Domain
             }
             
             var fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            
+
+            Contract.Assume(Contract.ForAll(fields, x => x != null));
+
             foreach (var field in fields)
             {
                 Contract.Assume(field != null);

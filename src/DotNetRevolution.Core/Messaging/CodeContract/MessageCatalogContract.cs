@@ -11,7 +11,6 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
             get
             {
                 Contract.Requires(messageType != null);
-                Contract.Ensures(Contract.Result<IMessageEntry>() != null);
 
                 throw new NotImplementedException();
             }
@@ -20,6 +19,7 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
         public void Add(IMessageEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(this[entry.MessageType] != null);
         }
     }
 }

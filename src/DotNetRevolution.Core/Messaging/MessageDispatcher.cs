@@ -28,6 +28,7 @@ namespace DotNetRevolution.Core.Messaging
             {
                 // get entry
                 var entry = _catalog[message.GetType()];
+                Contract.Assume(entry != null);
                 
                 // get a message handler
                 var handler = GetHandler(entry);
@@ -45,6 +46,7 @@ namespace DotNetRevolution.Core.Messaging
         protected virtual IMessageHandler CreateHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
 
             return (IMessageHandler)Activator.CreateInstance(handlerType);
         }
@@ -52,6 +54,7 @@ namespace DotNetRevolution.Core.Messaging
         private IMessageHandler GetHandler(IMessageEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
 
             // get handler from entry
             var handler = entry.MessageHandler;
@@ -64,7 +67,6 @@ namespace DotNetRevolution.Core.Messaging
 
             // create handler
             handler = CreateHandler(entry.MessageHandlerType);
-            Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry
             if (handler.Reusable)

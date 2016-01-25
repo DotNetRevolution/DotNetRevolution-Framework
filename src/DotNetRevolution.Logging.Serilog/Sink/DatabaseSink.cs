@@ -62,13 +62,12 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private void FillDataTable(IEnumerable<LogEvent> events)
         {
             Contract.Requires(events != null);
-            Contract.Requires(Contract.ForAll(events, ev => ev != null && ev.Properties != null));
+            Contract.Requires(Contract.ForAll(events, ev => ev?.Properties != null));
 
             // Add the new rows to the collection. 
             foreach (var logEvent in events)
             {
-                Contract.Assume(logEvent != null);
-                Contract.Assume(logEvent.Properties != null);
+                Contract.Assume(logEvent?.Properties != null);
 
                 var row = _eventsTable.NewRow();
 

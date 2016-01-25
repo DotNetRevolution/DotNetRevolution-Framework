@@ -1,9 +1,9 @@
-﻿using System.Web;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 using System.Diagnostics.Contracts;
+using System.Web;
 
-namespace DotNetRevolution.Logging.Serilog.Enricher
+namespace DotNetRevolution.Logging.Serilog.Web.Enricher
 {
     public class WebEnricher : ILogEventEnricher
     {
@@ -21,13 +21,11 @@ namespace DotNetRevolution.Logging.Serilog.Enricher
 
             var httpContext = HttpContext.Current;
             Contract.Assume(httpContext != null);
+            Contract.Assume(httpContext.Session != null);
+            Contract.Assume(httpContext.Request.Browser != null);
 
             var session = httpContext.Session;
-            Contract.Assume(session != null);
-
-            var httpRequest = httpContext.Request;
-            var browser = httpRequest.Browser;
-            Contract.Assume(browser != null);
+            var browser = httpContext.Request.Browser;
 
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(BrowserNamePropertyName, browser.Browser));
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(BrowserVersionPropertyName, browser.Version));
