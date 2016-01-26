@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A3DA95E3-E07E-4365-A3E1-4169BAE5F178}</ProjectGuid>
+    <ProjectGuid>{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DotNetRevolution.Json</RootNamespace>
-    <AssemblyName>DotNetRevolution.Json</AssemblyName>
+    <RootNamespace>DotNetRevolution.Newtonsoft.Json</RootNamespace>
+    <AssemblyName>DotNetRevolution.Newtonsoft.Json</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -85,12 +85,6 @@
     <Compile Include="ReadOnlyPropertyContractResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DotNetRevolution.Core\DotNetRevolution.Core.csproj">
-      <Project>{d65e8739-5f05-46d9-8b5e-47008f848257}</Project>
-      <Name>DotNetRevolution.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -98,6 +92,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetRevolution.Core\DotNetRevolution.Core.csproj">
+      <Project>{d65e8739-5f05-46d9-8b5e-47008f848257}</Project>
+      <Name>DotNetRevolution.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
