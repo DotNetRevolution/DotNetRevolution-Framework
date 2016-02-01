@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Messaging.CodeContract
 {
     [ContractClassFor(typeof(IMessageHandler))]
-    public abstract class MessageHandlerContract : IMessageHandler
+    internal abstract class MessageHandlerContract : IMessageHandler
     {
         public abstract bool Reusable { get; }
 
@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
     }
 
     [ContractClassFor(typeof(IMessageHandler<>))]
-    public abstract class MessageHandlerContract<TMessage> : IMessageHandler<TMessage>
+    internal abstract class MessageHandlerContract<TMessage> : IMessageHandler<TMessage>
         where TMessage : class
     {
         public abstract bool Reusable { get; }

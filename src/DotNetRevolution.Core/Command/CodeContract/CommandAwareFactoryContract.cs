@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Command.CodeContract
 {
     [ContractClassFor(typeof(ICommandAwareFactory<>))]
-    public abstract class CommandAwareFactoryContract<T> : ICommandAwareFactory<T>
+    internal abstract class CommandAwareFactoryContract<T> : ICommandAwareFactory<T>
         where T : class
     {
         public Type Type

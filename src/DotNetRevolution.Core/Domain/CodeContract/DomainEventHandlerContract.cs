@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventHandler))]
-    public abstract class DomainEventHandlerContract : IDomainEventHandler
+    internal abstract class DomainEventHandlerContract : IDomainEventHandler
     {
         public abstract bool Reusable { get; }
 
@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     }
 
     [ContractClassFor(typeof(IDomainEventHandler<>))]
-    public abstract class DomainEventHandlerContract<TDomainEvent> : IDomainEventHandler<TDomainEvent>
+    internal abstract class DomainEventHandlerContract<TDomainEvent> : IDomainEventHandler<TDomainEvent>
         where TDomainEvent : class
     {
         public abstract bool Reusable { get; }

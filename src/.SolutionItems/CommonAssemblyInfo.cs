@@ -2,7 +2,7 @@
 
 [assembly: AssemblyCompany("DotNetRevolution")]
 [assembly: AssemblyProduct("DotNetRevolution Framework")]
-[assembly: AssemblyCopyright("Copyright (c) 2015 DotNetRevolution")]
+[assembly: AssemblyCopyright("Copyright (c) 2016 DotNetRevolution")]
 
 #if (DEBUG)
 [assembly: AssemblyConfiguration("Debug")]

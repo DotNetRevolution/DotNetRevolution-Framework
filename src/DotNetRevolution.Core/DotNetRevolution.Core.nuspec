@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/DotNetRevolution/DotNetRevolution-Framework/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/DotNetRevolution/DotNetRevolution-Framework</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright (c) 2016 DotNetRevolution</copyright>
+    <tags>DDD CQRS EventSourcing DotNetRevolution</tags>
+  </metadata>
+</package>

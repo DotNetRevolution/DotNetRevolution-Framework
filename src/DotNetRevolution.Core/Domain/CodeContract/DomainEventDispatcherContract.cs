@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventDispatcher))]
-    public abstract class DomainEventDispatcherContract : IDomainEventDispatcher
+    internal abstract class DomainEventDispatcherContract : IDomainEventDispatcher
     {
         public void UseCatalog(IDomainEventCatalog catalog)
         {

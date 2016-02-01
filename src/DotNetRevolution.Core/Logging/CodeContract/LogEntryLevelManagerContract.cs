@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Logging.CodeContract
 {
     [ContractClassFor(typeof(ILogEntryLevelManager))]
-    public abstract class LogEntryLevelManagerContract : ILogEntryLevelManager
+    internal abstract class LogEntryLevelManagerContract : ILogEntryLevelManager
     {
         public LogEntryLevel GetLogEntryLevel()
         {

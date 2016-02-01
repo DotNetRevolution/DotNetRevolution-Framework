@@ -80,6 +80,9 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Base\Disposable.cs" />
+    <Compile Include="Base\ImplicitUseKindFlags.cs" />
+    <Compile Include="Base\ImplicitUseTargetFlags.cs" />
+    <Compile Include="Base\UsedImplicitlyAttribute.cs" />
     <Compile Include="Command\CodeContract\CommandAwareFactoryContract.cs" />
     <Compile Include="Command\CodeContract\CommandCatalogContract.cs" />
     <Compile Include="Command\CodeContract\CommandDispatcherContract.cs" />
@@ -188,7 +191,8 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
+    <Exec Command="nuget pack $(ProjectFileName) -Prop Configuration=Release" />
+  </Target>
 </Project>

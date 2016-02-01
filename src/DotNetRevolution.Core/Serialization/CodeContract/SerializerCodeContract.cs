@@ -6,7 +6,7 @@ using System.Text;
 namespace DotNetRevolution.Core.Serialization.CodeContract
 {
     [ContractClassFor(typeof(ISerializer))]
-    public abstract class SerializerCodeContract : ISerializer
+    internal abstract class SerializerCodeContract : ISerializer
     {
         public string Serialize(object item)
         {

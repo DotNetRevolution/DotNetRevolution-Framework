@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventEntry))]
-    public abstract class DomainEventEntryContract : IDomainEventEntry
+    internal abstract class DomainEventEntryContract : IDomainEventEntry
     {
         public Type DomainEventType
         {

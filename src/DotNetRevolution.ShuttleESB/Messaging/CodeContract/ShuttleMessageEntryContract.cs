@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.ShuttleESB.Messaging.CodeContract
 {
     [ContractClassFor(typeof(IShuttleMessageEntry))]
-    public abstract class ShuttleMessageEntryContract : IShuttleMessageEntry
+    internal abstract class ShuttleMessageEntryContract : IShuttleMessageEntry
     {
         public IMessageHandler MessageHandler
         {

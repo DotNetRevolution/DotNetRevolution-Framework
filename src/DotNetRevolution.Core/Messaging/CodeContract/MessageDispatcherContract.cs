@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Messaging.CodeContract
 {
     [ContractClassFor(typeof(IMessageDispatcher))]
-    public abstract class MessageDispatcherContract : IMessageDispatcher
+    internal abstract class MessageDispatcherContract : IMessageDispatcher
     {
         public void Dispatch(object message)
         {

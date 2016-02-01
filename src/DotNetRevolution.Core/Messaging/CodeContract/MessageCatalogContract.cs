@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Messaging.CodeContract
 {
     [ContractClassFor(typeof(IMessageCatalog))]
-    public abstract class MessageCatalogContract : IMessageCatalog
+    internal abstract class MessageCatalogContract : IMessageCatalog
     {
         public IMessageEntry this[Type messageType]
         {

@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventCatalog))]
-    public abstract class DomainEventCatalogContract : IDomainEventCatalog
+    internal abstract class DomainEventCatalogContract : IDomainEventCatalog
     {
         public IReadOnlyCollection<Type> DomainEventTypes
         {

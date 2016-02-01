@@ -1,5 +1,4 @@
 ﻿using DotNetRevolution.Core.Session;
-using System.Diagnostics.Contracts;
 using System.Web;
 
 namespace DotNetRevolution.MVC.Session
@@ -8,7 +7,10 @@ namespace DotNetRevolution.MVC.Session
     {
         public override ISession GetCurrentSession()
         {
-            Contract.Assume(HttpContext.Current?.Session != null);
+            if (HttpContext.Current?.Session == null)
+            {
+                return null;
+            }
 
             var session = HttpContext.Current.Session;
                         

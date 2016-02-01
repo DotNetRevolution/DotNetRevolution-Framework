@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Session.CodeContract
 {
     [ContractClassFor(typeof(ISessionManager))]
-    public abstract class SessionManagerContract : ISessionManager
+    internal abstract class SessionManagerContract : ISessionManager
     {
         public ISession this[string identity]
         {
@@ -36,7 +36,7 @@ namespace DotNetRevolution.Core.Session.CodeContract
         }
 
         public ISession GetCurrentSession()
-        {
+        {            
             throw new NotImplementedException();
         }
 

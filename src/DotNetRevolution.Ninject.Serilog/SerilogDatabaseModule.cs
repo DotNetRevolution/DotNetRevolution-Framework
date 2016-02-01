@@ -22,11 +22,9 @@ namespace DotNetRevolution.Ninject.Serilog
         public override void Load()
         {
             var binding = Bind<SinkWrapper>();
-
             Contract.Assume(binding != null);
 
             var bindingMethod = binding.ToMethod(context => new SinkWrapper(new DatabaseSink(_connectionString), _defaultMinimumLevel));
-
             Contract.Assume(bindingMethod != null);
             
             bindingMethod.WhenParentNamed(SerilogModule.MainLoggerFactoryName);

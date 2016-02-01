@@ -42,11 +42,9 @@ namespace DotNetRevolution.Ninject.Serilog
         private void BindMainLoggerFactory()
         {
             var binding = Bind<ILoggerFactory>();
-
             Contract.Assume(binding != null);
 
             var bindingTo = binding.To<LoggerFactory>();
-
             Contract.Assume(bindingTo != null);
 
             bindingTo.Named(MainLoggerFactoryName);
@@ -55,11 +53,9 @@ namespace DotNetRevolution.Ninject.Serilog
         private void BindLogEntryLevelManager()
         {
             var binding = Bind<ILogEntryLevelManager, ISerilogLogEntryLevelManager>();
-
             Contract.Assume(binding != null);
 
             var bindingTo = binding.To<LogEntryLevelManager>();
-
             Contract.Assume(bindingTo != null);
 
             bindingTo.WithConstructorArgument(typeof(LogEntryLevel), _defaultMinimumLevel);
@@ -69,11 +65,9 @@ namespace DotNetRevolution.Ninject.Serilog
         private void BindDefaultSink()
         {
             var binding = Bind<SinkWrapper>();
-
             Contract.Assume(binding != null);
 
             var bindingMethod = binding.ToMethod(context => new SinkWrapper(new DebugConsoleSink(), _defaultMinimumLevel));
-
             Contract.Assume(bindingMethod != null);
 
             bindingMethod.WhenParentNamed(MainLoggerFactoryName);
@@ -84,7 +78,6 @@ namespace DotNetRevolution.Ninject.Serilog
             Contract.Requires(serilogLogFilePath != null);
 
             var path = Path.Combine(serilogLogFilePath, string.Format("Serilog-Error-{0}.log", Guid.NewGuid()));
-
             Contract.Assume(!string.IsNullOrWhiteSpace(path));
 
             // send Serilog errors to console

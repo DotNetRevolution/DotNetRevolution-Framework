@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Query.CodeContract
 {
     [ContractClassFor(typeof(IQueryDispatcher))]
-    public abstract class QueryDispatcherContract : IQueryDispatcher
+    internal abstract class QueryDispatcherContract : IQueryDispatcher
     {
         public void UseCatalog(IQueryCatalog catalog)
         {

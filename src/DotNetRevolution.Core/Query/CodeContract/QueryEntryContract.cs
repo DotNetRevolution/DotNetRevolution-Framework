@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Query.CodeContract
 {
     [ContractClassFor(typeof(IQueryEntry))]
-    public abstract class QueryEntryContract : IQueryEntry
+    internal abstract class QueryEntryContract : IQueryEntry
     {
         public Type QueryType
         {

@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventEntryRegistration))]
-    public abstract class DomainEventEntryRegistrationContract : IDomainEventEntryRegistration
+    internal abstract class DomainEventEntryRegistrationContract : IDomainEventEntryRegistration
     {
         public Guid Id
         {

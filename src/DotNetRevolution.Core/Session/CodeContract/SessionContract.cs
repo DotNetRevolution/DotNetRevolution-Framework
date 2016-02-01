@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Session.CodeContract
 {
     [ContractClassFor(typeof(ISession))]
-    public abstract class SessionContract : ISession
+    internal abstract class SessionContract : ISession
     {
         public string Identity
         {

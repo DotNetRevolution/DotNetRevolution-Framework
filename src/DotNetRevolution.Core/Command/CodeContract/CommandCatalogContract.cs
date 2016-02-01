@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Command.CodeContract
 {
     [ContractClassFor(typeof(ICommandCatalog))]
-    public abstract class CommandCatalogContract : ICommandCatalog
+    internal abstract class CommandCatalogContract : ICommandCatalog
     {
         public IReadOnlyCollection<Type> CommandTypes
         {

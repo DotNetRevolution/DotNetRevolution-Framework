@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Command.CodeContract
 {
     [ContractClassFor(typeof(ICommandEntry))]
-    public abstract class CommandEntryContract : ICommandEntry
+    internal abstract class CommandEntryContract : ICommandEntry
     {
         public Type CommandType
         {

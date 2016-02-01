@@ -5,7 +5,7 @@ using System.Linq;
 namespace DotNetRevolution.Core.Logging.CodeContract
 {
     [ContractClassFor(typeof(ILogger))]
-    public abstract class LoggerContract : ILogger
+    internal abstract class LoggerContract : ILogger
     {
         public void Log(LogEntryLevel logEntryLevel, string message)
         {

@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Logging.CodeContract
 {
     [ContractClassFor(typeof(ILoggerFactory))]
-    public abstract class LoggerFactoryContract : ILoggerFactory
+    internal abstract class LoggerFactoryContract : ILoggerFactory
     {
         public ILogger Create(Type type)
         {

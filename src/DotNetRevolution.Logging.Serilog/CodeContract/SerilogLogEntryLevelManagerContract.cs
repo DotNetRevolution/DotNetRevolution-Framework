@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Logging.Serilog.CodeContract
 {
     [ContractClassFor(typeof(ISerilogLogEntryLevelManager))]
-    public abstract class SerilogLogEntryLevelManagerContract : ISerilogLogEntryLevelManager
+    internal abstract class SerilogLogEntryLevelManagerContract : ISerilogLogEntryLevelManager
     {
         public LogEntryLevel GetLogEntryLevel()
         {

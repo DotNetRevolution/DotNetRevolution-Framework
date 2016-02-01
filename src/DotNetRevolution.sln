@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.MVC", "Dot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Newtonsoft.Json", "DotNetRevolution.Newtonsoft.Json\DotNetRevolution.Newtonsoft.Json.csproj", "{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventSourcing", "EventSourcing", "{143E43E5-1A24-42B4-A010-2391E44C6D9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventStore", "DotNetRevolution.EventStore\DotNetRevolution.EventStore.csproj", "{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +79,10 @@ Global
 		{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,5 +96,6 @@ Global
 		{A4676E6A-64AB-4B46-A398-D020583752B0} = {17FFDA9B-6DB6-4E7E-AA9F-0824E4504032}
 		{07090DE2-BF10-4EB3-9389-0D8B66A16C12} = {48CE0BA6-3CA2-4FAD-87CE-F927DEF47B7E}
 		{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6} = {09DFED90-577A-4612-A89F-55071E2E6529}
+		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 	EndGlobalSection
 EndGlobal

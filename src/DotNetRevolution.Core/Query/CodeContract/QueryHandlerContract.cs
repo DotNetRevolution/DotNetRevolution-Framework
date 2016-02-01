@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Query.CodeContract
 {
     [ContractClassFor(typeof(IQueryHandler))]
-    public abstract class QueryHandlerContract : IQueryHandler
+    internal abstract class QueryHandlerContract : IQueryHandler
     {
         public abstract bool Reusable { get; }
 
@@ -18,7 +18,7 @@ namespace DotNetRevolution.Core.Query.CodeContract
     }
 
     [ContractClassFor(typeof(IQueryHandler<,>))]
-    public abstract class QueryHandlerContract<TQuery, TResult> : IQueryHandler<TQuery, TResult>
+    internal abstract class QueryHandlerContract<TQuery, TResult> : IQueryHandler<TQuery, TResult>
         where TQuery : class 
         where TResult : class
     {
