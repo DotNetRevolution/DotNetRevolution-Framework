@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Command.CodeContract;
 
 namespace DotNetRevolution.Core.Command
@@ -8,8 +7,6 @@ namespace DotNetRevolution.Core.Command
     public interface ICommandAwareFactory<out T>
         where T : class
     {        
-        Type Type { [Pure] get; }
-
-        T Create(object command);
+        T Get(object command);
     }
 }

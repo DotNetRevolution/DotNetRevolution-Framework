@@ -17,7 +17,7 @@ namespace DotNetRevolution.Core.Command.CodeContract
             }
         }
 
-        public T Create(object command)
+        public T Get(object command)
         {
             Contract.Requires(command != null);
             Contract.Ensures(Contract.Result<T>() != null);

@@ -8,6 +8,6 @@ namespace DotNetRevolution.Core.Logging
     public interface ILoggerFactory
     {
         [Pure]
-        ILogger Create(Type type);
+        ILogger Get(Type type);
     }
 }

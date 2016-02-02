@@ -88,16 +88,19 @@
     <Compile Include="Command\CodeContract\CommandDispatcherContract.cs" />
     <Compile Include="Command\CodeContract\CommandEntryContract.cs" />
     <Compile Include="Command\CodeContract\CommandHandlerContract.cs" />
+    <Compile Include="Command\CodeContract\CommandHandlerFactoryContract.cs" />
     <Compile Include="Command\CommandCatalog.cs" />
     <Compile Include="Command\CommandDispatcher.cs" />
     <Compile Include="Command\CommandEntry.cs" />
     <Compile Include="Command\CommandHandler.cs" />
+    <Compile Include="Command\CommandHandlerFactory.cs" />
     <Compile Include="Command\CommandHandlingException.cs" />
     <Compile Include="Command\ICommandAwareFactory.cs" />
     <Compile Include="Command\ICommandCatalog.cs" />
     <Compile Include="Command\ICommandDispatcher.cs" />
     <Compile Include="Command\ICommandEntry.cs" />
     <Compile Include="Command\ICommandHandler.cs" />
+    <Compile Include="Command\ICommandHandlerFactory.cs" />
     <Compile Include="Domain\ActionDomainEventHandler.cs" />
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\CodeContract\DomainEventCatalogContract.cs" />
@@ -149,6 +152,7 @@
     <Compile Include="Messaging\IMessageDispatcher.cs" />
     <Compile Include="Messaging\IMessageEntry.cs" />
     <Compile Include="Messaging\IMessageHandler.cs" />
+    <Compile Include="Messaging\IMessageHandlerFactory.cs" />
     <Compile Include="Messaging\MessageCatalog.cs" />
     <Compile Include="Messaging\MessageDispatcher.cs" />
     <Compile Include="Messaging\MessageEntry.cs" />

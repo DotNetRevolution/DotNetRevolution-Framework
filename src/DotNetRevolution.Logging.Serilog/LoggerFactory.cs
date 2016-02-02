@@ -30,7 +30,7 @@ namespace DotNetRevolution.Logging.Serilog
             _enrichers = enrichers;
         }
 
-        public ILogger Create(Type type)
+        public ILogger Get(Type type)
         {
             var loggerConfiguration = new LoggerConfiguration();
             

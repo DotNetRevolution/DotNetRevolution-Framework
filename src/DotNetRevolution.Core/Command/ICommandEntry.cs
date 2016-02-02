@@ -9,6 +9,5 @@ namespace DotNetRevolution.Core.Command
     {
         Type CommandType { [Pure] get; }
         Type CommandHandlerType { [Pure] get; }
-        ICommandHandler CommandHandler { [Pure] get; set; }
     }
 }

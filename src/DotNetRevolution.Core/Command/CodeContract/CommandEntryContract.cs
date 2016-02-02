@@ -25,7 +25,5 @@ namespace DotNetRevolution.Core.Command.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public abstract ICommandHandler CommandHandler { get; set; }
     }
 }

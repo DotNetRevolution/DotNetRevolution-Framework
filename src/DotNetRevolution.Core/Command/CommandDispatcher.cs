@@ -5,26 +5,45 @@ namespace DotNetRevolution.Core.Command
 {
     public class CommandDispatcher : ICommandDispatcher
     {
-        private readonly ICommandCatalog _catalog;
+        private readonly ICommandHandlerFactory _commandHandlerFactory;
 
-        public CommandDispatcher(ICommandCatalog catalog)
+        public CommandDispatcher(ICommandHandlerFactory commandHandlerFactory)
         {
-            Contract.Requires(catalog != null);
+            Contract.Requires(commandHandlerFactory != null);
 
-            _catalog = catalog;
+            _commandHandlerFactory = commandHandlerFactory;
         }
   
         public void Dispatch(object command)
         {
+            ICommandHandler handler = GetHandler(command);
+            HandleCommand(handler, command);            
+        }
+
+        private ICommandHandler GetHandler(object command)
+        {
+            Contract.Requires(command != null);
+            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
+
             try
             {
-                // get entry
-                var entry = _catalog[command.GetType()];
-                Contract.Assume(entry != null);
-                
-                // get a command handler
-                var handler = GetHandler(entry);
+                // get handler from factory
+                return _commandHandlerFactory.Get(command.GetType());
+            }
+            catch (Exception e)
+            {
+                // rethrow exception has a command handling exception
+                throw new CommandHandlingException(command, e, "Could not get a command handler for command.");
+            }
+        }
 
+        private static void HandleCommand(ICommandHandler handler, object command)
+        {
+            Contract.Requires(handler != null);
+            Contract.Requires(command != null);
+
+            try
+            {
                 // handle command
                 handler.Handle(command);
             }
@@ -35,44 +54,10 @@ namespace DotNetRevolution.Core.Command
             }
         }
 
-        protected virtual ICommandHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
-
-            return (ICommandHandler) Activator.CreateInstance(handlerType);
-        }
-
-        private ICommandHandler GetHandler(ICommandEntry entry)
-        {
-            Contract.Requires(entry != null);
-            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
-
-            // get handler from entry
-            var handler = entry.CommandHandler;
-            
-            // if handler is cached, return handler
-            if (handler != null)
-            {
-                return handler;
-            }
-
-            // create handler
-            handler = CreateHandler(entry.CommandHandlerType);
-
-            // if handler is reusable, cache in entry
-            if (handler.Reusable)
-            {
-                entry.CommandHandler = handler;
-            }
-
-            return handler;
-        }
-
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_catalog != null);
+            Contract.Invariant(_commandHandlerFactory != null);
         }
     }
 }

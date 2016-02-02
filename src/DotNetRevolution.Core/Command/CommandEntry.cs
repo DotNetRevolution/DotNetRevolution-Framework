@@ -7,7 +7,6 @@ namespace DotNetRevolution.Core.Command
     {
         public Type CommandType { get; }
         public Type CommandHandlerType { get; }
-        public ICommandHandler CommandHandler { get; set; }
 
         public CommandEntry(Type commandType, Type commandHandlerType)
         {
@@ -16,16 +15,6 @@ namespace DotNetRevolution.Core.Command
 
             CommandType = commandType;
             CommandHandlerType = commandHandlerType;
-        }
-
-        public CommandEntry(Type commandType, ICommandHandler commandHandler)
-        {
-            Contract.Requires(commandType != null);
-            Contract.Requires(commandHandler != null);
-
-            CommandType = commandType;
-            CommandHandler = CommandHandler;
-            CommandHandlerType = commandHandler.GetType();
         }
     }
 }
