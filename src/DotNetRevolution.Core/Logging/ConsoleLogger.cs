@@ -1,39 +1,39 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Properties;
+using System;
+using System.Globalization;
 
 namespace DotNetRevolution.Core.Logging
 {
     public class ConsoleLogger : ILogger
     {
-        private const string MessageFormat = "{0}: {1}: {2}";
-
         public virtual void Log(LogEntryLevel logEntryLevel, string message)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, message);
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, message);
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContextDictionary logEntryContext)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, string.Format("{0} [{1}]", message, logEntryContext));
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, string.Format(CultureInfo.CurrentCulture, "{0} [{1}]", message, logEntryContext));
         }
 
         public virtual void Log(LogEntryLevel logEntryLevel, string message, Exception exception)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, string.Format("{0}: {1}", message, exception));
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, string.Format(CultureInfo.CurrentCulture, "{0}: {1}", message, exception));
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, string.Format("{0} [{1}]: {2}", message, logEntryContext, exception));
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, string.Format(CultureInfo.CurrentCulture, "{0} [{1}]: {2}", message, logEntryContext, exception));
         }
 
         public virtual void Log(LogEntryLevel logEntryLevel, Exception exception)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, exception);
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, exception);
         }
 
-        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContextDictionary logEntryContext)
         {
-            Console.WriteLine(MessageFormat, logEntryLevel, DateTime.Now, string.Format("[{0}]: {1}", logEntryContext, exception));
+            Console.WriteLine(Resources.LogEntryFormat, logEntryLevel, DateTime.Now, string.Format(CultureInfo.CurrentCulture, "[{0}]: {1}", logEntryContext, exception));
         }
     }
 }

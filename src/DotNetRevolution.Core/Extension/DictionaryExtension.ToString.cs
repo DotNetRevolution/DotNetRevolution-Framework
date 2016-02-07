@@ -5,14 +5,7 @@ using DotNetRevolution.Core.Helper;
 namespace DotNetRevolution.Core.Extension
 {
     public static partial class DictionaryExtension
-    {
-        private static readonly DictionaryHelper DictionaryHelper;
-
-        static DictionaryExtension()
-        {
-            DictionaryHelper = new DictionaryHelper();
-        }
-
+    {        
         public static string ToString<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, string keyValueSeparator, string sequenceSeparator)
         {
             Contract.Requires(dictionary != null);

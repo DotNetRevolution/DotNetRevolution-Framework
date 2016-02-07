@@ -66,6 +66,7 @@
     <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
     <LangVersion>default</LangVersion>
+    <CodeAnalysisRuleSet>DotNetRevolution.Core.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,16 +75,16 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>DotNetRevolution.Core.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Base\Disposable.cs" />
-    <Compile Include="Base\ImplicitUseKindFlags.cs" />
-    <Compile Include="Base\ImplicitUseTargetFlags.cs" />
+    <Compile Include="Base\ImplicitUseKinds.cs" />
+    <Compile Include="Base\ImplicitUseTargets.cs" />
     <Compile Include="Base\UsedImplicitlyAttribute.cs" />
-    <Compile Include="Command\CodeContract\CommandAwareFactoryContract.cs" />
     <Compile Include="Command\CodeContract\CommandCatalogContract.cs" />
     <Compile Include="Command\CodeContract\CommandDispatcherContract.cs" />
     <Compile Include="Command\CodeContract\CommandEntryContract.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="Command\CommandHandler.cs" />
     <Compile Include="Command\CommandHandlerFactory.cs" />
     <Compile Include="Command\CommandHandlingException.cs" />
-    <Compile Include="Command\ICommandAwareFactory.cs" />
     <Compile Include="Command\ICommandCatalog.cs" />
     <Compile Include="Command\ICommandDispatcher.cs" />
     <Compile Include="Command\ICommandEntry.cs" />
@@ -107,12 +107,16 @@
     <Compile Include="Domain\CodeContract\DomainEventDispatcherContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventEntryContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventEntryRegistrationContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventHandlerCollectionContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventHandlerFactoryContract.cs" />
     <Compile Include="Domain\DomainEventCatalog.cs" />
     <Compile Include="Domain\DomainEventDispatcher.cs" />
     <Compile Include="Domain\DomainEventEntry.cs" />
     <Compile Include="Domain\DomainEventEntryRegistration.cs" />
     <Compile Include="Domain\DomainEventHandler.cs" />
+    <Compile Include="Domain\DomainEventHandlerCollection.cs" />
+    <Compile Include="Domain\DomainEventHandlerFactory.cs" />
     <Compile Include="Domain\DomainEventHandlingException.cs" />
     <Compile Include="Domain\DomainException.cs" />
     <Compile Include="Domain\EntityCollection.cs" />
@@ -122,11 +126,14 @@
     <Compile Include="Domain\IDomainEventEntry.cs" />
     <Compile Include="Domain\IDomainEventEntryRegistration.cs" />
     <Compile Include="Domain\IDomainEventHandler.cs" />
+    <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
+    <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
     <Compile Include="Domain\NullDomainEventDispatcher.cs" />
     <Compile Include="Domain\SequentialGuid.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />
     <Compile Include="Helper\TypeHelper.cs" />
@@ -148,6 +155,7 @@
     <Compile Include="Messaging\CodeContract\MessageDispatcherContract.cs" />
     <Compile Include="Messaging\CodeContract\MessageEntryContract.cs" />
     <Compile Include="Messaging\CodeContract\MessageHandlerContract.cs" />
+    <Compile Include="Messaging\CodeContract\MessageHandlerFactoryContract.cs" />
     <Compile Include="Messaging\IMessageCatalog.cs" />
     <Compile Include="Messaging\IMessageDispatcher.cs" />
     <Compile Include="Messaging\IMessageEntry.cs" />
@@ -157,38 +165,56 @@
     <Compile Include="Messaging\MessageDispatcher.cs" />
     <Compile Include="Messaging\MessageEntry.cs" />
     <Compile Include="Messaging\MessageHandler.cs" />
+    <Compile Include="Messaging\MessageHandlerFactory.cs" />
     <Compile Include="Messaging\MessageHandlingException.cs" />
     <Compile Include="Messaging\ProcessCommandMessage.cs" />
     <Compile Include="Messaging\ProcessCommandMessageHandler.cs" />
     <Compile Include="Messaging\ProcessDomainEventMessage.cs" />
     <Compile Include="Messaging\ProcessDomainEventMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Query\CodeContract\QueryCatalogContract.cs" />
     <Compile Include="Query\CodeContract\QueryDispatcherContract.cs" />
     <Compile Include="Query\CodeContract\QueryEntryContract.cs" />
     <Compile Include="Query\CodeContract\QueryHandlerContract.cs" />
+    <Compile Include="Query\CodeContract\QueryHandlerFactoryContract.cs" />
     <Compile Include="Query\IQueryCatalog.cs" />
     <Compile Include="Query\IQueryDispatcher.cs" />
     <Compile Include="Query\IQueryEntry.cs" />
     <Compile Include="Query\IQueryHandler.cs" />
+    <Compile Include="Query\IQueryHandlerFactory.cs" />
     <Compile Include="Query\QueryCatalog.cs" />
     <Compile Include="Query\QueryDispatcher.cs" />
     <Compile Include="Query\QueryEntry.cs" />
     <Compile Include="Query\QueryHandler.cs" />
+    <Compile Include="Query\QueryHandlerFactory.cs" />
     <Compile Include="Query\QueryHandlingException.cs" />
     <Compile Include="Serialization\CodeContract\SerializerCodeContract.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
-    <Compile Include="Session\CodeContract\SessionContract.cs" />
-    <Compile Include="Session\CodeContract\SessionManagerContract.cs" />
-    <Compile Include="Session\GuidSession.cs" />
-    <Compile Include="Session\ISession.cs" />
-    <Compile Include="Session\ISessionManager.cs" />
-    <Compile Include="Session\NullSessionManagerException.cs" />
-    <Compile Include="Session\Session.cs" />
-    <Compile Include="Session\SessionManager.cs" />
+    <Compile Include="Sessions\CodeContract\SessionContract.cs" />
+    <Compile Include="Sessions\CodeContract\SessionManagerContract.cs" />
+    <Compile Include="Sessions\GuidSession.cs" />
+    <Compile Include="Sessions\ISession.cs" />
+    <Compile Include="Sessions\ISessionManager.cs" />
+    <Compile Include="Sessions\Session.cs" />
+    <Compile Include="Sessions\SessionEventArgs.cs" />
+    <Compile Include="Sessions\SessionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DotNetRevolution.Core.ruleset" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

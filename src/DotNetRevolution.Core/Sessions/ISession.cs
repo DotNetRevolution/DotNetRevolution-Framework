@@ -1,8 +1,8 @@
-﻿using DotNetRevolution.Core.Session.CodeContract;
+﻿using DotNetRevolution.Core.Sessions.CodeContract;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Session
+namespace DotNetRevolution.Core.Sessions
 {
     [ContractClass(typeof(SessionContract))]
     public interface ISession

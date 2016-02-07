@@ -10,8 +10,9 @@ namespace DotNetRevolution.Core.Command
     {
         IReadOnlyCollection<Type> CommandTypes { [Pure] get; }
         
-        ICommandEntry this[Type commandType] { [Pure] get; }
-
         void Add(ICommandEntry entry);
+
+        [Pure]
+        ICommandEntry GetEntry(Type commandType);
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace DotNetRevolution.Base
+namespace DotNetRevolution.Core.Base
 {
     [Flags]
-    public enum ImplicitUseKindFlags
+    public enum ImplicitUseKinds
     {
         Default = Access | Assign | InstantiatedWithFixedConstructorSignature,
 

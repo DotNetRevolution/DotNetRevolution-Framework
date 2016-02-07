@@ -5,28 +5,49 @@ namespace DotNetRevolution.Core.Query
 {
     public class QueryDispatcher : IQueryDispatcher
     {
-        private readonly IQueryCatalog _catalog;
+        private readonly IQueryHandlerFactory _handlerFactory;
 
-        public QueryDispatcher(IQueryCatalog queryCatalog)
+        public QueryDispatcher(IQueryHandlerFactory handlerFactory)
         {
-            Contract.Requires(queryCatalog != null);
+            Contract.Requires(handlerFactory != null);
 
-            _catalog = queryCatalog;
+            _handlerFactory = handlerFactory;
         }
 
-        public TResult Dispatch<TResult>(object query)
+        public TResult Dispatch<TResult>(object query) where TResult : class
         {
+            IQueryHandler handler = GetHandler(query);
+            return HandleQuery<TResult>(query, handler);
+        }
+        
+        private IQueryHandler GetHandler(object query)
+        {
+            Contract.Requires(query != null);
+            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
+
             try
             {
-                // get entry
-                var entry = _catalog[query.GetType()];
-                Contract.Assume(entry != null);
+                // get handler from factory
+                return _handlerFactory.GetHandler(query.GetType());
+            }
+            catch (Exception e)
+            {
+                // rethrow exception has a query handling exception
+                throw new QueryHandlingException(query, e, "Could not get a query handler for query.");
+            }
+        }
 
-                // get a query handler
-                var handler = GetHandler(entry);
+        private static TResult HandleQuery<TResult>(object query, IQueryHandler handler)
+            where TResult : class
+        {
+            Contract.Requires(handler != null);
+            Contract.Requires(query != null);
+            Contract.Ensures(Contract.Result<TResult>() != null);
 
+            try
+            {
                 // handle query
-                return (TResult)handler.Handle(query);
+                return (TResult) handler.Handle(query);
             }
             catch (Exception e)
             {
@@ -35,44 +56,10 @@ namespace DotNetRevolution.Core.Query
             }
         }
 
-        protected virtual IQueryHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
-
-            return (IQueryHandler) Activator.CreateInstance(handlerType);
-        }
-
-        private IQueryHandler GetHandler(IQueryEntry entry)
-        {
-            Contract.Requires(entry != null);
-            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
-
-            // get handler from entry
-            var handler = entry.QueryHandler;
-
-            // if handler is cached, return handler
-            if (handler != null)
-            {
-                return handler;
-            }
-
-            // create handler
-            handler = CreateHandler(entry.QueryHandlerType);
-
-            // if handler is reusable, cache in entry
-            if (handler.Reusable)
-            {
-                entry.QueryHandler = handler;
-            }
-
-            return handler;
-        }
-
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_catalog != null);
+            Contract.Invariant(_handlerFactory != null);
         }
     }
 }

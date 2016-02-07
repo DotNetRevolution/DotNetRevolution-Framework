@@ -12,9 +12,7 @@ using System.IO;
 namespace DotNetRevolution.Ninject.Serilog
 {
     public class SerilogModule : NinjectModule
-    {
-        public const string MainLoggerFactoryName = "MainLoggerFactory";
-        
+    {        
         private readonly LogEventLevel _defaultMinimumLevel;
 
         public SerilogModule(string serilogLogFilePath,
@@ -47,7 +45,7 @@ namespace DotNetRevolution.Ninject.Serilog
             var bindingTo = binding.To<LoggerFactory>();
             Contract.Assume(bindingTo != null);
 
-            bindingTo.Named(MainLoggerFactoryName);
+            bindingTo.Named(LogFactoryName.Main.ToString());
         }
 
         private void BindLogEntryLevelManager()
@@ -70,7 +68,7 @@ namespace DotNetRevolution.Ninject.Serilog
             var bindingMethod = binding.ToMethod(context => new SinkWrapper(new DebugConsoleSink(), _defaultMinimumLevel));
             Contract.Assume(bindingMethod != null);
 
-            bindingMethod.WhenParentNamed(MainLoggerFactoryName);
+            bindingMethod.WhenParentNamed(LogFactoryName.Main.ToString());
         }
 
         private static void SetSerilogInternalLogger(string serilogLogFilePath)

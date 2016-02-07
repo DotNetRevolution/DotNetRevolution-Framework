@@ -28,7 +28,7 @@ namespace DotNetRevolution.Ninject.Serilog
             var bindingMethod = binding.ToMethod(context => new SinkWrapper(new EmailSink(_emailConnectionInfo), _defaultMinimumLevel));
             Contract.Assume(bindingMethod != null);
 
-            bindingMethod.WhenParentNamed(SerilogModule.MainLoggerFactoryName);            
+            bindingMethod.WhenParentNamed(LogFactoryName.Main.ToString());            
         }
     }
 }

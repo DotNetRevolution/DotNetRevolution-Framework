@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.Core.Session;
+using DotNetRevolution.Core.Sessions;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Display;
@@ -43,7 +43,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         {
             Contract.Ensures(Contract.Result<RollingFileSink>() != null);
 
-            var session = _sessionManager.GetCurrentSession();
+            var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Identity;
             Contract.Assume(sessionId != null);
@@ -64,10 +64,11 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             return sink;
         }
 
-        private void SessionReleased(object sender, ISession session)
+        private void SessionReleased(object sender, SessionEventArgs e)
         {
-            Contract.Requires(session != null);
-            Contract.Requires(session.Identity != null);
+            Contract.Requires(e?.Session?.Identity != null);
+
+            var session = e.Session;
 
             RollingFileSink sink;
 

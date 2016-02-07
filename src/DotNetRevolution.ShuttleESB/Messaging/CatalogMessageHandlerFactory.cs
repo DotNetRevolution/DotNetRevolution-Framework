@@ -48,7 +48,6 @@ namespace DotNetRevolution.ShuttleESB.Messaging
 
             // create handler
             handler = CreateHandler(entry.MessageHandlerType);
-
             Contract.Assume(handler != null);
 
             // if handler is reusable, cache in entry

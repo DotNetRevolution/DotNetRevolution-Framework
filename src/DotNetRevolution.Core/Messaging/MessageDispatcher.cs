@@ -5,13 +5,13 @@ namespace DotNetRevolution.Core.Messaging
 {
     public class MessageDispatcher : IMessageDispatcher
     {
-        private readonly IMessageCatalog _catalog;
+        private readonly IMessageHandlerFactory _handlerFactory;
 
-        public MessageDispatcher(IMessageCatalog catalog)
+        public MessageDispatcher(IMessageHandlerFactory handlerFactory)
         {
-            Contract.Requires(catalog != null);
+            Contract.Requires(handlerFactory != null);
 
-            _catalog = catalog;
+            _handlerFactory = handlerFactory;
         }
         
         public void Dispatch(object message)
@@ -24,15 +24,34 @@ namespace DotNetRevolution.Core.Messaging
 
         public void Dispatch(object message, string correlationId)
         {
+            IMessageHandler handler = GetHandler(message);
+            HandleMessage(message, handler, correlationId);
+        }
+
+        private IMessageHandler GetHandler(object message)
+        {
+            Contract.Requires(message != null);
+            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
+
             try
             {
-                // get entry
-                var entry = _catalog[message.GetType()];
-                Contract.Assume(entry != null);
-                
-                // get a message handler
-                var handler = GetHandler(entry);
+                // get handler from factory
+                return _handlerFactory.GetHandler(message.GetType());
+            }
+            catch (Exception e)
+            {
+                // rethrow exception has a message handling exception
+                throw new MessageHandlingException(message, e, "Could not get a message handler for message.");
+            }
+        }
 
+        private static void HandleMessage(object message, IMessageHandler handler, string correlationId)
+        {
+            Contract.Requires(handler != null);
+            Contract.Requires(message != null);
+
+            try
+            {
                 // handle message
                 handler.Handle(message, correlationId);
             }
@@ -43,44 +62,10 @@ namespace DotNetRevolution.Core.Messaging
             }
         }
 
-        protected virtual IMessageHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
-
-            return (IMessageHandler)Activator.CreateInstance(handlerType);
-        }
-
-        private IMessageHandler GetHandler(IMessageEntry entry)
-        {
-            Contract.Requires(entry != null);
-            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
-
-            // get handler from entry
-            var handler = entry.MessageHandler;
-
-            // if handler is cached, return handler
-            if (handler != null)
-            {
-                return handler;
-            }
-
-            // create handler
-            handler = CreateHandler(entry.MessageHandlerType);
-
-            // if handler is reusable, cache in entry
-            if (handler.Reusable)
-            {
-                entry.MessageHandler = handler;
-            }
-
-            return handler;
-        }
-        
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_catalog != null);
+            Contract.Invariant(_handlerFactory != null);
         }
     }
 }

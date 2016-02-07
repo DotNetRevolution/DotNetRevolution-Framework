@@ -8,16 +8,22 @@ namespace DotNetRevolution.Logging.Serilog.CodeContract
     [ContractClassFor(typeof(ISerilogLogEntryLevelManager))]
     internal abstract class SerilogLogEntryLevelManagerContract : ISerilogLogEntryLevelManager
     {
-        public LogEntryLevel GetLogEntryLevel()
+        public LogEntryLevel LogEntryLevel
         {
-            throw new NotImplementedException();
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public LoggingLevelSwitch GetLoggingLevelSwitch()
+        public LoggingLevelSwitch LoggingLevelSwitch
         {
-            Contract.Ensures(Contract.Result<LoggingLevelSwitch>() != null);
+            get
+            {
+                Contract.Ensures(Contract.Result<LoggingLevelSwitch>() != null);
 
-            throw new NotImplementedException();
+                throw new NotImplementedException();
+            }
         }
 
         public void SetLogEntryLevel(LogLevel logLevel, LogEntryLevel logEntryLevel)

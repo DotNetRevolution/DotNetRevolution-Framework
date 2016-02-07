@@ -9,7 +9,7 @@ namespace DotNetRevolution.MVC.ActionFilter
     /// You need to decorate your GET actions with this when using the <see cref="ValidateModelStateAttribute"/>.
     /// </summary>
     /// <remarks>
-    /// Useful when following the PRG (Post, Redirect, Get) pattern.
+    /// Useful when following the PRG (Post, Redirect, GetHandler) pattern.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public sealed class ImportModelStateFromTempDataAttribute : ModelStateTempDataTransferAttribute

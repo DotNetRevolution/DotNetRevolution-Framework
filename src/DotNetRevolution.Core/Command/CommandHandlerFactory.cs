@@ -19,9 +19,9 @@ namespace DotNetRevolution.Core.Command
             _handlers = new Dictionary<Type, ICommandHandler>();
         }
 
-        public ICommandHandler Get(object command)
+        public ICommandHandler GetHandler(object command)
         {
-            ICommandEntry entry = GetEntry(command);
+            var entry = GetEntry(command);
 
             return GetHandler(entry.CommandHandlerType);
         }
@@ -90,7 +90,7 @@ namespace DotNetRevolution.Core.Command
             Contract.Requires(command != null);
             Contract.Ensures(Contract.Result<ICommandEntry>() != null);
 
-            var entry = Catalog[command.GetType()];
+            var entry = Catalog.GetEntry(command.GetType());
             Contract.Assume(entry != null);
 
             return entry;

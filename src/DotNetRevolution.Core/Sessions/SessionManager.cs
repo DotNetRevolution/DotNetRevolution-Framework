@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace DotNetRevolution.Core.Session
+namespace DotNetRevolution.Core.Sessions
 {
     public class SessionManager : ISessionManager
     {
@@ -24,6 +24,14 @@ namespace DotNetRevolution.Core.Session
             }
         }
 
+        public virtual ISession Current
+        {
+            get
+            {
+                return _currentSession;
+            }
+        }
+
         public SessionManager()
         {
             _sessions = new List<ISession>();
@@ -36,15 +44,10 @@ namespace DotNetRevolution.Core.Session
             Contract.Requires(currentSession != null);
 
             _currentSession = currentSession;
-            Add(currentSession);
+            _sessions.Add(currentSession);
         }
 
-        public virtual ISession GetCurrentSession()
-        {
-            return _currentSession;
-        }
-
-        public event EventHandler<ISession> SessionReleased;
+        public event EventHandler<SessionEventArgs> SessionReleased;
 
         public void Add(ISession session)
         {
@@ -57,7 +60,7 @@ namespace DotNetRevolution.Core.Session
         {
             if (_sessions.Remove(_sessions.FirstOrDefault(x => x.Identity == session.Identity)))
             {
-                SessionReleased(this, session);
+                SessionReleased(this, new SessionEventArgs(session));
             }
 
             Contract.Assume(this[session.Identity] == null);

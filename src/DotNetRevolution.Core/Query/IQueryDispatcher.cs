@@ -6,6 +6,6 @@ namespace DotNetRevolution.Core.Query
     [ContractClass(typeof(QueryDispatcherContract))]
     public interface IQueryDispatcher
     {
-        TResult Dispatch<TResult>(object query);
+        TResult Dispatch<TResult>(object query) where TResult : class;
     }
 }

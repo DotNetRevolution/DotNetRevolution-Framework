@@ -7,12 +7,7 @@ namespace DotNetRevolution.Core.Helper
 {
     public static class TypeHelper
     {
-        private static readonly Dictionary<string, Type> Types;
-
-        static TypeHelper()
-        {
-            Types = new Dictionary<string, Type>();   
-        }
+        private static readonly Dictionary<string, Type> Types = new Dictionary<string, Type>();
 
         public static Type Find(string typeFullName)
         {

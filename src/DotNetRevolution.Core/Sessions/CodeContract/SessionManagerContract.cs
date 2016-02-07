@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Session.CodeContract
+namespace DotNetRevolution.Core.Sessions.CodeContract
 {
     [ContractClassFor(typeof(ISessionManager))]
     internal abstract class SessionManagerContract : ISessionManager
@@ -17,6 +17,14 @@ namespace DotNetRevolution.Core.Session.CodeContract
             }
         }
 
+        public ISession Current
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public IReadOnlyCollection<ISession> Sessions
         {
             get
@@ -27,17 +35,12 @@ namespace DotNetRevolution.Core.Session.CodeContract
             }
         }
 
-        public event EventHandler<ISession> SessionReleased;
+        public event EventHandler<SessionEventArgs> SessionReleased;
 
         public void Add(ISession session)
         {
             Contract.Requires(session != null);
             Contract.Ensures(this[session.Identity] != null);
-        }
-
-        public ISession GetCurrentSession()
-        {            
-            throw new NotImplementedException();
         }
 
         public void Remove(ISession session)

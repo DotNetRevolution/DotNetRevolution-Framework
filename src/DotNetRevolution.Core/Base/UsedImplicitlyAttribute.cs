@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotNetRevolution.Base
+namespace DotNetRevolution.Core.Base
 {
     /// <summary>
     /// Indicates that the marked symbol is used implicitly (e.g. via reflection, in external library),
@@ -10,31 +10,31 @@ namespace DotNetRevolution.Base
     public sealed class UsedImplicitlyAttribute : Attribute
     {
         public UsedImplicitlyAttribute()
-            : this(ImplicitUseKindFlags.Default, ImplicitUseTargetFlags.Default)
+            : this(ImplicitUseKinds.Default, ImplicitUseTargets.Default)
         {
         }
 
-        public UsedImplicitlyAttribute(ImplicitUseKindFlags useKindFlags, ImplicitUseTargetFlags targetFlags)
+        public UsedImplicitlyAttribute(ImplicitUseKinds useKind, ImplicitUseTargets target)
         {
-            UseKindFlags = useKindFlags;
-            TargetFlags = targetFlags;
+            UseKind = useKind;
+            Target = target;
         }
 
-        public UsedImplicitlyAttribute(ImplicitUseKindFlags useKindFlags)
-            : this(useKindFlags, ImplicitUseTargetFlags.Default)
+        public UsedImplicitlyAttribute(ImplicitUseKinds useKind)
+            : this(useKind, ImplicitUseTargets.Default)
         {
         }
         
-        public UsedImplicitlyAttribute(ImplicitUseTargetFlags targetFlags)
-            : this(ImplicitUseKindFlags.Default, targetFlags)
+        public UsedImplicitlyAttribute(ImplicitUseTargets target)
+            : this(ImplicitUseKinds.Default, target)
         {
         }
 
-        public ImplicitUseKindFlags UseKindFlags { get; private set; }
+        public ImplicitUseKinds UseKind { get; private set; }
 
         /// <summary>
         /// Gets value indicating what is meant to be used
         /// </summary>
-        public ImplicitUseTargetFlags TargetFlags { get; private set; }
+        public ImplicitUseTargets Target { get; private set; }
     }
 }

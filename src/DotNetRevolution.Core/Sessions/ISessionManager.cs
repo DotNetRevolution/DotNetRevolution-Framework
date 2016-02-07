@@ -1,9 +1,9 @@
-﻿using DotNetRevolution.Core.Session.CodeContract;
+﻿using DotNetRevolution.Core.Sessions.CodeContract;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Session
+namespace DotNetRevolution.Core.Sessions
 {
     [ContractClass(typeof(SessionManagerContract))]
     public interface ISessionManager
@@ -15,8 +15,8 @@ namespace DotNetRevolution.Core.Session
         void Add(ISession session);
         void Remove(ISession session);
 
-        ISession GetCurrentSession();
+        ISession Current { [Pure] get; }
         
-        event EventHandler<ISession> SessionReleased;
+        event EventHandler<SessionEventArgs> SessionReleased;
     }
 }

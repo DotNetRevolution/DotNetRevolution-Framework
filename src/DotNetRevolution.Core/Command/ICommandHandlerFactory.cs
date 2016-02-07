@@ -4,8 +4,10 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Command
 {
     [ContractClass(typeof(CommandHandlerFactoryContract))]
-    public interface ICommandHandlerFactory : ICommandAwareFactory<ICommandHandler>
+    public interface ICommandHandlerFactory
     {
         ICommandCatalog Catalog { [Pure] get; }
+
+        ICommandHandler GetHandler(object command);
     }
 }

@@ -10,7 +10,5 @@ namespace DotNetRevolution.Core.Messaging
         Type MessageType { [Pure] get; }
 
         Type MessageHandlerType { [Pure] get; }
-
-        IMessageHandler MessageHandler { [Pure] get; set; }
     }
 }

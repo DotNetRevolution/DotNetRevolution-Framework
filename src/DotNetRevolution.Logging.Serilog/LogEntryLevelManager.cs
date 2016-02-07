@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Base;
 using DotNetRevolution.Core.Logging;
-using DotNetRevolution.Core.Session;
+using DotNetRevolution.Core.Sessions;
 using DotNetRevolution.Logging.Serilog.Extension;
 using Serilog.Core;
 using Serilog.Events;
@@ -18,6 +18,28 @@ namespace DotNetRevolution.Logging.Serilog
         private readonly Dictionary<string, LoggingLevelSwitch> _sessionLogSwitches;
 
         private readonly LoggingLevelSwitch _applicationSwitch;
+
+        public LogEntryLevel LogEntryLevel
+        {
+            get
+            {
+                var logSwitch = FindLoggingLevelSwitch();
+
+                return logSwitch == null
+                    ? _applicationSwitch.MinimumLevel.ToLogEntryLevel()
+                    : logSwitch.MinimumLevel.ToLogEntryLevel();
+            }
+        }
+
+        public LoggingLevelSwitch LoggingLevelSwitch
+        {
+            get
+            {
+                var logSwitch = FindLoggingLevelSwitch();
+
+                return logSwitch ?? _applicationSwitch;
+            }
+        }
 
         public LogEntryLevelManager(ISessionManager sessionManager,
                                     LogEntryLevel applicationLogEntryLevel)
@@ -34,22 +56,6 @@ namespace DotNetRevolution.Logging.Serilog
             SetLogEntryLevel(LogLevel.Application, applicationLogEntryLevel);
         }
         
-        public LogEntryLevel GetLogEntryLevel()
-        {
-            var logSwitch = FindLoggingLevelSwitch();
-
-            return logSwitch != null 
-                ? logSwitch.MinimumLevel.ToLogEntryLevel() 
-                : _applicationSwitch.MinimumLevel.ToLogEntryLevel();
-        }
-
-        public LoggingLevelSwitch GetLoggingLevelSwitch()
-        {
-            var logSwitch = FindLoggingLevelSwitch();
-
-            return logSwitch ?? _applicationSwitch;
-        }
-
         public void SetLogEntryLevel(LogLevel logLevel, LogEntryLevel logEntryLevel)
         {
             switch (logLevel)
@@ -101,7 +107,7 @@ namespace DotNetRevolution.Logging.Serilog
         {
             LoggingLevelSwitch logSwitch;
 
-            var session = _sessionManager.GetCurrentSession();
+            var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Identity;
             Contract.Assume(sessionId != null);
@@ -118,12 +124,11 @@ namespace DotNetRevolution.Logging.Serilog
                        : null;
         }
 
-        private void SessionReleased(object sender, ISession session)
+        private void SessionReleased(object sender, SessionEventArgs e)
         {
-            Contract.Requires(session != null);
-            Contract.Requires(session.Identity != null);
+            Contract.Requires(e?.Session?.Identity != null);
 
-            _sessionLogSwitches.Remove(session.Identity);
+            _sessionLogSwitches.Remove(e.Session.Identity);
         }
 
         private static void SetLogEntryLevel(Dictionary<string, LoggingLevelSwitch> dictionary, LogEventLevel logEntryLevel, string context)

@@ -5,19 +5,14 @@ namespace DotNetRevolution.Core.Helper
 {
     public static class BooleanHelper
     {
-        private static readonly Collection<string> TrueValues;
-
-        static BooleanHelper()
-        {
-            TrueValues = new Collection<string>
+        private static readonly Collection<string> TrueValues = new Collection<string>
                 {
                     "T",
                     "YES",
                     "Y",
                     "1"
                 };
-        }
-
+        
         public static bool IsTrue(string value)
         {
             Contract.Requires(value != null);

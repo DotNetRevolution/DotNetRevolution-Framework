@@ -16,8 +16,11 @@ namespace DotNetRevolution.Core.Command.CodeContract
             }
         }
 
-        public ICommandHandler Get(object command)
+        public ICommandHandler GetHandler(object command)
         {
+            Contract.Requires(command != null);
+            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
+
             throw new NotImplementedException();
         }
     }

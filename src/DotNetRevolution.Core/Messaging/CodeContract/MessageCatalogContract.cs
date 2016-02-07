@@ -6,20 +6,17 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
     [ContractClassFor(typeof(IMessageCatalog))]
     internal abstract class MessageCatalogContract : IMessageCatalog
     {
-        public IMessageEntry this[Type messageType]
+        public IMessageEntry GetEntry(Type messageType)
         {
-            get
-            {
-                Contract.Requires(messageType != null);
+            Contract.Requires(messageType != null);
 
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
 
         public void Add(IMessageEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(this[entry.MessageType] != null);
+            Contract.Ensures(GetEntry(entry.MessageType) != null);
         }
     }
 }

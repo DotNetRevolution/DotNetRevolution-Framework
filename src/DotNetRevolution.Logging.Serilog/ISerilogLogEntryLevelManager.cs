@@ -8,6 +8,6 @@ namespace DotNetRevolution.Logging.Serilog
     [ContractClass(typeof(SerilogLogEntryLevelManagerContract))]
     public interface ISerilogLogEntryLevelManager : ILogEntryLevelManager
     {
-        LoggingLevelSwitch GetLoggingLevelSwitch();
+        LoggingLevelSwitch LoggingLevelSwitch { [Pure] get; }
     }
 }

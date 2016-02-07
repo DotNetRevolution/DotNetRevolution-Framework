@@ -21,7 +21,7 @@ namespace DotNetRevolution.Core.Domain
             var baseDate = new DateTime(1900, 1, 1);
             var now = DateTime.Now.ToUniversalTime();
 
-            // Get the days and milliseconds which will be used to build the byte string 
+            // GetHandler the days and milliseconds which will be used to build the byte string 
             var days = new TimeSpan(now.Ticks - baseDate.Ticks);
             var msecs = now.TimeOfDay;
 

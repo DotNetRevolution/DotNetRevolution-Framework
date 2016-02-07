@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Logging
         {
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContextDictionary logEntryContext)
         {
         }
 
@@ -16,7 +16,7 @@ namespace DotNetRevolution.Core.Logging
         {
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext)
         {
         }
 
@@ -24,7 +24,7 @@ namespace DotNetRevolution.Core.Logging
         {
         }
 
-        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContextDictionary logEntryContext)
         {
         }
     }

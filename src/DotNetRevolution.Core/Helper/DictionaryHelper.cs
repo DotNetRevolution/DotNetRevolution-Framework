@@ -2,12 +2,13 @@
 using System.Diagnostics.Contracts;
 using System.Text;
 using DotNetRevolution.Core.Extension;
+using System.Globalization;
 
 namespace DotNetRevolution.Core.Helper
 {
-    public class DictionaryHelper
+    public static class DictionaryHelper
     {
-        public string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary, string keyValueSeparator, string sequenceSeparator)
+        public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary, string keyValueSeparator, string sequenceSeparator)
         {
             Contract.Requires(dictionary != null);
             Contract.Requires(sequenceSeparator != null);
@@ -17,7 +18,7 @@ namespace DotNetRevolution.Core.Helper
 
             var stringBuilder = new StringBuilder();
 
-            dictionary.ForEach(x => stringBuilder.AppendFormat("{0}{1}{2}{3}", x.Key.ToString(), keyValueSeparator, x.Value.ToString(), sequenceSeparator));
+            dictionary.ForEach(x => stringBuilder.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}{2}{3}", x.Key.ToString(), keyValueSeparator, x.Value.ToString(), sequenceSeparator));
 
             var stringLength = stringBuilder.Length - sequenceSeparator.Length;
 

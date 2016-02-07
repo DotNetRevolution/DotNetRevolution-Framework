@@ -30,7 +30,7 @@ namespace DotNetRevolution.Logging.Serilog
             _enrichers = enrichers;
         }
 
-        public ILogger Get(Type type)
+        public ILogger GetLogger(Type type)
         {
             var loggerConfiguration = new LoggerConfiguration();
             
@@ -67,7 +67,7 @@ namespace DotNetRevolution.Logging.Serilog
             var loggerMinimumLevelConfiguration = configuration.MinimumLevel;
             Contract.Assume(loggerMinimumLevelConfiguration != null);
 
-            loggerMinimumLevelConfiguration.ControlledBy(_logEntryLevelManager.GetLoggingLevelSwitch());
+            loggerMinimumLevelConfiguration.ControlledBy(_logEntryLevelManager.LoggingLevelSwitch);
         }
 
         private void AddEnrichers(LoggerConfiguration configuration)

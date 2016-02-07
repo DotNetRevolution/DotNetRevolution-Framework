@@ -16,24 +16,21 @@ namespace DotNetRevolution.Core.Domain.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public IReadOnlyCollection<IDomainEventEntry> this[Type domainEventType]
-        {
-            get
-            {
-                Contract.Requires(domainEventType != null);
-                Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
+        
         public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(this[entry.DomainEventType] != null);
+            Contract.Ensures(GetEntries(entry.DomainEventType) != null);
             Contract.Ensures(Contract.Result<IDomainEventEntryRegistration>() != null);
             
+            throw new NotImplementedException();
+        }
+
+        public IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType)
+        {
+            Contract.Requires(domainEventType != null);
+            Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>() != null);
+
             throw new NotImplementedException();
         }
 

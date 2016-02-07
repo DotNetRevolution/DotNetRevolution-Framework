@@ -5,19 +5,19 @@ namespace DotNetRevolution.Core.Command
 {
     public class CommandDispatcher : ICommandDispatcher
     {
-        private readonly ICommandHandlerFactory _commandHandlerFactory;
+        private readonly ICommandHandlerFactory _handlerFactory;
 
-        public CommandDispatcher(ICommandHandlerFactory commandHandlerFactory)
+        public CommandDispatcher(ICommandHandlerFactory handlerFactory)
         {
-            Contract.Requires(commandHandlerFactory != null);
+            Contract.Requires(handlerFactory != null);
 
-            _commandHandlerFactory = commandHandlerFactory;
+            _handlerFactory = handlerFactory;
         }
   
         public void Dispatch(object command)
         {
             ICommandHandler handler = GetHandler(command);
-            HandleCommand(handler, command);            
+            HandleCommand(command, handler);            
         }
 
         private ICommandHandler GetHandler(object command)
@@ -28,7 +28,7 @@ namespace DotNetRevolution.Core.Command
             try
             {
                 // get handler from factory
-                return _commandHandlerFactory.Get(command.GetType());
+                return _handlerFactory.GetHandler(command.GetType());
             }
             catch (Exception e)
             {
@@ -37,7 +37,7 @@ namespace DotNetRevolution.Core.Command
             }
         }
 
-        private static void HandleCommand(ICommandHandler handler, object command)
+        private static void HandleCommand(object command, ICommandHandler handler)
         {
             Contract.Requires(handler != null);
             Contract.Requires(command != null);
@@ -57,7 +57,7 @@ namespace DotNetRevolution.Core.Command
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_commandHandlerFactory != null);
+            Contract.Invariant(_handlerFactory != null);
         }
     }
 }

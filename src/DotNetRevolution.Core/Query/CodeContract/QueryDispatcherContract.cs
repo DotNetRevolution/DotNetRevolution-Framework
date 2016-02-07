@@ -10,7 +10,7 @@ namespace DotNetRevolution.Core.Query.CodeContract
             Contract.Requires(catalog != null);
         }
 
-        public TResult Dispatch<TResult>(object query)
+        public TResult Dispatch<TResult>(object query) where TResult : class
         {
             Contract.Requires(query != null);
 

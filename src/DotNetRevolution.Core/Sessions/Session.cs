@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Session
+namespace DotNetRevolution.Core.Sessions
 {
     public class Session : ISession
     {

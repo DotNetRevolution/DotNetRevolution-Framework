@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Session.CodeContract
+namespace DotNetRevolution.Core.Sessions.CodeContract
 {
     [ContractClassFor(typeof(ISession))]
     internal abstract class SessionContract : ISession

@@ -6,9 +6,12 @@ namespace DotNetRevolution.Core.Logging.CodeContract
     [ContractClassFor(typeof(ILogEntryLevelManager))]
     internal abstract class LogEntryLevelManagerContract : ILogEntryLevelManager
     {
-        public LogEntryLevel GetLogEntryLevel()
+        public LogEntryLevel LogEntryLevel
         {
-            throw new NotImplementedException();
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void SetLogEntryLevel(LogLevel logLevel, LogEntryLevel logEntryLevel)

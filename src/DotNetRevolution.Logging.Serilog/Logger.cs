@@ -24,7 +24,7 @@ namespace DotNetRevolution.Logging.Serilog
             WriteLogEntry(logEntryLevel, message, null, null);
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContextDictionary logEntryContext)
         {
             WriteLogEntry(logEntryLevel, message, null, logEntryContext);
         }
@@ -34,7 +34,7 @@ namespace DotNetRevolution.Logging.Serilog
             WriteLogEntry(logEntryLevel, message, exception, null);
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext)
         {
             WriteLogEntry(logEntryLevel, message, exception, logEntryContext);
         }
@@ -44,12 +44,12 @@ namespace DotNetRevolution.Logging.Serilog
             WriteLogEntry(logEntryLevel, string.Empty, exception, null);
         }
 
-        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContextDictionary logEntryContext)
         {
             WriteLogEntry(logEntryLevel, string.Empty, exception, logEntryContext);
         }
 
-        private void WriteLogEntry(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext)
+        private void WriteLogEntry(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext)
         {
             var logger = logEntryContext == null
                              ? _logger

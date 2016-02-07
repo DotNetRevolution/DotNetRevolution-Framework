@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DotNetRevolution.Core.Session;
+using DotNetRevolution.Core.Sessions;
 using System.Diagnostics.Contracts;
 using System.Web.SessionState;
 

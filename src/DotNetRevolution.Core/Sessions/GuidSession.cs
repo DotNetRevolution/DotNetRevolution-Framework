@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotNetRevolution.Core.Session
+namespace DotNetRevolution.Core.Sessions
 {
     public class GuidSession : Session
     {

@@ -1,4 +1,4 @@
-﻿using DotNetRevolution.Base;
+﻿using DotNetRevolution.Core.Base;
 
 namespace DotNetRevolution.EventStore.Entity
 {

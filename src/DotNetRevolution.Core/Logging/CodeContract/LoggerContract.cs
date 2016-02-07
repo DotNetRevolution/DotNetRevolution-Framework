@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Logging.CodeContract
             throw new NotImplementedException();
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, LogEntryContextDictionary logEntryContext)
         {
             Contract.Requires(message != null);
             Contract.Requires(logEntryContext != null);
@@ -31,7 +31,7 @@ namespace DotNetRevolution.Core.Logging.CodeContract
             throw new NotImplementedException();
         }
 
-        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext)
         {
             Contract.Requires(message != null);
             Contract.Requires(exception != null);
@@ -48,7 +48,7 @@ namespace DotNetRevolution.Core.Logging.CodeContract
             throw new NotImplementedException();
         }
 
-        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContext logEntryContext)
+        public void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContextDictionary logEntryContext)
         {
             Contract.Requires(exception != null);
             Contract.Requires(logEntryContext != null);

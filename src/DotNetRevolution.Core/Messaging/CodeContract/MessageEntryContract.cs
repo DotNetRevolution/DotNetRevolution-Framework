@@ -25,7 +25,5 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public abstract IMessageHandler MessageHandler { get; set; }
     }
 }

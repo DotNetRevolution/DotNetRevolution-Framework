@@ -16,21 +16,19 @@ namespace DotNetRevolution.Core.Command.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public ICommandEntry this[Type commandType]
-        {
-            get
-            {
-                Contract.Requires(commandType != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
+        
         public void Add(ICommandEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(this[entry.CommandType] != null);         
+            Contract.Ensures(GetEntry(entry.CommandType) != null);
+        }
+
+        [Pure]
+        public ICommandEntry GetEntry(Type commandType)
+        {
+            Contract.Requires(commandType != null);
+
+            throw new NotImplementedException();
         }
     }
 }

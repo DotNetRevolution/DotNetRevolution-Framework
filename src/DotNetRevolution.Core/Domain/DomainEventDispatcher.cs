@@ -7,18 +7,19 @@ namespace DotNetRevolution.Core.Domain
 {
     public class DomainEventDispatcher : IDomainEventDispatcher
     {
-        private readonly IDomainEventCatalog _catalog;
+        private readonly IDomainEventHandlerFactory _handlerFactory;
 
-        public DomainEventDispatcher(IDomainEventCatalog catalog)
+        public DomainEventDispatcher(IDomainEventHandlerFactory handlerFactory)
         {
-            Contract.Requires(catalog != null);
+            Contract.Requires(handlerFactory != null);
 
-            _catalog = catalog;
+            _handlerFactory = handlerFactory;
         }
         
         public void Publish(object domainEvent)
         {
-            HandlePublishEvent(domainEvent);
+            var handlers = GetHandlers(domainEvent);
+            HandleDomainEvent(domainEvent, handlers);
         }
         
         public void PublishAll(IEnumerable<object> domainEvents)
@@ -27,99 +28,77 @@ namespace DotNetRevolution.Core.Domain
             foreach (var domainEvent in domainEvents)
             {
                 Contract.Assume(domainEvent != null);
-
+                
                 Publish(domainEvent);
             }
         }
         
-        private void HandlePublishEvent(object domainEvent)
+        private IDomainEventHandlerCollection GetHandlers(object domainEvent)
         {
             Contract.Requires(domainEvent != null);
+            Contract.Ensures(Contract.Result<IDomainEventHandlerCollection>() != null);
 
-            // get type of domain event
-            var domainEventType = domainEvent.GetType();
-
-            // find entries in catalog based on domain event type
-            do
+            try
             {
-                IReadOnlyCollection<IDomainEventEntry> entries;
-
-                if (!_catalog.TryGetEntries(domainEventType, out entries))
-                {
-                    // no entries, try base type if any
-                    continue;
-                }
-                
-                Contract.Assume(entries != null);
-
-                var exceptions = new List<Exception>();
-
-                // execute handlers
-                foreach (var entry in entries)
-                {
-                    Contract.Assume(entry != null);
-
-                    try
-                    {    
-                        // get a domain event handler
-                        var handler = GetHandler(entry);
-
-                        // handle domain event
-                        handler.Handle(domainEvent);
-                    }
-                    catch (Exception ex)
-                    {
-                        exceptions.Add(ex);
-                    }
-                }
-
-                if (exceptions.Any())
-                {
-                    // re-throw exceptions
-                    throw new AggregateException("One or more domain event handling exceptions occurred.", exceptions);
-                }
-
-                // while base type is not null or object, attempt to find entries.  this is for backwards compatibility
-            } while ((domainEventType = domainEventType.BaseType) != null && domainEventType != typeof(object));
+                // get handler from factory
+                return _handlerFactory.GetDomainEventHandlers(domainEvent.GetType());
+            }
+            catch (Exception e)
+            {
+                // rethrow exception has a domain event handling exception
+                throw new DomainEventHandlingException(domainEvent, e, "Could not get a domain event handler for domain event.");
+            }
         }
 
-        protected virtual IDomainEventHandler CreateHandler(Type handlerType)
+        private static void HandleDomainEvent(object domainEvent, IDomainEventHandlerCollection handlers)
         {
-            Contract.Requires(handlerType != null);
+            Contract.Requires(handlers != null);
+            Contract.Requires(domainEvent != null);
 
-            return (IDomainEventHandler) Activator.CreateInstance(handlerType);
+            var exceptions = new List<Exception>();
+
+            foreach(var handler in handlers)
+            {
+                Contract.Assume(handler != null);
+
+                try
+                {
+                    HandleDomainEvent(domainEvent, handler);
+                }
+                catch (DomainEventHandlingException exception)
+                {
+                    exceptions.Add(exception);
+                }
+            }
+
+            if (exceptions.Count > 1)
+            {
+                // rethrow exceptions as an aggregate
+                throw new AggregateException("One or more domain event handling exceptions occurred.", exceptions);
+            }
         }
 
-        private IDomainEventHandler GetHandler(IDomainEventEntry entry)
+        private static void HandleDomainEvent(object domainEvent, IDomainEventHandler handler)
         {
-            Contract.Requires(entry != null);
-            
-            // get handler from entry
-            var handler = entry.DomainEventHandler;
+            Contract.Requires(handler != null);
+            Contract.Requires(domainEvent != null);
 
-            // if handler is cached, return handler
-            if (handler != null)
+            try
             {
-                return handler;
+                // handle command
+                handler.Handle(domainEvent);
             }
-
-            // create handler
-            handler = CreateHandler(entry.DomainEventHandlerType);
-            Contract.Assume(handler != null);
-
-            // if handler is reusable, cache in entry
-            if (handler.Reusable)
+            catch (Exception e)
             {
-                entry.DomainEventHandler = handler;
+                // re-throw exception as a domain event handling exception
+                throw new DomainEventHandlingException(domainEvent, e, "Exception occurred in domain event handler, check inner exception for details.");
             }
-
-            return handler;
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_catalog != null);
+            Contract.Invariant(_handlerFactory != null);
         }
     }
 }

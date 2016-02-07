@@ -13,32 +13,13 @@ namespace DotNetRevolution.Core.Domain
         {
             get { return _entries.Keys.ToList().AsReadOnly(); }
         }
-
-        public IReadOnlyCollection<IDomainEventEntry> this[Type domainEventType]
-        {
-            get
-            {
-                lock (_entries)
-                {
-                    var result = _entries[domainEventType];
-                    Contract.Assume(result != null);
-
-                    return result.AsReadOnly();
-                }
-            }
-        }
-
+        
         public DomainEventCatalog()
         {
             _entries = new Dictionary<Type, List<IDomainEventEntry>>();
         }
 
-        [ContractInvariantMethod]
-        private void ObjectInvariant()
-        {
-            Contract.Invariant(_entries != null);
-        }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
         {
             lock (_entries)
@@ -46,6 +27,17 @@ namespace DotNetRevolution.Core.Domain
                 AddEntry(entry);
 
                 return new DomainEventEntryRegistration(this, entry);
+            }
+        }
+
+        public IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType)
+        {
+            lock (_entries)
+            {
+                var result = _entries[domainEventType];
+                Contract.Assume(result != null);
+
+                return result.AsReadOnly();
             }
         }
 
@@ -100,6 +92,12 @@ namespace DotNetRevolution.Core.Domain
             }
 
             _entries.Add(entry.DomainEventType, new List<IDomainEventEntry> { entry });
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_entries != null);
         }
     }
 }

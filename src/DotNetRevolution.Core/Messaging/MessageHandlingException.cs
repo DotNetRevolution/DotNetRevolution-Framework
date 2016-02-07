@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Messaging
     [Serializable]
     public class MessageHandlingException : Exception
     {
-        public object MessageObject { get; private set; }
+        public object MessageInstance { get; private set; }
 
         public MessageHandlingException()
         {
@@ -23,24 +23,24 @@ namespace DotNetRevolution.Core.Messaging
         {
         }
 
-        public MessageHandlingException(object messageObject)
-            : this(messageObject, null, "Message was not handled correctly.")
+        public MessageHandlingException(object value)
+            : this(value, null, "Message was not handled correctly.")
         {
-            Contract.Requires(messageObject != null);
+            Contract.Requires(value != null);
         }
 
-        public MessageHandlingException(object messageObject, string message)
-            : this(messageObject, null, message)
+        public MessageHandlingException(object value, string message)
+            : this(value, null, message)
         {
-            Contract.Requires(messageObject != null);
+            Contract.Requires(value != null);
         }
 
-        public MessageHandlingException(object messageObject, Exception innerException, string message)
+        public MessageHandlingException(object value, Exception innerException, string message)
             : base(message, innerException)
         {
-            Contract.Requires(messageObject != null);
+            Contract.Requires(value != null);
 
-            MessageObject = messageObject;
+            MessageInstance = value;
         }
 
         protected MessageHandlingException(SerializationInfo info, StreamingContext context)
@@ -48,12 +48,12 @@ namespace DotNetRevolution.Core.Messaging
         {
             Contract.Requires(info != null);
 
-            MessageObject = info.GetValue("MessageObject", typeof(object));
+            MessageInstance = info.GetValue("MessageInstance", typeof(object));
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("MessageObject", MessageObject);
+            info.AddValue("MessageInstance", MessageInstance);
 
             base.GetObjectData(info, context);
         }

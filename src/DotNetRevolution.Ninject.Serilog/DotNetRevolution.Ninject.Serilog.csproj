@@ -80,6 +80,7 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="LogFactoryName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerilogDatabaseModule.cs" />
     <Compile Include="SerilogEmailModule.cs" />

@@ -13,18 +13,7 @@ namespace DotNetRevolution.Core.Command
         {
             get { return _entries.Keys.ToList().AsReadOnly(); }
         }
-
-        public ICommandEntry this[Type commandType]
-        {
-            get
-            {
-                var result = _entries[commandType];
-                Contract.Assume(result != null);
-
-                return result;
-            }
-        }
-
+        
         public CommandCatalog()
         {
             _entries = new Dictionary<Type, ICommandEntry>();
@@ -34,7 +23,15 @@ namespace DotNetRevolution.Core.Command
         {
             _entries.Add(entry.CommandType, entry);
 
-            Contract.Assume(this[entry.CommandType] != null);
+            Contract.Assume(GetEntry(entry.CommandType) != null);
+        }
+
+        public ICommandEntry GetEntry(Type commandType)
+        {
+            var result = _entries[commandType];
+            Contract.Assume(result != null);
+
+            return result;
         }
 
         [ContractInvariantMethod]

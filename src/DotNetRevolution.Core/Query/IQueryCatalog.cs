@@ -7,7 +7,8 @@ namespace DotNetRevolution.Core.Query
     [ContractClass(typeof(QueryCatalogContract))]
     public interface IQueryCatalog
     {
-        IQueryEntry this[Type queryType] { [Pure] get; }
+        [Pure]
+        IQueryEntry GetEntry(Type queryType);
 
         void Add(IQueryEntry entry);
     }

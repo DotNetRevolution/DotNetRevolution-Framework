@@ -8,12 +8,12 @@ namespace DotNetRevolution.Core.Logging
     public interface ILogger
     {
         void Log(LogEntryLevel logEntryLevel, string message);
-        void Log(LogEntryLevel logEntryLevel, string message, LogEntryContext logEntryContext);
+        void Log(LogEntryLevel logEntryLevel, string message, LogEntryContextDictionary logEntryContext);
 
         void Log(LogEntryLevel logEntryLevel, string message, Exception exception);
-        void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContext logEntryContext);
+        void Log(LogEntryLevel logEntryLevel, string message, Exception exception, LogEntryContextDictionary logEntryContext);
 
         void Log(LogEntryLevel logEntryLevel, Exception exception);
-        void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContext logEntryContext);
+        void Log(LogEntryLevel logEntryLevel, Exception exception, LogEntryContextDictionary logEntryContext);
     }
 }

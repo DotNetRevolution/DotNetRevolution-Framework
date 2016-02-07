@@ -8,27 +8,24 @@ namespace DotNetRevolution.Core.Query
     {
         protected Dictionary<Type, IQueryEntry> Entries { get; private set; }
         
-        public IQueryEntry this[Type queryType]
-        {
-            get
-            {
-                var result = Entries[queryType];
-                Contract.Assume(result != null);
-
-                return result;
-            }
-        }
-
         public QueryCatalog()
         {
             Entries = new Dictionary<Type, IQueryEntry>();
+        }
+
+        public IQueryEntry GetEntry(Type queryType)
+        {
+            var result = Entries[queryType];
+            Contract.Assume(result != null);
+
+            return result;
         }
 
         public void Add(IQueryEntry entry)
         {
             Entries.Add(entry.QueryType, entry);
 
-            Contract.Assume(this[entry.QueryType] != null);
+            Contract.Assume(GetEntry(entry.QueryType) != null);
         }
 
         [ContractInvariantMethod]
