@@ -3,7 +3,7 @@ using DotNetRevolution.Core.Sessions;
 using System.Diagnostics.Contracts;
 using System.Web.SessionState;
 
-namespace DotNetRevolution.MVC.Session
+namespace DotNetRevolution.MVC.Sessions
 {
     public class HttpSession : ISession
     {

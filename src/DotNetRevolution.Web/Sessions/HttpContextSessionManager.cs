@@ -1,7 +1,7 @@
 ﻿using DotNetRevolution.Core.Sessions;
 using System.Web;
 
-namespace DotNetRevolution.MVC.Session
+namespace DotNetRevolution.MVC.Sessions
 {
     public class HttpContextSessionManager : SessionManager
     {

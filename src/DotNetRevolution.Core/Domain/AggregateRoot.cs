@@ -17,13 +17,13 @@ namespace DotNetRevolution.Core.Domain
         
         public abstract string AggregateDescription { get; }
 
-        public IReadOnlyList<object> UncommittedEvents
+        public IDomainEventCollection UncommittedEvents
         {
             get
             {
-                Contract.Ensures(Contract.Result<IReadOnlyList<object>>() != null);
+                Contract.Ensures(Contract.Result<IDomainEventCollection>() != null);
 
-                return _uncommittedEvents.AsReadOnly();
+                return new DomainEventCollection(this, _uncommittedEvents);
             }
         }
 
@@ -38,7 +38,7 @@ namespace DotNetRevolution.Core.Domain
             _uncommittedEvents = new List<object>();
         }
 
-        protected AggregateRoot(IEnumerable<object> events)
+        protected AggregateRoot(IReadOnlyCollection<object> events)
             : this()
         {
             Contract.Requires(events != null);

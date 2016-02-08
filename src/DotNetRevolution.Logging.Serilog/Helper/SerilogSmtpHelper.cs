@@ -5,9 +5,9 @@ using Serilog.Sinks.Email;
 
 namespace DotNetRevolution.Logging.Serilog.Helper
 {
-    public class SerilogSmtpHelper
+    public static class SerilogSmtpHelper
     {
-        public EmailConnectionInfo GetEmailConnectionInfo(SmtpSection smtpSection, string subject, string fromEmail, string toEmail)
+        public static EmailConnectionInfo GetEmailConnectionInfo(SmtpSection smtpSection, string subject, string fromEmail, string toEmail)
         {
             Contract.Requires(smtpSection != null);
             Contract.Requires(smtpSection.Network != null);

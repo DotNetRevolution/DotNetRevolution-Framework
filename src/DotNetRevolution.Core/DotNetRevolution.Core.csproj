@@ -66,7 +66,8 @@
     <CodeContractsReferenceAssembly>DoNotBuild</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>3</CodeContractsAnalysisWarningLevel>
     <LangVersion>default</LangVersion>
-    <CodeAnalysisRuleSet>DotNetRevolution.Core.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,7 +76,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>DotNetRevolution.Core.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
@@ -104,6 +106,7 @@
     <Compile Include="Domain\ActionDomainEventHandler.cs" />
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\CodeContract\DomainEventCatalogContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventCollectionContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventDispatcherContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventEntryContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventEntryRegistrationContract.cs" />
@@ -111,6 +114,7 @@
     <Compile Include="Domain\CodeContract\DomainEventHandlerContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerFactoryContract.cs" />
     <Compile Include="Domain\DomainEventCatalog.cs" />
+    <Compile Include="Domain\DomainEventCollection.cs" />
     <Compile Include="Domain\DomainEventDispatcher.cs" />
     <Compile Include="Domain\DomainEventEntry.cs" />
     <Compile Include="Domain\DomainEventEntryRegistration.cs" />
@@ -122,6 +126,7 @@
     <Compile Include="Domain\EntityCollection.cs" />
     <Compile Include="Domain\Identity.cs" />
     <Compile Include="Domain\IDomainEventCatalog.cs" />
+    <Compile Include="Domain\IDomainEventCollection.cs" />
     <Compile Include="Domain\IDomainEventDispatcher.cs" />
     <Compile Include="Domain\IDomainEventEntry.cs" />
     <Compile Include="Domain\IDomainEventEntryRegistration.cs" />
@@ -129,7 +134,7 @@
     <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
     <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
     <Compile Include="Domain\NullDomainEventDispatcher.cs" />
-    <Compile Include="Domain\SequentialGuid.cs" />
+    <Compile Include="Base\SequentialGuid.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
@@ -206,9 +211,6 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DotNetRevolution.Core.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

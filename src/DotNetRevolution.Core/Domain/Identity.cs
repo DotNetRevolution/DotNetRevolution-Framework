@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Base;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain

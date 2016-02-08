@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Domain
+namespace DotNetRevolution.Core.Base
 {
     public class SequentialGuid
     {

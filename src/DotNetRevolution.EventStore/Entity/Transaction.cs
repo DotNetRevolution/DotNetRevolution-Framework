@@ -85,7 +85,7 @@ namespace DotNetRevolution.EventStore.Entity
             Contract.Requires(serializeData != null);
             Contract.Requires(events != null);
 
-            var sequence = 0;
+            var sequence = -1;
 
             // loop through each event to add to the collection
             foreach (var @event in events)
@@ -95,10 +95,7 @@ namespace DotNetRevolution.EventStore.Entity
                 var eventType = @event.GetType();
 
                 // add a new transaction event to the collection
-                _events.Add(new TransactionEvent(this, sequence, new TransactionEventType(eventType.FullName), serializeData(@event)));
-
-                // increase sequence for ordering
-                sequence++;
+                _events.Add(new TransactionEvent(this, ++sequence, new TransactionEventType(eventType.FullName), serializeData(@event)));                
             }
         }
         
