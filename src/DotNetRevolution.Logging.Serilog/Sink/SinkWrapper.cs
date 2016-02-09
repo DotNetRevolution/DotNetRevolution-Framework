@@ -1,21 +1,20 @@
-﻿using System.Diagnostics.Contracts;
-using Serilog.Core;
+﻿using DotNetRevolution.Logging.Serilog.Sink.CodeContract;
+using Serilog.Configuration;
 using Serilog.Events;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Logging.Serilog.Sink
 {
-    public class SinkWrapper
+    [ContractClass(typeof(SinkWrapperContract))]
+    public abstract class SinkWrapper
     {
-        public ILogEventSink Sink { get; private set; }
-
         public LogEventLevel LogEventLevel { get; private set; }
 
-        public SinkWrapper(ILogEventSink sink, LogEventLevel logEventLevel)
+        public SinkWrapper(LogEventLevel logEventLevel)
         {
-            Contract.Requires(sink != null);
-
-            Sink = sink;
             LogEventLevel = logEventLevel;
         }
+
+        public abstract void SetSink(LoggerSinkConfiguration configuration);
     }
 }

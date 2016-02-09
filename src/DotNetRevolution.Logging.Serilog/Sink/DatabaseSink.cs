@@ -5,11 +5,10 @@ using System.Data.SqlClient;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.PeriodicBatching;
+using System.Threading;
 
 namespace DotNetRevolution.Logging.Serilog.Sink
 {
@@ -19,7 +18,6 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private const string TableName = "log.Entry";
 
         private readonly string _connectionString;
-        private readonly DataTable _eventsTable;
         private readonly CancellationTokenSource _token;
 
         static DatabaseSink()
@@ -33,34 +31,31 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
 
             _connectionString = connectionString;
-
-            // Prepare the data table
-            _eventsTable = CreateDataTable();
-
             _token = new CancellationTokenSource();
         }
 
         protected override async Task EmitBatchAsync(IEnumerable<LogEvent> events)
         {
-            // Copy the events to the data table
-            FillDataTable(events);
+            // create new data table
+            var table = CreateDataTable();
 
+            // Copy the events to the data table
+            FillDataTable(table, events);
+            
             using (var connection = new SqlConnection(_connectionString))
             {
-                await connection.OpenAsync(_token.Token);
+                await connection.OpenAsync(_token.Token).ConfigureAwait(false);
 
                 using (var copy = CreateSqlBulkCopy(connection))
                 {
-                    await copy.WriteToServerAsync(_eventsTable, _token.Token);
-
-                    // Processed the items, clear for the next run
-                    _eventsTable.Clear();
+                    await copy.WriteToServerAsync(table, _token.Token).ConfigureAwait(false);
                 }
             }
         }
         
-        private void FillDataTable(IEnumerable<LogEvent> events)
+        private static void FillDataTable(DataTable table, IEnumerable<LogEvent> events)
         {
+            Contract.Requires(table != null);
             Contract.Requires(events != null);
             Contract.Requires(Contract.ForAll(events, ev => ev?.Properties != null));
 
@@ -69,7 +64,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             {
                 Contract.Assume(logEvent?.Properties != null);
 
-                var row = _eventsTable.NewRow();
+                var row = table.NewRow();
 
                 row["Timestamp"] = logEvent.Timestamp.DateTime;
                 row["Level"] = logEvent.Level;
@@ -84,10 +79,10 @@ namespace DotNetRevolution.Logging.Serilog.Sink
                     row["Exception"] = logEvent.Exception.ToString();
                 }
 
-                _eventsTable.Rows.Add(row);
+                table.Rows.Add(row);
             }
 
-            _eventsTable.AcceptChanges();
+            table.AcceptChanges();
         }
 
         private static string GetLogEventProperty(LogEvent logEvent, string propertyName)
@@ -121,7 +116,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private static string ConvertPropertiesToXmlStructure(IEnumerable<KeyValuePair<string, LogEventPropertyValue>> properties)
         {
             Contract.Requires(properties != null);
-
+            
             var propertiesToSave = properties.Where(property => !IgnoreProperties.Contains(property.Key))
                                              .ToList();
 
@@ -136,7 +131,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
 
             foreach (var property in propertiesToSave)
             {
-                sb.AppendFormat("<p key='{0}'>{1}</p>", property.Key, XmlPropertyFormatter.Simplify(property.Value));
+                sb.AppendFormat("<p key='{0}'>{1}</p>", property.Key, property.Value);
             }
 
             sb.Append("</pp>");
@@ -148,8 +143,6 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         {
             _token.Cancel();
             
-            _eventsTable.Dispose();
-
             base.Dispose(disposing);
         }
         
@@ -252,7 +245,6 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private void ObjectInvariants()
         {
             Contract.Invariant(_token != null);
-            Contract.Invariant(_eventsTable != null);
         }
     }
 }

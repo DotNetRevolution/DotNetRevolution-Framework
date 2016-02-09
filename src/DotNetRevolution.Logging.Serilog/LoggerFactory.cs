@@ -86,7 +86,7 @@ namespace DotNetRevolution.Logging.Serilog
         {
             Contract.Requires(configuration != null);
 
-            Parallel.ForEach(_sinkWrappers, wrapper => configuration.WriteTo.Sink(wrapper.Sink, wrapper.LogEventLevel));
+            Parallel.ForEach(_sinkWrappers, wrapper => wrapper.SetSink(configuration.WriteTo));
         }
 
         [ContractInvariantMethod]

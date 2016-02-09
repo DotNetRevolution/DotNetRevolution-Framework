@@ -65,7 +65,7 @@ namespace DotNetRevolution.Ninject.Serilog
             var binding = Bind<SinkWrapper>();
             Contract.Assume(binding != null);
 
-            var bindingMethod = binding.ToMethod(context => new SinkWrapper(new DebugConsoleSink(), _defaultMinimumLevel));
+            var bindingMethod = binding.ToConstant(new ConcreteSinkWrapper(_defaultMinimumLevel, new DebugConsoleSink()));
             Contract.Assume(bindingMethod != null);
 
             bindingMethod.WhenParentNamed(LogFactoryName.Main.ToString());
