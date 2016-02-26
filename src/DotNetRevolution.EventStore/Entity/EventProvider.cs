@@ -9,27 +9,27 @@ namespace DotNetRevolution.EventStore.Entity
 	public class EventProvider
 	{
         private readonly ICollection<Transaction> _transactions;
-        private readonly ICollection<EventProviderDescriptor> _descriptions;
+        private readonly ICollection<EventProviderDescriptor> _descriptors;
         
-        public Guid EventProviderId { get; private set; }
-        public int EventProviderTypeId { get; private set; }
+        public Guid EventProviderId { get; }
+        public int EventProviderTypeId { get; }
         
-        public virtual EventProviderType EventProviderType { get; private set; }
+        public virtual EventProviderType EventProviderType { get; }
 
         public virtual EntityCollection<Transaction> Transactions
         {
             get { return _transactions as EntityCollection<Transaction>; }
         }
 
-        public virtual EntityCollection<EventProviderDescriptor> Descriptions
+        public virtual EntityCollection<EventProviderDescriptor> Descriptors
         {
-            get { return _descriptions as EntityCollection<EventProviderDescriptor>; }
+            get { return _descriptors as EntityCollection<EventProviderDescriptor>; }
         }
 
 	    private EventProvider()
         {
             _transactions = new EntityCollection<Transaction>();
-            _descriptions = new EntityCollection<EventProviderDescriptor>();
+            _descriptors = new EntityCollection<EventProviderDescriptor>();
         }
 
         public EventProvider(Guid eventProviderId, EventProviderType type)
@@ -60,12 +60,12 @@ namespace DotNetRevolution.EventStore.Entity
             var transaction = new Transaction(EventProviderId, user, transactionCommandType, commandData, events, serializeData);
             
             // get current event provider description
-            var currentDescription = _descriptions.OrderByDescending(x => x.Transaction.Processed).FirstOrDefault();
+            var currentDescription = _descriptors.OrderByDescending(x => x.Transaction.Processed).FirstOrDefault();
 
             // add new event provider description if description is different than latest description
             if (currentDescription == null || currentDescription.Descriptor != eventProviderDescription)
             {
-                _descriptions.Add(new EventProviderDescriptor(this, transaction, eventProviderDescription));
+                _descriptors.Add(new EventProviderDescriptor(this, transaction, eventProviderDescription));
             }
 
             // add transaction to collection
@@ -78,7 +78,7 @@ namespace DotNetRevolution.EventStore.Entity
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_descriptions != null);
+            Contract.Invariant(_descriptors != null);
             Contract.Invariant(_transactions != null);
         }
     }

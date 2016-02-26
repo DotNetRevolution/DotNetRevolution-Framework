@@ -4,14 +4,14 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class TransactionEvent
     {
-        public long TransactionEventId { get; private set; }
-        public long TransactionId { get; private set; }
-        public int TransactionEventTypeId { get; private set; }
-        public int Sequence { get; private set; }
-        public string Data { get; private set; }
+        public long TransactionEventId { get; }
+        public long TransactionId { get; }
+        public int TransactionEventTypeId { get; }
+        public int Sequence { get; }
+        public string Data { get; }
 
-        public virtual TransactionEventType TransactionEventType { get; private set; }
-        public virtual Transaction Transaction { get; private set; }
+        public virtual TransactionEventType TransactionEventType { get; }
+        public virtual Transaction Transaction { get; }
 
         [UsedImplicitly]
         private TransactionEvent()

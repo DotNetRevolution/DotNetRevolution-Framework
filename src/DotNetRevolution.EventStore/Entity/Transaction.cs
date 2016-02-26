@@ -11,13 +11,13 @@ namespace DotNetRevolution.EventStore.Entity
         private readonly ICollection<TransactionEvent> _events;
         private readonly ICollection<TransactionAnnouncement> _announcements;
 
-        public long TransactionId { get; private set; }
-        public Guid EventProviderId { get; private set; }
-        public string User { get; private set; }
-        public string Application { get; private set; }
-        public DateTime Processed { get; private set; }
+        public long TransactionId { get; }
+        public Guid EventProviderId { get; }
+        public string User { get; }
+        public string Application { get; }
+        public DateTime Processed { get; }
         
-        public TransactionCommand TransactionCommand { get; private set; }
+        public TransactionCommand TransactionCommand { get; }
 
         public virtual EntityCollection<TransactionAnnouncement> Announcements
         {

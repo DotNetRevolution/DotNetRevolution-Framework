@@ -4,7 +4,7 @@ namespace DotNetRevolution.Core.Messaging
 {
     public class ProcessCommandMessage
     {
-        public object Command { get; private set; }
+        public object Command { get; }
 
         public ProcessCommandMessage(object command)
         {

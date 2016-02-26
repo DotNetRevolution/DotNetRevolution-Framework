@@ -5,7 +5,7 @@ namespace DotNetRevolution.Core.Base
 {
     public class SequentialGuid
     {
-        public Guid Value { get; private set; }
+        public Guid Value { get; }
 
         public SequentialGuid()
         {

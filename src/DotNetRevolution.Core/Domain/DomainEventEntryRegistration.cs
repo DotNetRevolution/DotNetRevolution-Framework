@@ -9,7 +9,7 @@ namespace DotNetRevolution.Core.Domain
         private readonly IDomainEventCatalog _catalog;
         private readonly IDomainEventEntry _entry;
 
-        public Guid Id { get; private set; }
+        public Guid Id { get; }
 
         internal DomainEventEntryRegistration(IDomainEventCatalog catalog, IDomainEventEntry entry)
         {

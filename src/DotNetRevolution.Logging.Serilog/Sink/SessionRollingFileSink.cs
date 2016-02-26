@@ -26,7 +26,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             Contract.Requires(!string.IsNullOrWhiteSpace(logPath));
 
             _sessionManager = sessionManager;
-            _sessionManager.SessionReleased += SessionReleased;
+            _sessionManager.SessionRemoved += SessionRemoved;
             _logPath = logPath;
 
             _sinks = new Dictionary<string, RollingFileSink>();
@@ -45,7 +45,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
 
             var session = _sessionManager.Current;
 
-            var sessionId = session == null ? string.Empty : session.Identity;
+            var sessionId = session == null ? string.Empty : session.Id;
             Contract.Assume(sessionId != null);
 
             RollingFileSink sink;
@@ -64,22 +64,23 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             return sink;
         }
 
-        private void SessionReleased(object sender, SessionEventArgs e)
+        private void SessionRemoved(object sender, SessionEventArgs e)
         {
-            Contract.Requires(e?.Session?.Identity != null);
+            Contract.Requires(e?.Session != null);
+            Contract.Requires(!string.IsNullOrWhiteSpace(e.Session.Id));
 
             var session = e.Session;
 
             RollingFileSink sink;
 
-            if (_sinks.TryGetValue(session.Identity, out sink))
+            if (_sinks.TryGetValue(session.Id, out sink))
             {
                 Contract.Assume(sink != null);
 
                 sink.Dispose();
             }
 
-            _sinks.Remove(session.Identity);
+            _sinks.Remove(session.Id);
         }
 
         [ContractInvariantMethod]

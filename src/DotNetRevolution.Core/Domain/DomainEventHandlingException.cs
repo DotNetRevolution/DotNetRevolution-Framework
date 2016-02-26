@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Domain
     [Serializable]
     public class DomainEventHandlingException : Exception
     {
-        public object DomainEvent { get; private set; }
+        public object DomainEvent { get; }
 
         public DomainEventHandlingException()
         {

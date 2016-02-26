@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Sessions
 {
     public class SessionManager : ISessionManager
     {
-        private readonly ISession _currentSession;
+        private readonly ICurrentSession _currentSession;
         private readonly List<ISession> _sessions;
 
         public IReadOnlyCollection<ISession> Sessions
@@ -16,15 +16,15 @@ namespace DotNetRevolution.Core.Sessions
             get { return new ReadOnlyCollection<ISession>(_sessions); }
         }
 
-        public ISession this[string identity]
+        public ISession this[string id]
         {
             get
             {
-                return _sessions.FirstOrDefault(x => x.Identity == identity);
+                return _sessions.FirstOrDefault(x => x.Id == id);
             }
         }
 
-        public virtual ISession Current
+        public virtual ICurrentSession Current
         {
             get
             {
@@ -32,13 +32,13 @@ namespace DotNetRevolution.Core.Sessions
             }
         }
 
-        public SessionManager()
+        protected SessionManager()
         {
             _sessions = new List<ISession>();
-            SessionReleased += (sender, session) => { };
+            SessionRemoved += (sender, session) => { };
         }
 
-        public SessionManager(ISession currentSession)
+        public SessionManager(ICurrentSession currentSession)
             : this()
         {
             Contract.Requires(currentSession != null);
@@ -47,29 +47,29 @@ namespace DotNetRevolution.Core.Sessions
             _sessions.Add(currentSession);
         }
 
-        public event EventHandler<SessionEventArgs> SessionReleased;
+        public event EventHandler<SessionEventArgs> SessionRemoved;
 
         public void Add(ISession session)
         {
             _sessions.Add(session);
 
-            Contract.Assume(this[session.Identity] != null);
+            Contract.Assume(this[session.Id] != null);
         }
 
         public void Remove(ISession session)
         {
-            if (_sessions.Remove(_sessions.FirstOrDefault(x => x.Identity == session.Identity)))
+            if (_sessions.Remove(_sessions.FirstOrDefault(x => x.Id == session.Id)))
             {
-                SessionReleased(this, new SessionEventArgs(session));
+                SessionRemoved(this, new SessionEventArgs(session));
             }
 
-            Contract.Assume(this[session.Identity] == null);
+            Contract.Assume(this[session.Id] == null);
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(SessionReleased != null);
+            Contract.Invariant(SessionRemoved != null);
             Contract.Invariant(_sessions != null);
         }
     }

@@ -5,15 +5,15 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class TransactionCommand
     {
-        public long TransactionId { get; private set; }
+        public long TransactionId { get; }
         
-        public int TransactionCommandTypeId { get; private set; }
+        public int TransactionCommandTypeId { get; }
 
-        public virtual TransactionCommandType TransactionCommandType { get; private set; }
+        public virtual TransactionCommandType TransactionCommandType { get; }
 
-        public string Data { get; private set; }
+        public string Data { get; }
 
-        public virtual Transaction Transaction { get; private set; }
+        public virtual Transaction Transaction { get; }
 
         [UsedImplicitly]
         private TransactionCommand()

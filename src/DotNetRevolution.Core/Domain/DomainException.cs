@@ -3,9 +3,9 @@ namespace DotNetRevolution.Core.Domain
 //    [Serializable]
 //    public class DomainException : Exception
 //    {
-//        public IEnumerable<string> Reasons { get; private set; }
+//        public IEnumerable<string> Reasons { get; }
 
-//        public IEnumerable<string> Suggestions { get; private set; }
+//        public IEnumerable<string> Suggestions { get; }
 
 //        public DomainException(IEnumerable<string> reasons, IEnumerable<string> suggestions)
 //            : this(reasons, suggestions, null)

@@ -7,8 +7,8 @@ namespace DotNetRevolution.MVC
 {
     public abstract class DotNetRevolutionController : Controller
     {
-        public ICommandDispatcher CommandDispatcher { get; private set; }
-        public IQueryDispatcher QueryDispatcher { get; private set; }
+        public ICommandDispatcher CommandDispatcher { get; }
+        public IQueryDispatcher QueryDispatcher { get; }
 
         protected DotNetRevolutionController(ICommandDispatcher commandDispatcher,
                                      IQueryDispatcher queryDispatcher)

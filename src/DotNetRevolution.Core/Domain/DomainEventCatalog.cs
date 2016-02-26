@@ -22,58 +22,46 @@ namespace DotNetRevolution.Core.Domain
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
         {
-            lock (_entries)
-            {
-                AddEntry(entry);
+            AddEntry(entry);
 
-                return new DomainEventEntryRegistration(this, entry);
-            }
+            return new DomainEventEntryRegistration(this, entry);
         }
 
         public IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType)
-        {
-            lock (_entries)
-            {
-                var result = _entries[domainEventType];
-                Contract.Assume(result != null);
+        {            
+            var result = _entries[domainEventType];
+            Contract.Assume(result != null);
 
-                return result.AsReadOnly();
-            }
+            return result.AsReadOnly();
         }
 
         public void Remove(IDomainEventEntry entry)
         {
-            lock (_entries)
+            List<IDomainEventEntry> entries;
+
+            if (_entries.TryGetValue(entry.DomainEventType, out entries))
             {
-                List<IDomainEventEntry> entries;
+                Contract.Assume(entries != null);
 
-                if (_entries.TryGetValue(entry.DomainEventType, out entries))
-                {
-                    Contract.Assume(entries != null);
-
-                    entries.Remove(entry);
-                }
+                entries.Remove(entry);
             }
         }
 
         public bool TryGetEntries(Type domainEventType, out IReadOnlyCollection<IDomainEventEntry> entries)
-        {
-            lock (_entries)
+        {            
+            List<IDomainEventEntry> eventEntries;
+
+            if (_entries.TryGetValue(domainEventType, out eventEntries))
             {
-                List<IDomainEventEntry> eventEntries;
+                Contract.Assume(eventEntries != null);
+                Contract.Assume(Contract.ForAll(eventEntries, entry => entry != null));
 
-                if (_entries.TryGetValue(domainEventType, out eventEntries))
-                {
-                    Contract.Assume(eventEntries != null);
-                    Contract.Assume(Contract.ForAll(eventEntries, entry => entry != null));
-
-                    entries = eventEntries.AsReadOnly();
-                    return true;
-                }
-
-                entries = null;
-                return false;
+                entries = eventEntries.AsReadOnly();
+                return true;
             }
+
+            entries = null;
+            return false;
         }
 
         private void AddEntry(IDomainEventEntry entry)

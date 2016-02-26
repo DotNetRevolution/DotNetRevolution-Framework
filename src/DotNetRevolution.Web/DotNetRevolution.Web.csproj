@@ -82,7 +82,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sessions\HttpContextSessionManager.cs" />
-    <Compile Include="Sessions\Session.cs" />
+    <Compile Include="Sessions\HttpCurrentSession.cs" />
+    <Compile Include="Sessions\HttpSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetRevolution.Core\DotNetRevolution.Core.csproj">

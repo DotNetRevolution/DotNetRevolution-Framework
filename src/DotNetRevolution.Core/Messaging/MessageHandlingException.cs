@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Messaging
     [Serializable]
     public class MessageHandlingException : Exception
     {
-        public object MessageInstance { get; private set; }
+        public object MessageInstance { get; }
 
         public MessageHandlingException()
         {

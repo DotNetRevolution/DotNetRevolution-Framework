@@ -5,14 +5,14 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class TransactionAnnouncementError
     {
-        public long TransactionAnnouncementErrorId { get; private set; }
-        public long TransactionAnnouncementId { get; private set; }
-        public long TransactionEventId { get; private set; }
-        public string ErrorType { get; private set; }
-        public string ErrorMessage { get; private set; }
+        public long TransactionAnnouncementErrorId { get; }
+        public long TransactionAnnouncementId { get; }
+        public long TransactionEventId { get; }
+        public string ErrorType { get; }
+        public string ErrorMessage { get; }
 
-        public virtual TransactionAnnouncement TransactionAnnouncement { get; private set; }
-        public virtual TransactionEvent TransactionEvent { get; private set; }
+        public virtual TransactionAnnouncement TransactionAnnouncement { get; }
+        public virtual TransactionEvent TransactionEvent { get; }
 
         [UsedImplicitly]
         private TransactionAnnouncementError()

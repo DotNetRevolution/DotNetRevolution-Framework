@@ -83,6 +83,11 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Authorization\CodeContract\IdentityManagerContract.cs" />
+    <Compile Include="Authorization\IdentityEventArgs.cs" />
+    <Compile Include="Authorization\IdentityManager.cs" />
+    <Compile Include="Authorization\IIdentityManager.cs" />
+    <Compile Include="Authorization\IIdentityService.cs" />
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />
@@ -138,7 +143,8 @@
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Extension\GuidExtension.AsString.cs" />
+    <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />
     <Compile Include="Helper\TypeHelper.cs" />
@@ -198,11 +204,15 @@
     <Compile Include="Query\QueryHandler.cs" />
     <Compile Include="Query\QueryHandlerFactory.cs" />
     <Compile Include="Query\QueryHandlingException.cs" />
+    <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\CodeContract\SerializerCodeContract.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Sessions\CodeContract\CurrentSessionContract.cs" />
     <Compile Include="Sessions\CodeContract\SessionContract.cs" />
     <Compile Include="Sessions\CodeContract\SessionManagerContract.cs" />
+    <Compile Include="Sessions\CurrentGuidSession.cs" />
     <Compile Include="Sessions\GuidSession.cs" />
+    <Compile Include="Sessions\ICurrentSession.cs" />
     <Compile Include="Sessions\ISession.cs" />
     <Compile Include="Sessions\ISessionManager.cs" />
     <Compile Include="Sessions\Session.cs" />
@@ -217,6 +227,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extension\DictionaryExtension.PureContainsKey.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

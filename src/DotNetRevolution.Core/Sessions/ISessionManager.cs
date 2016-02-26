@@ -10,13 +10,13 @@ namespace DotNetRevolution.Core.Sessions
     {        
         IReadOnlyCollection<ISession> Sessions { [Pure] get; }
                 
-        ISession this[string identity] { [Pure] get; }
+        ISession this[string id] { [Pure] get; }
 
         void Add(ISession session);
         void Remove(ISession session);
 
-        ISession Current { [Pure] get; }
+        ICurrentSession Current { [Pure] get; }
         
-        event EventHandler<SessionEventArgs> SessionReleased;
+        event EventHandler<SessionEventArgs> SessionRemoved;
     }
 }

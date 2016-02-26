@@ -8,7 +8,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
     [ContractClass(typeof(SinkWrapperContract))]
     public abstract class SinkWrapper
     {
-        public LogEventLevel LogEventLevel { get; private set; }
+        public LogEventLevel LogEventLevel { get; }
 
         public SinkWrapper(LogEventLevel logEventLevel)
         {

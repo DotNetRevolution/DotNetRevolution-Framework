@@ -7,8 +7,8 @@ namespace DotNetRevolution.Core.Sessions
     [ContractClass(typeof(SessionContract))]
     public interface ISession
     {
-        string Identity { get; }
+        string Id { get; }
 
-        Dictionary<string, object> Variables { get; }
+        IReadOnlyDictionary<string, object> Variables { get; }
     }
 }

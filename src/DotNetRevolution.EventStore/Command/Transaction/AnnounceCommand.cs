@@ -2,7 +2,7 @@
 {
     public class AnnounceCommand
     {
-        public long TransactionId { get; private set; }
+        public long TransactionId { get; }
 
         public AnnounceCommand(long transactionId)
         {

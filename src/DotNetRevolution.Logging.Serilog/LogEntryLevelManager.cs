@@ -7,13 +7,15 @@ using DotNetRevolution.Core.Sessions;
 using DotNetRevolution.Logging.Serilog.Extension;
 using Serilog.Core;
 using Serilog.Events;
+using DotNetRevolution.Core.Authorization;
 
 namespace DotNetRevolution.Logging.Serilog
 {
     public class LogEntryLevelManager : Disposable, ISerilogLogEntryLevelManager
     {
         private readonly ISessionManager _sessionManager;
-
+        private readonly IIdentityManager _identityManager;
+        
         private readonly Dictionary<string, LoggingLevelSwitch> _userLogSwitches;
         private readonly Dictionary<string, LoggingLevelSwitch> _sessionLogSwitches;
 
@@ -42,12 +44,16 @@ namespace DotNetRevolution.Logging.Serilog
         }
 
         public LogEntryLevelManager(ISessionManager sessionManager,
+                                    IIdentityManager identityManager,
                                     LogEntryLevel applicationLogEntryLevel)
         {
             Contract.Requires(sessionManager != null);
+            Contract.Requires(identityManager != null);
 
             _sessionManager = sessionManager;
-            _sessionManager.SessionReleased += SessionReleased;
+            _sessionManager.SessionRemoved += SessionRemoved;
+
+            _identityManager = identityManager;
 
             _sessionLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
             _userLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
@@ -99,7 +105,7 @@ namespace DotNetRevolution.Logging.Serilog
         {
             if (disposing)
             {
-                _sessionManager.SessionReleased -= SessionReleased;
+                _sessionManager.SessionRemoved -= SessionRemoved;
             }
         }
 
@@ -107,28 +113,49 @@ namespace DotNetRevolution.Logging.Serilog
         {
             LoggingLevelSwitch logSwitch;
 
-            var session = _sessionManager.Current;
-
-            var sessionId = session == null ? string.Empty : session.Identity;
-            Contract.Assume(sessionId != null);
-
-            if (_sessionLogSwitches.TryGetValue(sessionId, out logSwitch))
+            if (FindSessionLoggingLevelSwitch(out logSwitch))
             {
                 Contract.Assume(logSwitch != null);
 
                 return logSwitch;
             }
 
-            return _userLogSwitches.TryGetValue(string.Empty, out logSwitch)
-                       ? logSwitch
-                       : null;
+            if (FindUserLoggingLevelSwitch(out logSwitch))
+            {
+                Contract.Assume(logSwitch != null);
+
+                return logSwitch;
+            }
+
+            return null;
         }
 
-        private void SessionReleased(object sender, SessionEventArgs e)
+        private bool FindUserLoggingLevelSwitch(out LoggingLevelSwitch logSwitch)
         {
-            Contract.Requires(e?.Session?.Identity != null);
+            var identity = _identityManager.Current;
 
-            _sessionLogSwitches.Remove(e.Session.Identity);
+            var identityName = identity == null ? string.Empty : identity.Name;
+            Contract.Assume(identityName != null);
+
+            return _userLogSwitches.TryGetValue(identityName, out logSwitch);
+        }
+
+        private bool FindSessionLoggingLevelSwitch(out LoggingLevelSwitch logSwitch)
+        {
+            var session = _sessionManager.Current;
+
+            var sessionId = session == null ? string.Empty : session.Id;
+            Contract.Assume(sessionId != null);
+
+            return _sessionLogSwitches.TryGetValue(sessionId, out logSwitch);            
+        }
+
+        private void SessionRemoved(object sender, SessionEventArgs e)
+        {
+            Contract.Requires(e?.Session != null);
+            Contract.Requires(!string.IsNullOrWhiteSpace(e.Session.Id));
+
+            _sessionLogSwitches.Remove(e.Session.Id);
         }
 
         private static void SetLogEntryLevel(Dictionary<string, LoggingLevelSwitch> dictionary, LogEventLevel logEntryLevel, string context)
@@ -156,7 +183,8 @@ namespace DotNetRevolution.Logging.Serilog
             Contract.Invariant(_sessionManager != null);
             Contract.Invariant(_userLogSwitches != null);
             Contract.Invariant(_sessionLogSwitches != null);
-            Contract.Invariant(_applicationSwitch != null);
+            Contract.Invariant(_identityManager != null);
+            Contract.Invariant(_applicationSwitch != null); 
         }
     }
 }

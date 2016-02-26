@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
     [ContractClassFor(typeof(ISession))]
     internal abstract class SessionContract : ISession
     {
-        public string Identity
+        public string Id
         {
             get
             {
@@ -17,11 +17,11 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
             }
         }
 
-        public Dictionary<string, object> Variables
+        public IReadOnlyDictionary<string, object> Variables
         {
             get
             {
-                Contract.Ensures(Contract.Result<Dictionary<string, object>>() != null);
+                Contract.Ensures(Contract.Result<IReadOnlyDictionary<string, object>>() != null);
 
                 throw new NotImplementedException();
             }

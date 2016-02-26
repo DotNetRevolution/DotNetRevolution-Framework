@@ -1,11 +1,11 @@
 ﻿using DotNetRevolution.Core.Sessions;
 using System.Web;
 
-namespace DotNetRevolution.MVC.Sessions
+namespace DotNetRevolution.Web.Sessions
 {
     public class HttpContextSessionManager : SessionManager
     {
-        public override ISession Current
+        public override ICurrentSession Current
         {
             get
             {
@@ -16,7 +16,7 @@ namespace DotNetRevolution.MVC.Sessions
 
                 var session = HttpContext.Current.Session;
 
-                return this[session.SessionID];
+                return new HttpCurrentSession(HttpContext.Current.Session);
             }
         }
     }

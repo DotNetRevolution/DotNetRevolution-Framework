@@ -2,53 +2,54 @@
 using DotNetRevolution.Core.Sessions;
 using System.Diagnostics.Contracts;
 using System.Web.SessionState;
+using System.Collections.ObjectModel;
 
-namespace DotNetRevolution.MVC.Sessions
+namespace DotNetRevolution.Web.Sessions
 {
     public class HttpSession : ISession
     {
-        private readonly HttpSessionState _httpSession;
-
+        protected HttpSessionState InternalHttpSession { get; private set; }
+        
         public HttpSession(HttpSessionState httpSession)
         {
             Contract.Requires(httpSession != null);
 
-            _httpSession = httpSession;
+            InternalHttpSession = httpSession;
         }
 
-        public string Identity
+        public string Id
         {
             get
             {                
-                return _httpSession.SessionID;
+                return InternalHttpSession.SessionID;
             }
         }
 
-        public Dictionary<string, object> Variables
+        public IReadOnlyDictionary<string, object> Variables
         {
             get
             {
-                Contract.Assume(_httpSession.Keys != null);
+                Contract.Assume(InternalHttpSession.Keys != null);
 
                 var dictionary = new Dictionary<string, object>();                
                 
-                foreach (var key in _httpSession.Keys)
+                foreach (var key in InternalHttpSession.Keys)
                 {
                     Contract.Assume(key != null);
 
                     var keyString = key.ToString();
 
-                    dictionary[keyString] = _httpSession[keyString];
+                    dictionary[keyString] = InternalHttpSession[keyString];
                 }
 
-                return dictionary;
+                return new ReadOnlyDictionary<string, object>(dictionary);
             }
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_httpSession != null);
+            Contract.Invariant(InternalHttpSession != null);
         }
     }
 }

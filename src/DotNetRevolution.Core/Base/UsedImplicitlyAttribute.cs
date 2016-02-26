@@ -30,11 +30,11 @@ namespace DotNetRevolution.Core.Base
         {
         }
 
-        public ImplicitUseKinds UseKind { get; private set; }
+        public ImplicitUseKinds UseKind { get; }
 
         /// <summary>
         /// Gets value indicating what is meant to be used
         /// </summary>
-        public ImplicitUseTargets Target { get; private set; }
+        public ImplicitUseTargets Target { get; }
     }
 }

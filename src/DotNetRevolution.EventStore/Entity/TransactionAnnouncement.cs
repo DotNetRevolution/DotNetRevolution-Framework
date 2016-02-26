@@ -9,11 +9,11 @@ namespace DotNetRevolution.EventStore.Entity
     {
         private readonly ICollection<TransactionAnnouncementError> _transactionAnnouncementErrors;
 
-        public long TransactionAnnouncementId { get; private set; }
-        public long TransactionId { get; private set; }
-        public DateTime Announced { get; private set; }
+        public long TransactionAnnouncementId { get; }
+        public long TransactionId { get; }
+        public DateTime Announced { get; }
 
-        public virtual Transaction Transaction { get; private set; }
+        public virtual Transaction Transaction { get; }
 
         public virtual EntityCollection<TransactionAnnouncementError> Errors
         {

@@ -5,9 +5,9 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class TransactionCommandType
     {
-        public int TransactionCommandTypeId { get; private set; }
+        public int TransactionCommandTypeId { get; }
 
-        public string FullName { get; private set; }
+        public string FullName { get; }
 
         [UsedImplicitly]
         private TransactionCommandType()

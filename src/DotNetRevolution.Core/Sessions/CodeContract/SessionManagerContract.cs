@@ -7,17 +7,17 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
     [ContractClassFor(typeof(ISessionManager))]
     internal abstract class SessionManagerContract : ISessionManager
     {
-        public ISession this[string identity]
+        public ISession this[string id]
         {
             get
             {
-                Contract.Requires(!string.IsNullOrWhiteSpace(identity));
+                Contract.Requires(!string.IsNullOrWhiteSpace(id));
 
                 throw new NotImplementedException();
             }
         }
 
-        public ISession Current
+        public ICurrentSession Current
         {
             get
             {
@@ -35,18 +35,18 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
             }
         }
 
-        public event EventHandler<SessionEventArgs> SessionReleased;
+        public event EventHandler<SessionEventArgs> SessionRemoved;
 
         public void Add(ISession session)
         {
             Contract.Requires(session != null);
-            Contract.Ensures(this[session.Identity] != null);
+            Contract.Ensures(this[session.Id] != null);
         }
 
         public void Remove(ISession session)
         {
             Contract.Requires(session != null);
-            Contract.Ensures(this[session.Identity] == null);
+            Contract.Ensures(this[session.Id] == null);
         }
     }
 }

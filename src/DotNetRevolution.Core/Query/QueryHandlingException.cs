@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Query
     [Serializable]
     public class QueryHandlingException : Exception
     {
-        public object Query { get; private set; }
+        public object Query { get; }
 
         public QueryHandlingException()
         {

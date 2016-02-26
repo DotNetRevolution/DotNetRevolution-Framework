@@ -6,13 +6,13 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class EventProviderDescriptor
     {
-        public int EventProviderDescriptorId { get; private set; }
-        public Guid EventProviderId { get; private set; }
-        public long TransactionId { get; private set; }
-        public string Descriptor { get; private set; }
+        public int EventProviderDescriptorId { get; }
+        public Guid EventProviderId { get; }
+        public long TransactionId { get; }
+        public string Descriptor { get; }
 
-        public virtual EventProvider EventProvider { get; private set; }
-        public virtual Transaction Transaction { get; private set; }
+        public virtual EventProvider EventProvider { get; }
+        public virtual Transaction Transaction { get; }
 
         [UsedImplicitly]
         private EventProviderDescriptor()

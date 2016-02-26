@@ -5,9 +5,9 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class EventProviderType
     {
-        public int EventProviderTypeId { get; private set; }
+        public int EventProviderTypeId { get; }
 
-        public string FullName { get; private set; }
+        public string FullName { get; }
 
         [UsedImplicitly]
         private EventProviderType()

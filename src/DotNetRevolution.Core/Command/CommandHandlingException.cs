@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Command
     [Serializable]
     public class CommandHandlingException : Exception
     {
-        public object Command { get; private set; }
+        public object Command { get; }
 
         public CommandHandlingException()
         {

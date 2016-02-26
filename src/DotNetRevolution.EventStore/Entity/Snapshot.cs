@@ -6,7 +6,7 @@
 //{
 //    public class Snapshot : Transaction
 //    {
-//        public string Data { get; private set; }
+//        public string Data { get; }
 
 //        [UsedImplicitly]
 //        private Snapshot()

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Extension;
+using System;
 
 namespace DotNetRevolution.Core.Sessions
 {
     public class GuidSession : Session
     {
         public GuidSession()
-            : base(Guid.NewGuid().ToString())
+            : base(Guid.NewGuid().AsString())
         {
         }
     }
