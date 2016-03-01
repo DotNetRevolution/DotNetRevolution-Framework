@@ -7,7 +7,7 @@ using DotNetRevolution.Core.Sessions;
 using DotNetRevolution.Logging.Serilog.Extension;
 using Serilog.Core;
 using Serilog.Events;
-using DotNetRevolution.Core.Authorization;
+using DotNetRevolution.Core.Authentication;
 
 namespace DotNetRevolution.Logging.Serilog
 {

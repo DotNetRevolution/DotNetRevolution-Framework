@@ -83,11 +83,12 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Authorization\CodeContract\IdentityManagerContract.cs" />
-    <Compile Include="Authorization\IdentityEventArgs.cs" />
-    <Compile Include="Authorization\IdentityManager.cs" />
-    <Compile Include="Authorization\IIdentityManager.cs" />
-    <Compile Include="Authorization\IIdentityService.cs" />
+    <Compile Include="Authentication\CodeContract\IdentityManagerContract.cs" />
+    <Compile Include="Authentication\IdentityEventArgs.cs" />
+    <Compile Include="Authentication\IdentityManager.cs" />
+    <Compile Include="Authentication\IIdentityManager.cs" />
+    <Compile Include="Authentication\IIdentityService.cs" />
+    <Compile Include="Authorization\IDotNetRevolutionPrincipal.cs" />
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />

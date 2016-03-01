@@ -1,4 +1,4 @@
-﻿//namespace DotNetRevolution.Core.Authorization
+﻿//namespace DotNetRevolution.Core.Authentication
 //{
 //    public class IIdentityService
 //    {

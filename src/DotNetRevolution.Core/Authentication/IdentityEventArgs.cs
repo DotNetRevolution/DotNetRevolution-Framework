@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Security.Principal;
 
-namespace DotNetRevolution.Core.Authorization
+namespace DotNetRevolution.Core.Authentication
 {
     public class IdentityEventArgs : EventArgs
     {

@@ -5,9 +5,9 @@ namespace DotNetRevolution.Core.Sessions
 {
     public class CurrentGuidSession : GuidSession, ICurrentSession
     {
-        public void AddVariable(string key, object variable)
+        public void SetVariable(string key, object variable)
         {
-            InternalVariables.Add(key, variable);
+            InternalVariables[key] = variable;
             Contract.Assume(Variables.PureContainsKey(key));
         }
 

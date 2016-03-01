@@ -11,7 +11,6 @@ namespace DotNetRevolution.Logging.Serilog.Web.Enricher
         public const string BrowserVersionPropertyName = "BrowserVersion";
         public const string UserAgentPropertyName = "UserAgent";
         public const string UrlPropertyName = "Url";
-        public const string SessionIdPropertyName = "SessionId";
         public const string HttpMethodPropertyName = "HttpMethod";
         
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -21,15 +20,17 @@ namespace DotNetRevolution.Logging.Serilog.Web.Enricher
 
             var httpContext = HttpContext.Current;
             Contract.Assume(httpContext != null);
-            Contract.Assume(httpContext.Session != null);
-            Contract.Assume(httpContext.Request.Browser != null);
 
-            var session = httpContext.Session;
-            var browser = httpContext.Request.Browser;
+            var request = httpContext.Request; 
+                       
+            var browser = request.Browser;
+            Contract.Assume(browser != null);
 
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(BrowserNamePropertyName, browser.Browser));
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(BrowserVersionPropertyName, browser.Version));
-            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(SessionIdPropertyName, session.SessionID));
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(HttpMethodPropertyName, request.HttpMethod));
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(UrlPropertyName, request.RawUrl));
+            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(UserAgentPropertyName, request.UserAgent));
         }
     }
 }

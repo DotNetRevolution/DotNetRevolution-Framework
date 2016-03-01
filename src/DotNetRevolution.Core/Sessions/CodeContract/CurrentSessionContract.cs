@@ -24,7 +24,7 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
             }
         }
 
-        public void AddVariable(string key, object variable)
+        public void SetVariable(string key, object variable)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(key));
             Contract.Ensures(Variables.PureContainsKey(key));

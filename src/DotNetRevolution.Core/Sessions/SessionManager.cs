@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
@@ -13,7 +12,7 @@ namespace DotNetRevolution.Core.Sessions
 
         public IReadOnlyCollection<ISession> Sessions
         {
-            get { return new ReadOnlyCollection<ISession>(_sessions); }
+            get { return _sessions.AsReadOnly(); }
         }
 
         public ISession this[string id]

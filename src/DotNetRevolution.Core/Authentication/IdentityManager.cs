@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Security.Principal;
 
-namespace DotNetRevolution.Core.Authorization
+namespace DotNetRevolution.Core.Authentication
 {
     public class IdentityManager : IIdentityManager
     {
@@ -14,13 +14,8 @@ namespace DotNetRevolution.Core.Authorization
                 return _currentIdentity;
             }
         }
-
-        protected IdentityManager()
-        {
-        }
-
+        
         public IdentityManager(IIdentity currentIdentity)
-            : this()
         {
             Contract.Requires(currentIdentity != null);
 

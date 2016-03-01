@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Sessions
     [ContractClass(typeof(CurrentSessionContract))]
     public interface ICurrentSession : ISession
     {
-        void AddVariable(string key, object variable);
+        void SetVariable(string key, object variable);
 
         void RemoveVariable(string key);
     }

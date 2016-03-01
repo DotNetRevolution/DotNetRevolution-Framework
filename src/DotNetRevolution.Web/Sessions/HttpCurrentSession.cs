@@ -12,7 +12,7 @@ namespace DotNetRevolution.Web.Sessions
             Contract.Requires(httpSession != null);
         }
 
-        public void AddVariable(string key, object variable)
+        public void SetVariable(string key, object variable)
         {
             InternalHttpSession[key] = variable;
         }

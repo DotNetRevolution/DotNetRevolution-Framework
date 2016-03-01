@@ -81,6 +81,8 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeContract\SerilogLogEntryLevelManagerContract.cs" />
+    <Compile Include="Enricher\IdentityEnricher.cs" />
+    <Compile Include="Enricher\SessionEnricher.cs" />
     <Compile Include="Extension\LogEntryLevelExtension.ToLogEventLevel.cs" />
     <Compile Include="Extension\LogEventLevelExtension.ToLogEntryLevel.cs" />
     <Compile Include="Helper\SerilogSmtpHelper.cs" />
