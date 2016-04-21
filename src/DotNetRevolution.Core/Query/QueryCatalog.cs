@@ -30,11 +30,13 @@ namespace DotNetRevolution.Core.Query
             return result;
         }
 
-        public void Add(IQueryEntry entry)
+        public IQueryCatalog Add(IQueryEntry entry)
         {
             _entries.Add(entry.QueryType, entry);
 
             Contract.Assume(GetEntry(entry.QueryType) == entry);
+
+            return this;
         }
 
         [ContractInvariantMethod]

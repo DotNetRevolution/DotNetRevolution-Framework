@@ -31,7 +31,17 @@ namespace DotNetRevolution.Core.Tests.Query
             _catalog.Add(new QueryEntry(typeof(Query2), typeof(MockQueryHandler<Query2, Query2.Result>)));
 
             Assert.IsNotNull(_catalog.GetEntry(typeof(Query1)));
-            Assert.IsNotNull(_catalog.GetEntry(typeof(Query2)));            
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Query2)));
+        }
+
+        [TestMethod]
+        public void CanAddEntriesUsingFluentApi()
+        {
+            _catalog.Add(new QueryEntry(typeof(Query1), typeof(MockQueryHandler<Query1, Query1.Result>)))
+                    .Add(new QueryEntry(typeof(Query2), typeof(MockQueryHandler<Query2, Query2.Result>)));
+
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Query1)));
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Query2)));
         }
 
         [TestMethod]

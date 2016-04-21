@@ -29,11 +29,13 @@ namespace DotNetRevolution.Core.Command
             }
         }
 
-        public void Add(ICommandEntry entry)
+        public ICommandCatalog Add(ICommandEntry entry)
         {
             _entries.Add(entry.CommandType, entry);
 
             Contract.Assume(GetEntry(entry.CommandType) == entry);
+
+            return this;
         }
 
         public ICommandEntry GetEntry(Type commandType)

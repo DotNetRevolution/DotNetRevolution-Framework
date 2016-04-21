@@ -31,7 +31,17 @@ namespace DotNetRevolution.Core.Tests.Command
             _catalog.Add(new CommandEntry(typeof(Command2), typeof(MockCommandHandler<Command2>)));
 
             Assert.IsNotNull(_catalog.GetEntry(typeof(Command1)));
-            Assert.IsNotNull(_catalog.GetEntry(typeof(Command2)));            
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Command2)));
+        }
+        
+        [TestMethod]
+        public void CanAddEntriesUsingFluentApi()
+        {
+            _catalog.Add(new CommandEntry(typeof(Command1), typeof(MockCommandHandler<Command1>)))
+                    .Add(new CommandEntry(typeof(Command2), typeof(MockCommandHandler<Command2>)));
+
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Command1)));
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Command2)));
         }
 
         [TestMethod]

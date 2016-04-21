@@ -13,11 +13,14 @@ namespace DotNetRevolution.Core.Query.CodeContract
             throw new NotImplementedException();
         }
 
-        public void Add(IQueryEntry entry)
+        public IQueryCatalog Add(IQueryEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(Contract.Result<IQueryCatalog>() != null);
             Contract.Ensures(GetEntry(entry.QueryType) == entry);
             Contract.EnsuresOnThrow<ArgumentException>(GetEntry(entry.QueryType) == Contract.OldValue(GetEntry(entry.QueryType)));
+
+            throw new NotImplementedException();
         }
     }
 }

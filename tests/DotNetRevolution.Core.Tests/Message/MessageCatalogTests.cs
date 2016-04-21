@@ -31,7 +31,17 @@ namespace DotNetRevolution.Core.Tests.Message
             _catalog.Add(new MessageEntry(typeof(Message2), typeof(MockMessageHandler<Message2>)));
 
             Assert.IsNotNull(_catalog.GetEntry(typeof(Message1)));
-            Assert.IsNotNull(_catalog.GetEntry(typeof(Message2)));            
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Message2)));
+        }
+
+        [TestMethod]
+        public void CanAddEntriesUsingFluentApi()
+        {
+            _catalog.Add(new MessageEntry(typeof(Message1), typeof(MockMessageHandler<Message1>)))
+                    .Add(new MessageEntry(typeof(Message2), typeof(MockMessageHandler<Message2>)));
+
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Message1)));
+            Assert.IsNotNull(_catalog.GetEntry(typeof(Message2)));
         }
 
         [TestMethod]

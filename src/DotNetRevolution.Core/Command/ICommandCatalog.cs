@@ -9,8 +9,8 @@ namespace DotNetRevolution.Core.Command
     public interface ICommandCatalog
     {
         IReadOnlyCollection<Type> CommandTypes { [Pure] get; }
-        
-        void Add(ICommandEntry entry);
+
+        ICommandCatalog Add(ICommandEntry entry);
 
         [Pure]
         ICommandEntry GetEntry(Type commandType);

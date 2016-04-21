@@ -31,11 +31,13 @@ namespace DotNetRevolution.Core.Messaging
             return result;
         }
 
-        public void Add(IMessageEntry entry)
+        public IMessageCatalog Add(IMessageEntry entry)
         {
             _entries.Add(entry.MessageType, entry);
 
             Contract.Assume(GetEntry(entry.MessageType) == entry);
+
+            return this;
         }
 
         [ContractInvariantMethod]

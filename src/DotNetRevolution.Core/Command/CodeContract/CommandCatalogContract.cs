@@ -17,11 +17,14 @@ namespace DotNetRevolution.Core.Command.CodeContract
             }
         }
         
-        public void Add(ICommandEntry entry)
+        public ICommandCatalog Add(ICommandEntry entry)
         {
             Contract.Requires(entry != null);
+            Contract.Ensures(Contract.Result<ICommandCatalog>() != null);
             Contract.Ensures(GetEntry(entry.CommandType) == entry);
             Contract.EnsuresOnThrow<ArgumentException>(GetEntry(entry.CommandType) == Contract.OldValue(GetEntry(entry.CommandType)));
+
+            throw new NotImplementedException();
         }
 
         [Pure]

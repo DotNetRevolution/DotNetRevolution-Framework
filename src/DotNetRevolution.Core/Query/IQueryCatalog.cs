@@ -10,6 +10,6 @@ namespace DotNetRevolution.Core.Query
         [Pure]
         IQueryEntry GetEntry(Type queryType);
 
-        void Add(IQueryEntry entry);
+        IQueryCatalog Add(IQueryEntry entry);
     }
 }
