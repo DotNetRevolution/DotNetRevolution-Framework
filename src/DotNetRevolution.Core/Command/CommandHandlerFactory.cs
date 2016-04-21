@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Command
 {
     public class CommandHandlerFactory : ICommandHandlerFactory
     {
-        private readonly Dictionary<Type, ICommandHandler> _handlers;
+        private readonly Dictionary<Type, ICommandHandler> _handlers = new Dictionary<Type, ICommandHandler>();
 
         public ICommandCatalog Catalog { get; }
 
@@ -15,29 +15,13 @@ namespace DotNetRevolution.Core.Command
             Contract.Requires(catalog != null);
 
             Catalog = catalog;
-
-            _handlers = new Dictionary<Type, ICommandHandler>();
         }
 
-        public ICommandHandler GetHandler(object command)
+        public ICommandHandler GetHandler(Type commandType)
         {
-            var entry = GetEntry(command);
+            var entry = GetEntry(commandType);
 
-            return GetHandler(entry.CommandHandlerType);
-        }
-
-        protected virtual ICommandHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
-
-            return (ICommandHandler)Activator.CreateInstance(handlerType);
-        }
-
-        private ICommandHandler GetHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
+            var handlerType = entry.CommandHandlerType;
 
             // lock cache for concurrency
             lock (_handlers)
@@ -56,11 +40,20 @@ namespace DotNetRevolution.Core.Command
                 return handler;
             }
         }
+        
+        [Pure]
+        protected virtual ICommandHandler CreateHandler(Type handlerType)
+        {
+            Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<ICommandHandler>() != null);
 
+            return (ICommandHandler)Activator.CreateInstance(handlerType);
+        }
+        
         private void CacheHandler(ICommandHandler handler)
         {
             Contract.Requires(handler != null);
-            Contract.Ensures((!handler.Reusable && _handlers[handler.GetType()] == null) ||
+            Contract.Ensures((!handler.Reusable && GetCachedHandler(handler.GetType()) == null) ||
                              (handler.Reusable && _handlers[handler.GetType()] != null));
 
             // if handler is reusable, cache
@@ -70,10 +63,11 @@ namespace DotNetRevolution.Core.Command
             }
             else
             {
-                Contract.Assume(_handlers[handler.GetType()] == null);
+                Contract.Assume(GetCachedHandler(handler.GetType()) == null);
             }
         }
 
+        [Pure]
         private ICommandHandler GetCachedHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
@@ -85,12 +79,13 @@ namespace DotNetRevolution.Core.Command
             return handler;
         }
 
-        private ICommandEntry GetEntry(object command)
+        [Pure]
+        private ICommandEntry GetEntry(Type commandType)
         {
-            Contract.Requires(command != null);
+            Contract.Requires(commandType != null);
             Contract.Ensures(Contract.Result<ICommandEntry>() != null);
 
-            var entry = Catalog.GetEntry(command.GetType());
+            var entry = Catalog.GetEntry(commandType);
             Contract.Assume(entry != null);
 
             return entry;

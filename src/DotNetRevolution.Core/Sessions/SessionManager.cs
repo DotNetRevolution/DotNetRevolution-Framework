@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Sessions
     public class SessionManager : ISessionManager
     {
         private readonly ICurrentSession _currentSession;
-        private readonly List<ISession> _sessions;
+        private readonly List<ISession> _sessions = new List<ISession>();
 
         public IReadOnlyCollection<ISession> Sessions
         {
@@ -33,7 +33,6 @@ namespace DotNetRevolution.Core.Sessions
 
         protected SessionManager()
         {
-            _sessions = new List<ISession>();
             SessionRemoved += (sender, session) => { };
         }
 

@@ -7,9 +7,9 @@ namespace DotNetRevolution.Core.Messaging
     [ContractClass(typeof(MessageCatalogContract))]
     public interface IMessageCatalog
     {
+        void Add(IMessageEntry entry);
+
         [Pure]
         IMessageEntry GetEntry(Type messageType);
-
-        void Add(IMessageEntry entry);
     }
 }

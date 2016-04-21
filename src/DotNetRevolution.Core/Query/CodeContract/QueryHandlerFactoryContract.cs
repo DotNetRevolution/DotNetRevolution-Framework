@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Query.CodeContract
 {
     [ContractClassFor(typeof(IQueryHandlerFactory))]
-    public abstract class QueryHandlerFactoryContract : IQueryHandlerFactory
+    internal abstract class QueryHandlerFactoryContract : IQueryHandlerFactory
     {
         public IQueryCatalog Catalog
         {
@@ -16,9 +16,9 @@ namespace DotNetRevolution.Core.Query.CodeContract
             }
         }
 
-        public IQueryHandler GetHandler(object query)
+        public IQueryHandler GetHandler(Type queryType)
         {
-            Contract.Requires(query != null);
+            Contract.Requires(queryType != null);
             Contract.Ensures(Contract.Result<IQueryHandler>() != null);
 
             throw new NotImplementedException();

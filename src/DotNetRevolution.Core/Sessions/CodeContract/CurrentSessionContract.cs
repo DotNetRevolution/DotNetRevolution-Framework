@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Sessions.CodeContract
 {
     [ContractClassFor(typeof(ICurrentSession))]
-    public abstract class CurrentSessionContract : ICurrentSession
+    internal abstract class CurrentSessionContract : ICurrentSession
     {
         public string Id
         {

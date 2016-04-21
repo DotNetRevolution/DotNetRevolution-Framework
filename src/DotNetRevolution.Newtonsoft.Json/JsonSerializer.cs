@@ -42,13 +42,14 @@ namespace DotNetRevolution.Json
         
         public string Serialize(object item)
         {
-            return JsonConvert.SerializeObject(item, _serializerSettings);
+            var returnValue = JsonConvert.SerializeObject(item, _serializerSettings);
+            Contract.Assume(returnValue != null);
+
+            return returnValue;
         }
 
         public Stream Serialize(object item, Encoding encoding)
         {
-            Contract.Assume(encoding != null);
-
             // get item as a string
             var messageAsString = item as string;
 
@@ -79,7 +80,10 @@ namespace DotNetRevolution.Json
         public object Deserialize(Type type, string data)
         {
             // deserialize and return
-            return JsonConvert.DeserializeObject(data, type, _serializerSettings);
+            var returnValue = JsonConvert.DeserializeObject(data, type, _serializerSettings);
+            Contract.Assume(returnValue != null);
+
+            return returnValue;
         }
     }
 }

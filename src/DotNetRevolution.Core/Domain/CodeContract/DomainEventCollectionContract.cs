@@ -6,13 +6,13 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventCollection))]
-    public abstract class DomainEventCollectionContract : IDomainEventCollection
+    internal abstract class DomainEventCollectionContract : IDomainEventCollection
     {
-        public AggregateRoot AggregateRoot
+        public IAggregateRoot AggregateRoot
         {
             get
             {
-                Contract.Ensures(Contract.Result<AggregateRoot>() != null);
+                Contract.Ensures(Contract.Result<IAggregateRoot>() != null);
 
                 throw new NotImplementedException();
             }

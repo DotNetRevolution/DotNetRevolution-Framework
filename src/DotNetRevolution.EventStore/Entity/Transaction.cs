@@ -8,11 +8,13 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class Transaction
     {
-        private readonly ICollection<TransactionEvent> _events;
-        private readonly ICollection<TransactionAnnouncement> _announcements;
+        private readonly ICollection<TransactionEvent> _events = new EntityCollection<TransactionEvent>();
+        private readonly ICollection<TransactionAnnouncement> _announcements = new EntityCollection<TransactionAnnouncement>();
+        private readonly ICollection<TransactionEventProvider> _transactionEventProviders = new EntityCollection<TransactionEventProvider>();
+
+        private int _eventSequence = -1;
 
         public long TransactionId { get; }
-        public Guid EventProviderId { get; }
         public string User { get; }
         public string Application { get; }
         public DateTime Processed { get; }
@@ -24,39 +26,35 @@ namespace DotNetRevolution.EventStore.Entity
             get { return _announcements as EntityCollection<TransactionAnnouncement>; }
         }
 
+        public virtual EntityCollection<TransactionEventProvider> EventProviders
+        {
+            get { return _transactionEventProviders as EntityCollection<TransactionEventProvider>; }
+        }
+
         public virtual EntityCollection<TransactionEvent> Events
         {
             get { return _events as EntityCollection<TransactionEvent>; }
         }
-
-        protected Transaction()
+        
+        internal Transaction(int eventProviderId, string user, object command, IEnumerable<object> events, Func<object, string> serializeData)
         {
-            _events = new EntityCollection<TransactionEvent>();
-            _announcements = new EntityCollection<TransactionAnnouncement>();
-        }
-
-        internal Transaction(Guid eventProviderId, string user, TransactionCommandType transactionCommandType, string commandData, IEnumerable<object> events, Func<object, string> serializeData)
-            : this()
-        {
-            Contract.Requires(!string.IsNullOrWhiteSpace(commandData));
-            Contract.Requires(eventProviderId != Guid.Empty);
-            Contract.Requires(transactionCommandType != null);
+            Contract.Requires(command != null);
             Contract.Requires(events != null);
             Contract.Requires(serializeData != null);
-            
-            EventProviderId = eventProviderId;
 
-            TransactionCommand = new TransactionCommand(this, transactionCommandType, commandData);
+            var commandData = serializeData(command);
+            Contract.Assume(!string.IsNullOrWhiteSpace(commandData));
+
+            TransactionCommand = new TransactionCommand(this, new TransactionCommandType(command.GetType().FullName), commandData);
 
             if (!string.IsNullOrWhiteSpace(user))
             {
                 User = user;
             }
             
-            AddEvents(events, serializeData);
+            AddEvents(eventProviderId, events, serializeData);
         }
-
-        
+                
         public void Announce(Action<TransactionEvent> announceEvent)
         {
             Contract.Requires(announceEvent != null);
@@ -80,12 +78,12 @@ namespace DotNetRevolution.EventStore.Entity
             }
         }
 
-        private void AddEvents(IEnumerable<object> events, Func<object, string> serializeData)
+        public void AddEvents(int eventProviderId, IEnumerable<object> events, Func<object, string> serializeData)
         {
             Contract.Requires(serializeData != null);
             Contract.Requires(events != null);
 
-            var sequence = -1;
+            var transactionEventProvider = AddOrReturnTransactionEventProvider(eventProviderId);
 
             // loop through each event to add to the collection
             foreach (var @event in events)
@@ -94,16 +92,35 @@ namespace DotNetRevolution.EventStore.Entity
 
                 var eventType = @event.GetType();
 
+                var eventData = serializeData(@event);
+                Contract.Assume(!string.IsNullOrWhiteSpace(eventData));
+
                 // add a new transaction event to the collection
-                _events.Add(new TransactionEvent(this, ++sequence, new TransactionEventType(eventType.FullName), serializeData(@event)));                
+                _events.Add(new TransactionEvent(transactionEventProvider, ++_eventSequence, new TransactionEventType(eventType.FullName), eventData));                
             }
         }
-        
+
+        private TransactionEventProvider AddOrReturnTransactionEventProvider(int eventProviderId)
+        {
+            Contract.Ensures(Contract.Result<TransactionEventProvider>() != null);
+
+            var transactionEventProvider = _transactionEventProviders.FirstOrDefault(x => x.EventProviderId == eventProviderId);
+
+            if (transactionEventProvider == null)
+            {
+                transactionEventProvider = new TransactionEventProvider(this, eventProviderId);
+                _transactionEventProviders.Add(transactionEventProvider);
+            }
+            
+            return transactionEventProvider;
+        }
+
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
             Contract.Invariant(_events != null);
             Contract.Invariant(_announcements != null);
+            Contract.Invariant(_transactionEventProviders != null);
         }
     }
 }

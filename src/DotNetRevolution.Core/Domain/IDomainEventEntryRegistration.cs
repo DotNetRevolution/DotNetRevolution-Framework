@@ -7,6 +7,6 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(DomainEventEntryRegistrationContract))]
     public interface IDomainEventEntryRegistration : IDisposable
     {
-        Guid Id { [Pure] get; } 
+        IDomainEventEntry Entry { [Pure] get; }
     }
 }

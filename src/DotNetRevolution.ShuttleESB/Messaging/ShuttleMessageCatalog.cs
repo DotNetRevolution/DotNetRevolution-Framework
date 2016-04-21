@@ -7,7 +7,7 @@ namespace DotNetRevolution.ShuttleESB.Messaging
 {
     public class ShuttleMessageCatalog : IShuttleMessageCatalog
     {
-        private readonly Dictionary<Type, IShuttleMessageEntry> _entries;
+        private readonly Dictionary<Type, IShuttleMessageEntry> _entries = new Dictionary<Type, IShuttleMessageEntry>();
 
         public IReadOnlyCollection<IShuttleMessageEntry> Entries
         {
@@ -24,12 +24,7 @@ namespace DotNetRevolution.ShuttleESB.Messaging
                 return result;
             }
         }
-
-        public ShuttleMessageCatalog()
-        {
-            _entries = new Dictionary<Type, IShuttleMessageEntry>();
-        }
-
+        
         public void Add(IShuttleMessageEntry entry)
         {            
             _entries.Add(entry.MessageType, entry);

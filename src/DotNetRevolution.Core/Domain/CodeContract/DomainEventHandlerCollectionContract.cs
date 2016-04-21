@@ -6,13 +6,13 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventHandlerCollection))]
-    public abstract class DomainEventHandlerCollectionContract : IDomainEventHandlerCollection
+    internal abstract class DomainEventHandlerCollectionContract : IDomainEventHandlerCollection
     {
-        public object DomainEvent
+        public Type DomainEventType
         {
             get
             {
-                Contract.Ensures(Contract.Result<object>() != null);
+                Contract.Ensures(Contract.Result<Type>() != null);
 
                 throw new NotImplementedException();
             }

@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Query
 {
     public class QueryHandlerFactory : IQueryHandlerFactory
     {
-        private readonly Dictionary<Type, IQueryHandler> _handlers;
+        private readonly Dictionary<Type, IQueryHandler> _handlers = new Dictionary<Type, IQueryHandler>();
 
         public IQueryCatalog Catalog { get; }
 
@@ -15,29 +15,13 @@ namespace DotNetRevolution.Core.Query
             Contract.Requires(catalog != null);
 
             Catalog = catalog;
-
-            _handlers = new Dictionary<Type, IQueryHandler>();
         }
 
-        public IQueryHandler GetHandler(object query)
+        public IQueryHandler GetHandler(Type queryType)
         {
-            var entry = GetEntry(query);
+            var entry = GetEntry(queryType);
 
-            return GetHandler(entry.QueryHandlerType);
-        }
-
-        protected virtual IQueryHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
-
-            return (IQueryHandler)Activator.CreateInstance(handlerType);
-        }
-
-        private IQueryHandler GetHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
+            var handlerType = entry.QueryHandlerType;
 
             // lock cache for concurrency
             lock (_handlers)
@@ -57,10 +41,18 @@ namespace DotNetRevolution.Core.Query
             }
         }
 
+        protected virtual IQueryHandler CreateHandler(Type handlerType)
+        {
+            Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<IQueryHandler>() != null);
+
+            return (IQueryHandler)Activator.CreateInstance(handlerType);
+        }
+        
         private void CacheHandler(IQueryHandler handler)
         {
             Contract.Requires(handler != null);
-            Contract.Ensures((!handler.Reusable && _handlers[handler.GetType()] == null) ||
+            Contract.Ensures((!handler.Reusable && GetCachedHandler(handler.GetType()) == null) ||
                              (handler.Reusable && _handlers[handler.GetType()] != null));
 
             // if handler is reusable, cache
@@ -70,10 +62,11 @@ namespace DotNetRevolution.Core.Query
             }
             else
             {
-                Contract.Assume(_handlers[handler.GetType()] == null);
+                Contract.Assume(GetCachedHandler(handler.GetType()) == null);
             }
         }
 
+        [Pure]
         private IQueryHandler GetCachedHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
@@ -85,12 +78,13 @@ namespace DotNetRevolution.Core.Query
             return handler;
         }
 
-        private IQueryEntry GetEntry(object query)
+        [Pure]
+        private IQueryEntry GetEntry(Type queryType)
         {
-            Contract.Requires(query != null);
+            Contract.Requires(queryType != null);
             Contract.Ensures(Contract.Result<IQueryEntry>() != null);
 
-            var entry = Catalog.GetEntry(query.GetType());
+            var entry = Catalog.GetEntry(queryType);
             Contract.Assume(entry != null);
 
             return entry;

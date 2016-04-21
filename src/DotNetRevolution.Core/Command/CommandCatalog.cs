@@ -7,23 +7,33 @@ namespace DotNetRevolution.Core.Command
 {
     public class CommandCatalog : ICommandCatalog
     {
-        private readonly Dictionary<Type, ICommandEntry> _entries;
+        private readonly Dictionary<Type, ICommandEntry> _entries = new Dictionary<Type, ICommandEntry>();
 
         public IReadOnlyCollection<Type> CommandTypes
         {
             get { return _entries.Keys.ToList().AsReadOnly(); }
         }
-        
+
         public CommandCatalog()
         {
-            _entries = new Dictionary<Type, ICommandEntry>();
+        }
+
+        public CommandCatalog(IReadOnlyCollection<ICommandEntry> entries)
+        {            
+            Contract.Requires(entries != null);
+            Contract.Requires(Contract.ForAll(entries, o => o != null));
+
+            foreach(var entry in entries)
+            {
+                Add(entry);
+            }
         }
 
         public void Add(ICommandEntry entry)
         {
             _entries.Add(entry.CommandType, entry);
 
-            Contract.Assume(GetEntry(entry.CommandType) != null);
+            Contract.Assume(GetEntry(entry.CommandType) == entry);
         }
 
         public ICommandEntry GetEntry(Type commandType)

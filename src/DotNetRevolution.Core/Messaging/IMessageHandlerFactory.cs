@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Messaging.CodeContract;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Messaging
@@ -8,6 +9,6 @@ namespace DotNetRevolution.Core.Messaging
     {
         IMessageCatalog Catalog { [Pure] get; }
 
-        IMessageHandler GetHandler(object message);
+        IMessageHandler GetHandler(Type messageType);
     }
 }

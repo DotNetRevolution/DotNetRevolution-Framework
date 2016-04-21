@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -9,22 +10,22 @@ namespace DotNetRevolution.Core.Domain
     {
         private readonly IReadOnlyCollection<IDomainEventHandler> _handlers;
 
-        public DomainEventHandlerCollection(object domainEvent)
-            : this(domainEvent, new Collection<IDomainEventHandler>())
+        public DomainEventHandlerCollection(Type domainEventType)
+            : this(domainEventType, new Collection<IDomainEventHandler>())
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(domainEventType != null);
         }
 
-        public DomainEventHandlerCollection(object domainEvent, IReadOnlyCollection<IDomainEventHandler> handlers)
+        public DomainEventHandlerCollection(Type domainEventType, IReadOnlyCollection<IDomainEventHandler> handlers)
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(domainEventType != null);
             Contract.Requires(handlers != null);
 
-            DomainEvent = domainEvent;
+            DomainEventType = domainEventType;
             _handlers = handlers;
         }
 
-        public object DomainEvent { get; }
+        public Type DomainEventType { get; }
 
         public int Count
         {

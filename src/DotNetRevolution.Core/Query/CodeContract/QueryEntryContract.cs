@@ -25,7 +25,5 @@ namespace DotNetRevolution.Core.Query.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public abstract IQueryHandler QueryHandler { get; set; }
     }
 }

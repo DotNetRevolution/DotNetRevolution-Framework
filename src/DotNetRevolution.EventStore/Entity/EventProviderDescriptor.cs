@@ -19,15 +19,14 @@ namespace DotNetRevolution.EventStore.Entity
         {
         }
 
-        public EventProviderDescriptor(EventProvider eventProvider, Transaction transaction, string descriptor)
+        internal EventProviderDescriptor(EventProvider eventProvider, Transaction transaction, string descriptor)
         {
-            Contract.Requires(eventProvider != null, "eventProvider");
-            Contract.Requires(transaction != null, "transaction");
-            Contract.Requires(!string.IsNullOrWhiteSpace(descriptor), "Descriptor");
+            Contract.Requires(eventProvider != null);
+            Contract.Requires(transaction != null);
 
             EventProvider = eventProvider;
             Transaction = transaction;
-            Descriptor = descriptor;
+            Descriptor = string.IsNullOrWhiteSpace(descriptor) ? "__UNKNOWN__" : descriptor;
         }
     }
 }

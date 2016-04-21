@@ -111,6 +111,9 @@
     <Compile Include="Command\ICommandHandlerFactory.cs" />
     <Compile Include="Domain\ActionDomainEventHandler.cs" />
     <Compile Include="Domain\AggregateRoot.cs" />
+    <Compile Include="Domain\AggregateRootWithMapping.cs" />
+    <Compile Include="Domain\CodeContract\AggregateRootContract.cs" />
+    <Compile Include="Domain\CodeContract\AggregateRootWithEventSourcingContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventCatalogContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventCollectionContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventDispatcherContract.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="Domain\CodeContract\DomainEventHandlerCollectionContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerFactoryContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventMethodInvokerContract.cs" />
     <Compile Include="Domain\DomainEventCatalog.cs" />
     <Compile Include="Domain\DomainEventCollection.cs" />
     <Compile Include="Domain\DomainEventDispatcher.cs" />
@@ -128,8 +132,12 @@
     <Compile Include="Domain\DomainEventHandlerCollection.cs" />
     <Compile Include="Domain\DomainEventHandlerFactory.cs" />
     <Compile Include="Domain\DomainEventHandlingException.cs" />
+    <Compile Include="Domain\DomainEventMethodInvoker.cs" />
     <Compile Include="Domain\DomainException.cs" />
     <Compile Include="Domain\EntityCollection.cs" />
+    <Compile Include="Domain\AggregateRootWithEventSourcing.cs" />
+    <Compile Include="Domain\IAggregateRoot.cs" />
+    <Compile Include="Domain\IAggregateRootWithEventSourcing.cs" />
     <Compile Include="Domain\Identity.cs" />
     <Compile Include="Domain\IDomainEventCatalog.cs" />
     <Compile Include="Domain\IDomainEventCollection.cs" />
@@ -139,12 +147,15 @@
     <Compile Include="Domain\IDomainEventHandler.cs" />
     <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
     <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
+    <Compile Include="Domain\IDomainEventMethodInvoker.cs" />
+    <Compile Include="Domain\MissingApplyDomainEventMappingException.cs" />
     <Compile Include="Domain\NullDomainEventDispatcher.cs" />
     <Compile Include="Base\SequentialGuid.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
     <Compile Include="Extension\GuidExtension.AsString.cs" />
+    <Compile Include="Pipeline\Pipeline.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />

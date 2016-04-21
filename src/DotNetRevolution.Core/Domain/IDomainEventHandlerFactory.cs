@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain.CodeContract;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain
@@ -8,6 +9,6 @@ namespace DotNetRevolution.Core.Domain
     {
         IDomainEventCatalog Catalog { [Pure] get; }
 
-        IDomainEventHandlerCollection GetDomainEventHandlers(object domainEvent);
+        IDomainEventHandlerCollection GetHandlers(Type domainEventType);
     }
 }

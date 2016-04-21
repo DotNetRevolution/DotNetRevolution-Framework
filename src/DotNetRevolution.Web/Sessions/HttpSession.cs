@@ -20,7 +20,10 @@ namespace DotNetRevolution.Web.Sessions
         public string Id
         {
             get
-            {                
+            {
+                var id = InternalHttpSession.SessionID;
+                Contract.Assume(!string.IsNullOrWhiteSpace(id));
+
                 return InternalHttpSession.SessionID;
             }
         }

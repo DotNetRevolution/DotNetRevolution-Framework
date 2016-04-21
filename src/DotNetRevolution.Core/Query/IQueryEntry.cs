@@ -10,7 +10,5 @@ namespace DotNetRevolution.Core.Query
         Type QueryType { [Pure] get; }
 
         Type QueryHandlerType { [Pure] get; }
-
-        IQueryHandler QueryHandler { [Pure] get; set; }
     }
 }

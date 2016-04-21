@@ -35,6 +35,14 @@ namespace DotNetRevolution.Core.Domain
             Contract.Requires(action != null);
             Contract.Ensures(Contract.Result<DomainEventEntry>() != null);
 
+            return New(action, false);
+        }
+
+        public static DomainEventEntry New<TDomainEvent>(Action<TDomainEvent> action, bool reusable) where TDomainEvent : class
+        {
+            Contract.Requires(action != null);
+            Contract.Ensures(Contract.Result<DomainEventEntry>() != null);
+
             return new DomainEventEntry(typeof(TDomainEvent), new ActionDomainEventHandler<TDomainEvent>(action));
         }
     }

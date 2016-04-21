@@ -7,7 +7,6 @@ namespace DotNetRevolution.Core.Query
     {
         public Type QueryType { get; }
         public Type QueryHandlerType { get; }
-        public IQueryHandler QueryHandler { get; set; }
 
         public QueryEntry(Type queryType, Type queryHandlerType)
         {
@@ -16,16 +15,6 @@ namespace DotNetRevolution.Core.Query
 
             QueryType = queryType;
             QueryHandlerType = queryHandlerType;
-        }
-
-        public QueryEntry(Type queryType, IQueryHandler queryHandler)
-        {
-            Contract.Requires(queryType != null);
-            Contract.Requires(queryHandler != null);
-
-            QueryType = queryType;
-            QueryHandler = queryHandler;
-            QueryHandlerType = queryHandler.GetType();
-        }
+        }        
     }
 }

@@ -20,7 +20,6 @@ namespace DotNetRevolution.Core.Domain.CodeContract
         public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(GetEntries(entry.DomainEventType) != null);
             Contract.Ensures(Contract.Result<IDomainEventEntryRegistration>() != null);
             
             throw new NotImplementedException();
@@ -37,7 +36,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
         public void Remove(IDomainEventEntry entry)
         {
             Contract.Requires(entry != null);
-
+            
             throw new NotImplementedException();
         }
 

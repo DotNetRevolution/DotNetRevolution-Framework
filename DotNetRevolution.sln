@@ -3,39 +3,45 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core", "DotNetRevolution.Core\DotNetRevolution.Core.csproj", "{D65E8739-5F05-46D9-8B5E-47008F848257}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core", "src\DotNetRevolution.Core\DotNetRevolution.Core.csproj", "{D65E8739-5F05-46D9-8B5E-47008F848257}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Logging.Serilog", "DotNetRevolution.Logging.Serilog\DotNetRevolution.Logging.Serilog.csproj", "{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Logging.Serilog", "src\DotNetRevolution.Logging.Serilog\DotNetRevolution.Logging.Serilog.csproj", "{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logging", "Logging", "{17FFDA9B-6DB6-4E7E-AA9F-0824E4504032}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DotNetRevolution.Logging.Database", "DotNetRevolution.Logging.Database\DotNetRevolution.Logging.Database.sqlproj", "{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}"
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DotNetRevolution.Logging.Database", "src\DotNetRevolution.Logging.Database\DotNetRevolution.Logging.Database.sqlproj", "{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ninject", "Ninject", "{7F327415-88E2-4E71-92FC-D0844EC6C5CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Ninject.Serilog", "DotNetRevolution.Ninject.Serilog\DotNetRevolution.Ninject.Serilog.csproj", "{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Ninject.Serilog", "src\DotNetRevolution.Ninject.Serilog\DotNetRevolution.Ninject.Serilog.csproj", "{CD62BDB8-85E8-4EAD-B269-BC2A407415C3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServiceBus", "ServiceBus", "{CFC4ABC0-DBC4-4009-BE80-E924CAA16CC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.ShuttleESB", "DotNetRevolution.ShuttleESB\DotNetRevolution.ShuttleESB.csproj", "{04D5E9FF-1B58-4014-8F78-29D143D8A074}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.ShuttleESB", "src\DotNetRevolution.ShuttleESB\DotNetRevolution.ShuttleESB.csproj", "{04D5E9FF-1B58-4014-8F78-29D143D8A074}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serialization", "Serialization", "{09DFED90-577A-4612-A89F-55071E2E6529}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{48CE0BA6-3CA2-4FAD-87CE-F927DEF47B7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Web", "DotNetRevolution.Web\DotNetRevolution.Web.csproj", "{4F605714-4AF6-4F52-B0D4-8B4A97C7C9B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Web", "src\DotNetRevolution.Web\DotNetRevolution.Web.csproj", "{4F605714-4AF6-4F52-B0D4-8B4A97C7C9B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Logging.Serilog.Web", "DotNetRevolution.Logging.Serilog.Web\DotNetRevolution.Logging.Serilog.Web.csproj", "{A4676E6A-64AB-4B46-A398-D020583752B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Logging.Serilog.Web", "src\DotNetRevolution.Logging.Serilog.Web\DotNetRevolution.Logging.Serilog.Web.csproj", "{A4676E6A-64AB-4B46-A398-D020583752B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.MVC", "DotNetRevolution.MVC\DotNetRevolution.MVC.csproj", "{07090DE2-BF10-4EB3-9389-0D8B66A16C12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.MVC", "src\DotNetRevolution.MVC\DotNetRevolution.MVC.csproj", "{07090DE2-BF10-4EB3-9389-0D8B66A16C12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Newtonsoft.Json", "DotNetRevolution.Newtonsoft.Json\DotNetRevolution.Newtonsoft.Json.csproj", "{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Newtonsoft.Json", "src\DotNetRevolution.Newtonsoft.Json\DotNetRevolution.Newtonsoft.Json.csproj", "{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventSourcing", "EventSourcing", "{143E43E5-1A24-42B4-A010-2391E44C6D9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventStore", "DotNetRevolution.EventStore\DotNetRevolution.EventStore.csproj", "{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventStore", "src\DotNetRevolution.EventStore\DotNetRevolution.EventStore.csproj", "{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Ninject", "DotNetRevolution.Ninject\DotNetRevolution.Ninject.csproj", "{F4C0E5D1-2244-499B-856C-815CE3C458A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Ninject", "src\DotNetRevolution.Ninject\DotNetRevolution.Ninject.csproj", "{F4C0E5D1-2244-499B-856C-815CE3C458A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E4A1D295-C96B-42F1-BEE6-EBF21E75D591}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core.Tests", "tests\DotNetRevolution.Core.Tests\DotNetRevolution.Core.Tests.csproj", "{90F8BCF4-EAD7-4F06-9E51-D4E627B92482}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.Domain", "tests\DotNetRevolution.Test.Domain\DotNetRevolution.Test.Domain.csproj", "{5D0BDE59-1510-47FE-A313-49DA714602FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +95,14 @@ Global
 		{F4C0E5D1-2244-499B-856C-815CE3C458A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4C0E5D1-2244-499B-856C-815CE3C458A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4C0E5D1-2244-499B-856C-815CE3C458A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,5 +118,7 @@ Global
 		{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6} = {09DFED90-577A-4612-A89F-55071E2E6529}
 		{2BCCCE1F-EA7C-46C8-B8B1-794E340589AD} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{F4C0E5D1-2244-499B-856C-815CE3C458A3} = {7F327415-88E2-4E71-92FC-D0844EC6C5CA}
+		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
+		{5D0BDE59-1510-47FE-A313-49DA714602FF} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 	EndGlobalSection
 EndGlobal

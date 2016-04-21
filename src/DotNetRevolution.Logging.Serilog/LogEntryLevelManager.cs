@@ -16,10 +16,10 @@ namespace DotNetRevolution.Logging.Serilog
         private readonly ISessionManager _sessionManager;
         private readonly IIdentityManager _identityManager;
         
-        private readonly Dictionary<string, LoggingLevelSwitch> _userLogSwitches;
-        private readonly Dictionary<string, LoggingLevelSwitch> _sessionLogSwitches;
+        private readonly Dictionary<string, LoggingLevelSwitch> _userLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
+        private readonly Dictionary<string, LoggingLevelSwitch> _sessionLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
 
-        private readonly LoggingLevelSwitch _applicationSwitch;
+        private readonly LoggingLevelSwitch _applicationSwitch = new LoggingLevelSwitch();
 
         public LogEntryLevel LogEntryLevel
         {
@@ -54,11 +54,7 @@ namespace DotNetRevolution.Logging.Serilog
             _sessionManager.SessionRemoved += SessionRemoved;
 
             _identityManager = identityManager;
-
-            _sessionLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
-            _userLogSwitches = new Dictionary<string, LoggingLevelSwitch>();
-            _applicationSwitch = new LoggingLevelSwitch();
-
+            
             SetLogEntryLevel(LogLevel.Application, applicationLogEntryLevel);
         }
         
@@ -145,16 +141,14 @@ namespace DotNetRevolution.Logging.Serilog
             var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Id;
-            Contract.Assume(sessionId != null);
-
+            
             return _sessionLogSwitches.TryGetValue(sessionId, out logSwitch);            
         }
 
         private void SessionRemoved(object sender, SessionEventArgs e)
         {
             Contract.Requires(e?.Session != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(e.Session.Id));
-
+            
             _sessionLogSwitches.Remove(e.Session.Id);
         }
 

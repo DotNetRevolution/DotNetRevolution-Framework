@@ -47,8 +47,6 @@ namespace DotNetRevolution.Core.Domain
 
             foreach (var field in fields)
             {
-                Contract.Assume(field != null);
-
                 var value1 = field.GetValue(other);
                 var value2 = field.GetValue(this);
                 
@@ -85,8 +83,8 @@ namespace DotNetRevolution.Core.Domain
         }
 
         public static bool operator ==(ValueObject<T> valueObject1, ValueObject<T> valueObject2)
-        {
-            return valueObject1 != null && valueObject1.Equals(valueObject2);
+        { 
+            return ((object)valueObject1 != null) && valueObject1.Equals(valueObject2);
         }
 
         public static bool operator !=(ValueObject<T> valueObject1, ValueObject<T> valueObject2)

@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Command.CodeContract;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Command
@@ -8,6 +9,6 @@ namespace DotNetRevolution.Core.Command
     {
         ICommandCatalog Catalog { [Pure] get; }
 
-        ICommandHandler GetHandler(object command);
+        ICommandHandler GetHandler(Type commandType);
     }
 }

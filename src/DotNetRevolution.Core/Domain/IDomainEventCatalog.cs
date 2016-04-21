@@ -20,3 +20,4 @@ namespace DotNetRevolution.Core.Domain
         bool TryGetEntries(Type domainEventType, out IReadOnlyCollection<IDomainEventEntry> entries);
     }
 }
+ 

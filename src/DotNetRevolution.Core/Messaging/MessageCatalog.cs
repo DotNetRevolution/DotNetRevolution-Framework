@@ -6,11 +6,21 @@ namespace DotNetRevolution.Core.Messaging
 {
     public class MessageCatalog : IMessageCatalog
     {
-        private readonly Dictionary<Type, IMessageEntry> _entries;
-        
+        private readonly Dictionary<Type, IMessageEntry> _entries = new Dictionary<Type, IMessageEntry>();
+
         public MessageCatalog()
         {
-            _entries = new Dictionary<Type, IMessageEntry>();
+        }
+
+        public MessageCatalog(IReadOnlyCollection<IMessageEntry> entries)
+        {
+            Contract.Requires(entries != null);
+            Contract.Requires(Contract.ForAll(entries, o => o != null));
+
+            foreach (var entry in entries)
+            {
+                Add(entry);
+            }
         }
 
         public IMessageEntry GetEntry(Type messageType)
@@ -25,7 +35,7 @@ namespace DotNetRevolution.Core.Messaging
         {
             _entries.Add(entry.MessageType, entry);
 
-            Contract.Assume(GetEntry(entry.MessageType) != null);
+            Contract.Assume(GetEntry(entry.MessageType) == entry);
         }
 
         [ContractInvariantMethod]

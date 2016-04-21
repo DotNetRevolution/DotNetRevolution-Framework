@@ -17,7 +17,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
 
         private readonly ISessionManager _sessionManager;
         private readonly string _logPath;
-        private readonly Dictionary<string, RollingFileSink> _sinks;
+        private readonly Dictionary<string, RollingFileSink> _sinks = new Dictionary<string, RollingFileSink>();
 
         public SessionRollingFileSink(ISessionManager sessionManager,
                                       string logPath)
@@ -28,8 +28,6 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             _sessionManager = sessionManager;
             _sessionManager.SessionRemoved += SessionRemoved;
             _logPath = logPath;
-
-            _sinks = new Dictionary<string, RollingFileSink>();
         }
         
         public void Emit(LogEvent logEvent)
@@ -46,8 +44,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Id;
-            Contract.Assume(sessionId != null);
-
+            
             RollingFileSink sink;
 
             if (_sinks.TryGetValue(sessionId, out sink))
@@ -67,8 +64,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private void SessionRemoved(object sender, SessionEventArgs e)
         {
             Contract.Requires(e?.Session != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(e.Session.Id));
-
+            
             var session = e.Session;
 
             RollingFileSink sink;

@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Messaging
 {
     public class MessageHandlerFactory : IMessageHandlerFactory
     {
-        private readonly Dictionary<Type, IMessageHandler> _handlers;
+        private readonly Dictionary<Type, IMessageHandler> _handlers = new Dictionary<Type, IMessageHandler>();
 
         public IMessageCatalog Catalog { get; }
 
@@ -15,29 +15,13 @@ namespace DotNetRevolution.Core.Messaging
             Contract.Requires(catalog != null);
 
             Catalog = catalog;
-
-            _handlers = new Dictionary<Type, IMessageHandler>();
         }
 
-        public IMessageHandler GetHandler(object message)
+        public IMessageHandler GetHandler(Type messageType)
         {
-            var entry = GetEntry(message);
+            var entry = GetEntry(messageType);
 
-            return GetHandler(entry.MessageHandlerType);
-        }
-
-        protected virtual IMessageHandler CreateHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
-
-            return (IMessageHandler)Activator.CreateInstance(handlerType);
-        }
-
-        private IMessageHandler GetHandler(Type handlerType)
-        {
-            Contract.Requires(handlerType != null);
-            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
+            var handlerType = entry.MessageHandlerType;
 
             // lock cache for concurrency
             lock (_handlers)
@@ -57,11 +41,19 @@ namespace DotNetRevolution.Core.Messaging
             }
         }
 
+        protected virtual IMessageHandler CreateHandler(Type handlerType)
+        {
+            Contract.Requires(handlerType != null);
+            Contract.Ensures(Contract.Result<IMessageHandler>() != null);
+
+            return (IMessageHandler)Activator.CreateInstance(handlerType);
+        }
+        
         private void CacheHandler(IMessageHandler handler)
         {
             Contract.Requires(handler != null);
             Contract.Ensures((handler.Reusable && _handlers[handler.GetType()] != null) ||
-                             (!handler.Reusable && _handlers[handler.GetType()] == null));
+                             (!handler.Reusable && GetCachedHandler(handler.GetType()) == null));
 
             // if handler is reusable, cache
             if (handler.Reusable)
@@ -70,10 +62,11 @@ namespace DotNetRevolution.Core.Messaging
             }
             else
             {
-                Contract.Assume(_handlers[handler.GetType()] == null);
+                Contract.Assume(GetCachedHandler(handler.GetType()) == null);
             }
         }
 
+        [Pure]
         private IMessageHandler GetCachedHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
@@ -85,12 +78,13 @@ namespace DotNetRevolution.Core.Messaging
             return handler;
         }
 
-        private IMessageEntry GetEntry(object message)
+        [Pure]
+        private IMessageEntry GetEntry(Type messageType)
         {
-            Contract.Requires(message != null);
+            Contract.Requires(messageType != null);
             Contract.Ensures(Contract.Result<IMessageEntry>() != null);
 
-            var entry = Catalog.GetEntry(message.GetType());
+            var entry = Catalog.GetEntry(messageType);
             Contract.Assume(entry != null);
 
             return entry;

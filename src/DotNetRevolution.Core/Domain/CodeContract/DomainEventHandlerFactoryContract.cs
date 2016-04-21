@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
     [ContractClassFor(typeof(IDomainEventHandlerFactory))]
-    public abstract class DomainEventHandlerFactoryContract : IDomainEventHandlerFactory
+    internal abstract class DomainEventHandlerFactoryContract : IDomainEventHandlerFactory
     {
         public IDomainEventCatalog Catalog
         {
@@ -16,9 +16,9 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             }
         }
 
-        public IDomainEventHandlerCollection GetDomainEventHandlers(object domainEvent)
+        public IDomainEventHandlerCollection GetHandlers(Type domainEventType)
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(domainEventType != null);
             Contract.Ensures(Contract.Result<IDomainEventHandlerCollection>() != null);
             
             throw new NotImplementedException();

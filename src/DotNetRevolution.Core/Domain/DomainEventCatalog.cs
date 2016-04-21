@@ -6,24 +6,45 @@ using System.Linq;
 namespace DotNetRevolution.Core.Domain
 {
     public class DomainEventCatalog : IDomainEventCatalog
-    { 
-        private readonly Dictionary<Type, List<IDomainEventEntry>> _entries;
+    {
+        private readonly Dictionary<Type, List<IDomainEventEntry>> _entries = new Dictionary<Type, List<IDomainEventEntry>>();        
 
         public IReadOnlyCollection<Type> DomainEventTypes
         {
             get { return _entries.Keys.ToList().AsReadOnly(); }
         }
-        
+
         public DomainEventCatalog()
         {
-            _entries = new Dictionary<Type, List<IDomainEventEntry>>();
+        }
+
+        public DomainEventCatalog(IReadOnlyCollection<IDomainEventEntry> entries)
+        {
+            Contract.Requires(entries != null);
+            Contract.Requires(Contract.ForAll(entries, o => o != null));
+
+            foreach (var entry in entries)
+            {
+                Add(entry);
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
         public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
         {
-            AddEntry(entry);
+            List<IDomainEventEntry> domainEventEntries;
 
+            if (_entries.TryGetValue(entry.DomainEventType, out domainEventEntries))
+            {
+                Contract.Assume(domainEventEntries != null);
+
+                domainEventEntries.Add(entry);
+            }
+            else
+            {
+                _entries.Add(entry.DomainEventType, new List<IDomainEventEntry> { entry });
+            }
+            
             return new DomainEventEntryRegistration(this, entry);
         }
 
@@ -44,6 +65,9 @@ namespace DotNetRevolution.Core.Domain
                 Contract.Assume(entries != null);
 
                 entries.Remove(entry);
+
+                Contract.Assume(!_entries.TryGetValue(entry.DomainEventType, out entries) ||
+                    (_entries.TryGetValue(entry.DomainEventType, out entries) && !entries.Contains(entry)));
             }
         }
 
@@ -63,25 +87,7 @@ namespace DotNetRevolution.Core.Domain
             entries = null;
             return false;
         }
-
-        private void AddEntry(IDomainEventEntry entry)
-        {
-            Contract.Requires(entry != null);
-
-            List<IDomainEventEntry> domainEventEntries;
-
-            if (_entries.TryGetValue(entry.DomainEventType, out domainEventEntries))
-            {
-                Contract.Assume(domainEventEntries != null);
-                Contract.Assume(Contract.ForAll(domainEventEntries, eventEntry => eventEntry != null));
-
-                domainEventEntries.Add(entry);
-                return;
-            }
-
-            _entries.Add(entry.DomainEventType, new List<IDomainEventEntry> { entry });
-        }
-
+        
         [ContractInvariantMethod]
         private void ObjectInvariant()
         {

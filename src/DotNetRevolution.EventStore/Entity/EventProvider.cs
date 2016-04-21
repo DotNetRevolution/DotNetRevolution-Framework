@@ -8,10 +8,11 @@ namespace DotNetRevolution.EventStore.Entity
 {
 	public class EventProvider
 	{
-        private readonly ICollection<Transaction> _transactions;
-        private readonly ICollection<EventProviderDescriptor> _descriptors;
-        
-        public Guid EventProviderId { get; }
+        private readonly ICollection<Transaction> _transactions = new EntityCollection<Transaction>();
+        private readonly ICollection<EventProviderDescriptor> _descriptors = new EntityCollection<EventProviderDescriptor>();
+
+        public int EventProviderId { get; }
+        public Guid EventProviderGuid { get; }
         public int EventProviderTypeId { get; }
         
         public virtual EventProviderType EventProviderType { get; }
@@ -25,47 +26,37 @@ namespace DotNetRevolution.EventStore.Entity
         {
             get { return _descriptors as EntityCollection<EventProviderDescriptor>; }
         }
-
-	    private EventProvider()
+        
+        public EventProvider(IEventStoreAggregateRoot aggregateRoot)
         {
-            _transactions = new EntityCollection<Transaction>();
-            _descriptors = new EntityCollection<EventProviderDescriptor>();
-        }
+            Contract.Requires(aggregateRoot != null);
+            Contract.Requires(aggregateRoot.AggregateRootType != null);
 
-        public EventProvider(Guid eventProviderId, EventProviderType type)
-            : this()
-        {
-            Contract.Requires(eventProviderId != Guid.Empty);
-            Contract.Requires(type != null);
-
-            EventProviderId = eventProviderId;
-            EventProviderType = type;
+            EventProviderGuid = aggregateRoot.Identity.Id;
+            EventProviderType = new EventProviderType(aggregateRoot.AggregateRootType.FullName);
         }
         
-        public Transaction CreateNewTransaction(string eventProviderDescription, string user, object command, TransactionCommandType transactionCommandType, IEnumerable<object> events, Func<object, string> serializeData)
+        public Transaction CreateNewTransaction(IEventStoreAggregateRoot aggregateRoot, string user, object command, Func<object, string> serializeData)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(eventProviderDescription));
+            Contract.Requires(aggregateRoot != null);
+            Contract.Requires(!string.IsNullOrWhiteSpace(aggregateRoot.AggregateDescription));
             Contract.Requires(command != null);
-            Contract.Requires(transactionCommandType != null);
             Contract.Requires(serializeData != null);
-            Contract.Requires(events != null);
             Contract.Ensures(Contract.Result<Transaction>() != null);
 
-            Contract.Assume(EventProviderId != Guid.Empty);
+            var uncommittedEvents = aggregateRoot.UncommittedEvents;
+            Contract.Assume(uncommittedEvents != null);
 
-            var commandData = serializeData(command);
-            Contract.Assume(!string.IsNullOrWhiteSpace(commandData));
-            
             // create a new transaction
-            var transaction = new Transaction(EventProviderId, user, transactionCommandType, commandData, events, serializeData);
+            var transaction = new Transaction(EventProviderId, user, command, uncommittedEvents, serializeData);
             
             // get current event provider description
             var currentDescription = _descriptors.OrderByDescending(x => x.Transaction.Processed).FirstOrDefault();
 
             // add new event provider description if description is different than latest description
-            if (currentDescription == null || currentDescription.Descriptor != eventProviderDescription)
+            if (currentDescription == null || currentDescription.Descriptor != aggregateRoot.AggregateDescription)
             {
-                _descriptors.Add(new EventProviderDescriptor(this, transaction, eventProviderDescription));
+                _descriptors.Add(new EventProviderDescriptor(this, transaction, aggregateRoot.AggregateDescription));
             }
 
             // add transaction to collection

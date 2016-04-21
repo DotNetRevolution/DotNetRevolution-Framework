@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain
 {
     public class DomainEventHandlerFactory : IDomainEventHandlerFactory
     {
-        private readonly IDictionary<Type, IDictionary<Type, IDomainEventHandler>> _handlers;
+        private readonly IDictionary<Type, IDictionary<Type, IDomainEventHandler>> _handlers = new Dictionary<Type, IDictionary<Type, IDomainEventHandler>>();
 
         public IDomainEventCatalog Catalog { get; }
 
@@ -16,33 +15,31 @@ namespace DotNetRevolution.Core.Domain
             Contract.Requires(catalog != null);
 
             Catalog = catalog;
-
-            _handlers = new Dictionary<Type, IDictionary<Type, IDomainEventHandler>>();
         }
 
-        public IDomainEventHandlerCollection GetDomainEventHandlers(object domainEvent)
-        {            
-            var entries = GetEntries(domainEvent);
+        public IDomainEventHandlerCollection GetHandlers(Type domainEventType)
+        {
+            // get entries from catalog
+            var entries = GetEntries(domainEventType);
 
-            return new DomainEventHandlerCollection(domainEvent, GetHandlers(domainEvent.GetType(), entries));
+            return new DomainEventHandlerCollection(domainEventType, GetHandlers(domainEventType, entries));
         }
 
         private IReadOnlyCollection<IDomainEventHandler> GetHandlers(Type domainEventType, IReadOnlyCollection<IDomainEventEntry> entries)
         {
             Contract.Requires(domainEventType != null);
             Contract.Requires(entries != null);
+            Contract.Requires(Contract.ForAll(entries, o => o != null));
             Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventHandler>>() != null);
-            
+
             var results = new List<IDomainEventHandler>();
 
             // lock cache for concurrency
             lock (_handlers)
             {
-                IDictionary<Type, IDomainEventHandler> cachedHandlers = GetCachedHandlers(domainEventType);
-
                 foreach (var entry in entries)
                 {
-                    Contract.Assume(entry != null);
+                    IDictionary<Type, IDomainEventHandler> cachedHandlers = GetCachedHandlers(domainEventType);
 
                     // add handlers to results
                     results.Add(GetHandler(entry.DomainEventHandlerType, cachedHandlers));
@@ -66,9 +63,9 @@ namespace DotNetRevolution.Core.Domain
                 return cachedHandlers;
             }
 
-            return new Dictionary<Type, IDomainEventHandler>();
+            return _handlers[domainEventType] = new Dictionary<Type, IDomainEventHandler>();
         }
-        
+
         protected virtual IDomainEventHandler CreateHandler(Type handlerType)
         {
             Contract.Requires(handlerType != null);
@@ -78,7 +75,7 @@ namespace DotNetRevolution.Core.Domain
         }
 
         private IDomainEventHandler GetHandler(Type handlerType, IDictionary<Type, IDomainEventHandler> handlers)
-        {            
+        {
             Contract.Requires(handlerType != null);
             Contract.Requires(handlers != null);
             Contract.Ensures(Contract.Result<IDomainEventHandler>() != null);
@@ -90,8 +87,8 @@ namespace DotNetRevolution.Core.Domain
                 handler = CreateHandler(handlerType);
 
                 CacheHandler(handler, handlers);
-            }            
-            
+            }
+
             return handler;
         }
 
@@ -99,7 +96,7 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Requires(handler != null);
             Contract.Requires(handlers != null);
-            Contract.Ensures((!handler.Reusable && handlers[handler.GetType()] == null) ||
+            Contract.Ensures((!handler.Reusable && GetCachedHandler(handler.GetType(), handlers) == null) ||
                              (handler.Reusable && handlers[handler.GetType()] != null));
 
             // if handler is reusable, cache
@@ -109,12 +106,13 @@ namespace DotNetRevolution.Core.Domain
             }
             else
             {
-                Contract.Assume(handlers[handler.GetType()] == null);
+                Contract.Assume(GetCachedHandler(handler.GetType(), handlers) == null);
             }
         }
 
+        [Pure]
         private static IDomainEventHandler GetCachedHandler(Type handlerType, IDictionary<Type, IDomainEventHandler> handlers)
-        {            
+        {
             Contract.Requires(handlerType != null);
             Contract.Requires(handlers != null);
 
@@ -125,13 +123,14 @@ namespace DotNetRevolution.Core.Domain
             return handler;
         }
 
-        private IReadOnlyCollection<IDomainEventEntry> GetEntries(object domainEvent)
+        [Pure]
+        private IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType)
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(domainEventType != null);
             Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>() != null);
+            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>(), o => o != null));
 
             // get type of domain event
-            var domainEventType = domainEvent.GetType();
             var results = new List<IDomainEventEntry>();
 
             // find entries in catalog based on domain event type
@@ -146,10 +145,12 @@ namespace DotNetRevolution.Core.Domain
                 }
 
                 Contract.Assume(entries != null);
-                results.AddRange(entries);                
+                results.AddRange(entries);
 
-                // while base type is not null or object, attempt to find entries.  this is for backwards compatibility
-            } while ((domainEventType = domainEventType.BaseType) != null && domainEventType != typeof(object));
+                // while base type is not null, attempt to find entries.  this is for backwards compatibility
+            } while ((domainEventType = domainEventType.BaseType) != null);
+
+            Contract.Assume(Contract.ForAll(results, o => o != null));
 
             return results;
         }

@@ -5,7 +5,7 @@ using System.Security.Principal;
 namespace DotNetRevolution.Core.Authentication.CodeContract
 {
     [ContractClassFor(typeof(IIdentityManager))]
-    public abstract class IdentityManagerContract : IIdentityManager
+    internal abstract class IdentityManagerContract : IIdentityManager
     {
         public IIdentity Current
         {

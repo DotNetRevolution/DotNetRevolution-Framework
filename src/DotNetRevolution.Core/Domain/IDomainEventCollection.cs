@@ -7,6 +7,6 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(DomainEventCollectionContract))]
     public interface IDomainEventCollection : IReadOnlyCollection<object>
     {
-        AggregateRoot AggregateRoot { [Pure] get; }
+        IAggregateRoot AggregateRoot { [Pure] get; }
     }
 }

@@ -16,7 +16,8 @@ namespace DotNetRevolution.Core.Query.CodeContract
         public void Add(IQueryEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(GetEntry(entry.QueryType) != null);
+            Contract.Ensures(GetEntry(entry.QueryType) == entry);
+            Contract.EnsuresOnThrow<ArgumentException>(GetEntry(entry.QueryType) == Contract.OldValue(GetEntry(entry.QueryType)));
         }
     }
 }

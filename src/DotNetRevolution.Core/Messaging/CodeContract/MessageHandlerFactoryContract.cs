@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Messaging.CodeContract
 {
     [ContractClassFor(typeof(IMessageHandlerFactory))]
-    public abstract class MessageHandlerFactoryContract : IMessageHandlerFactory
+    internal abstract class MessageHandlerFactoryContract : IMessageHandlerFactory
     {
         public IMessageCatalog Catalog
         {
@@ -15,10 +15,10 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public IMessageHandler GetHandler(object command)
+        
+        public IMessageHandler GetHandler(Type messageType)
         {
-            Contract.Requires(command != null);
+            Contract.Requires(messageType != null);
             Contract.Ensures(Contract.Result<IMessageHandler>() != null);
 
             throw new NotImplementedException();

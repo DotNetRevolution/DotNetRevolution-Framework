@@ -14,7 +14,7 @@ namespace DotNetRevolution.EventStore.Entity
         {
         }
 
-        public TransactionCommandType(string fullName)
+        internal TransactionCommandType(string fullName)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(fullName));
 

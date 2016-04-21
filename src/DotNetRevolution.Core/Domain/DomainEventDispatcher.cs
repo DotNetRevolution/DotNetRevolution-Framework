@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace DotNetRevolution.Core.Domain
 {
@@ -26,9 +25,7 @@ namespace DotNetRevolution.Core.Domain
         {
             // publish events
             foreach (var domainEvent in domainEvents)
-            {
-                Contract.Assume(domainEvent != null);
-                
+            {                
                 Publish(domainEvent);
             }
         }
@@ -41,7 +38,7 @@ namespace DotNetRevolution.Core.Domain
             try
             {
                 // get handler from factory
-                return _handlerFactory.GetDomainEventHandlers(domainEvent.GetType());
+                return _handlerFactory.GetHandlers(domainEvent.GetType());
             }
             catch (Exception e)
             {

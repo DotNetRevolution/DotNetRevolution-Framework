@@ -7,7 +7,7 @@ namespace DotNetRevolution.EventStore.Entity
 {
     public class TransactionAnnouncement
     {
-        private readonly ICollection<TransactionAnnouncementError> _transactionAnnouncementErrors;
+        private readonly ICollection<TransactionAnnouncementError> _transactionAnnouncementErrors = new EntityCollection<TransactionAnnouncementError>();
 
         public long TransactionAnnouncementId { get; }
         public long TransactionId { get; }
@@ -20,13 +20,7 @@ namespace DotNetRevolution.EventStore.Entity
             get { return _transactionAnnouncementErrors as EntityCollection<TransactionAnnouncementError>; }
         }
         
-        private TransactionAnnouncement()
-        {
-            _transactionAnnouncementErrors = new EntityCollection<TransactionAnnouncementError>();
-        }
-
         internal TransactionAnnouncement(Transaction transaction)
-            : this()
         {
             Contract.Requires(transaction != null);
             

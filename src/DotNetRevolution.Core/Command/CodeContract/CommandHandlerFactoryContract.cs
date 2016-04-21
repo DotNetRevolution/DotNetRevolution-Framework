@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Command.CodeContract
 {
     [ContractClassFor(typeof(ICommandHandlerFactory))]
-    public abstract class CommandHandlerFactoryContract : ICommandHandlerFactory
+    internal abstract class CommandHandlerFactoryContract : ICommandHandlerFactory
     {
         public ICommandCatalog Catalog
         {
@@ -16,9 +16,9 @@ namespace DotNetRevolution.Core.Command.CodeContract
             }
         }
 
-        public ICommandHandler GetHandler(object command)
+        public ICommandHandler GetHandler(Type commandType)
         {
-            Contract.Requires(command != null);
+            Contract.Requires(commandType != null);
             Contract.Ensures(Contract.Result<ICommandHandler>() != null);
 
             throw new NotImplementedException();

@@ -18,7 +18,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         private const string TableName = "log.Entry";
 
         private readonly string _connectionString;
-        private readonly CancellationTokenSource _token;
+        private readonly CancellationTokenSource _token = new CancellationTokenSource();
 
         static DatabaseSink()
         {
@@ -31,7 +31,6 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
 
             _connectionString = connectionString;
-            _token = new CancellationTokenSource();
         }
 
         protected override async Task EmitBatchAsync(IEnumerable<LogEvent> events)

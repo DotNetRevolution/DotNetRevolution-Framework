@@ -6,16 +6,25 @@ namespace DotNetRevolution.Core.Query
 {
     public class QueryCatalog : IQueryCatalog
     {
-        protected Dictionary<Type, IQueryEntry> Entries { get; private set; }
-        
+        private readonly Dictionary<Type, IQueryEntry> _entries = new Dictionary<Type, IQueryEntry>();
+                
         public QueryCatalog()
         {
-            Entries = new Dictionary<Type, IQueryEntry>();
         }
 
+        public QueryCatalog(IReadOnlyCollection<IQueryEntry> entries)
+        {
+            Contract.Requires(entries != null);
+            Contract.Requires(Contract.ForAll(entries, o => o != null));
+
+            foreach (var entry in entries)
+            {
+                Add(entry);
+            }
+        }
         public IQueryEntry GetEntry(Type queryType)
         {
-            var result = Entries[queryType];
+            var result = _entries[queryType];
             Contract.Assume(result != null);
 
             return result;
@@ -23,15 +32,15 @@ namespace DotNetRevolution.Core.Query
 
         public void Add(IQueryEntry entry)
         {
-            Entries.Add(entry.QueryType, entry);
+            _entries.Add(entry.QueryType, entry);
 
-            Contract.Assume(GetEntry(entry.QueryType) != null);
+            Contract.Assume(GetEntry(entry.QueryType) == entry);
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(Entries != null);
+            Contract.Invariant(_entries != null);
         }
     }
 }

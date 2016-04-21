@@ -29,6 +29,7 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
         public object Deserialize(Type type, Stream stream)
         {
             // implements interface, can't require but can assume / assert
+            Contract.Assume(type != null);
             Contract.Assume(stream != null);
 
             // create an array to store the bytes from the stream
@@ -37,8 +38,12 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
             // read bytes into the stream
             stream.Read(bytes, 0, bytes.Length);
 
+            // convert bytes to string
+            var data = Encoding.UTF8.GetString(bytes);
+            Contract.Assume(!string.IsNullOrWhiteSpace(data));
+
             // use serializer to deserialize the object
-            return _serializer.Deserialize(type, Encoding.UTF8.GetString(bytes));
+            return _serializer.Deserialize(type, data);
         }
 
         [ContractInvariantMethod]

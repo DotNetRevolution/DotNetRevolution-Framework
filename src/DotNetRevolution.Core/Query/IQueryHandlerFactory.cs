@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Query.CodeContract;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Query
@@ -8,6 +9,6 @@ namespace DotNetRevolution.Core.Query
     {
         IQueryCatalog Catalog { [Pure] get; }
 
-        IQueryHandler GetHandler(object query);
+        IQueryHandler GetHandler(Type queryType);
     }
 }
