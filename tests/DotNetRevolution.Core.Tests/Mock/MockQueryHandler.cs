@@ -1,9 +1,9 @@
-﻿using DotNetRevolution.Core.Query;
+﻿using DotNetRevolution.Core.Querying;
 
 namespace DotNetRevolution.Core.Tests.Mock
 {
     public class MockQueryHandler<TQuery, TResult> : QueryHandler<TQuery, TResult>
-        where TQuery : class
+        where TQuery : IQuery<TResult>
         where TResult : class, new()
     {
         public override bool Reusable

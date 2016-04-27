@@ -85,14 +85,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account\AggregateRoot.cs" />
-    <Compile Include="Account\Command\DepositHandler.cs" />
-    <Compile Include="Account\Command\TransferFundsHandler.cs" />
-    <Compile Include="Account\Command\WithdrawHandler.cs" />
+    <Compile Include="Account\AccountAggregateRoot.cs" />
+    <Compile Include="Account\Commands\DepositHandler.cs" />
+    <Compile Include="Account\Commands\TransferFundsHandler.cs" />
+    <Compile Include="Account\Commands\WithdrawHandler.cs" />
     <Compile Include="Account\Delegate\CanCreditAccount.cs" />
     <Compile Include="Account\Delegate\CanDebitAccount.cs" />
     <Compile Include="Account\DomainEvent\CreditApplied.cs" />
-    <Compile Include="Account\Command\Deposit.cs" />
+    <Compile Include="Account\Commands\Deposit.cs" />
     <Compile Include="Account\DomainEvent\CreditAppliedHandler.cs" />
     <Compile Include="Account\DomainEvent\CreditOverdrawn.cs" />
     <Compile Include="Account\DomainEvent\DebitApplied.cs" />
@@ -100,8 +100,8 @@
     <Compile Include="Account\DomainEvent\CreditDeclined.cs" />
     <Compile Include="Account\DomainEvent\DebitDeclined.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Account\Command\TransferFunds.cs" />
-    <Compile Include="Account\Command\Withdraw.cs" />
+    <Compile Include="Account\Commands\TransferFunds.cs" />
+    <Compile Include="Account\Commands\Withdraw.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\DotNetRevolution.Core\DotNetRevolution.Core.csproj">

@@ -7,8 +7,8 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(DomainEventDispatcherContract))]
     public interface IDomainEventDispatcher
     {
-        void Publish(object domainEvent);
+        void Publish(IDomainEvent domainEvent);
 
-        void PublishAll(IEnumerable<object> domainEvents);
+        void PublishAll(IEnumerable<IDomainEvent> domainEvents);
     }
 }

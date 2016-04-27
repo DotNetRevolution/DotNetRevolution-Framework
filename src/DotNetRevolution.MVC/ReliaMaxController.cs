@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Web.Mvc;
-using DotNetRevolution.Core.Command;
-using DotNetRevolution.Core.Query;
+using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Querying;
 
 namespace DotNetRevolution.MVC
 {

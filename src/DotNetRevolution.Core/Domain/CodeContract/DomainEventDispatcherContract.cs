@@ -11,12 +11,12 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             Contract.Requires(catalog != null);
         }
 
-        public void Publish(object domainEvent)
+        public void Publish(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);
         }
         
-        public void PublishAll(IEnumerable<object> domainEvents)
+        public void PublishAll(IEnumerable<IDomainEvent> domainEvents)
         {
             Contract.Requires(domainEvents != null);
             Contract.Requires(Contract.ForAll(domainEvents, o => o != null));

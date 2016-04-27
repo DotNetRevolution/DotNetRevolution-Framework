@@ -8,11 +8,11 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     [ContractClassFor(typeof(IDomainEventCollection))]
     internal abstract class DomainEventCollectionContract : IDomainEventCollection
     {
-        public IAggregateRoot AggregateRoot
+        public object AggregateRoot
         {
             get
             {
-                Contract.Ensures(Contract.Result<IAggregateRoot>() != null);
+                Contract.Ensures(Contract.Result<object>() != null);
 
                 throw new NotImplementedException();
             }
@@ -20,7 +20,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
 
         public abstract int Count { get; }
 
-        public abstract IEnumerator<object> GetEnumerator();
+        public abstract IEnumerator<IDomainEvent> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
         {

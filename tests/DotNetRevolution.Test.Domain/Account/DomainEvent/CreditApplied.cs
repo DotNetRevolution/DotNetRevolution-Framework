@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Domain;
+using System;
 
-namespace DotNetRevolution.Test.Domain.Account.DomainEvent
+namespace DotNetRevolution.Test.Domain.Account.DomainEvents
 {
-    public class CreditApplied
+    public class CreditApplied : DomainEvent
     {
         public Guid AccountId { get; }
 

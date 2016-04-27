@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core", "src\DotNetRevolution.Core\DotNetRevolution.Core.csproj", "{D65E8739-5F05-46D9-8B5E-47008F848257}"
 EndProject
@@ -43,6 +43,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Core.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.Domain", "tests\DotNetRevolution.Test.Domain\DotNetRevolution.Test.Domain.csproj", "{5D0BDE59-1510-47FE-A313-49DA714602FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.EventStoreDomain", "tests\DotNetRevolution.Test.EventStoreDomain\DotNetRevolution.Test.EventStoreDomain.csproj", "{C3E88787-D808-48E8-9D07-FE369525B52A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing", "src\DotNetRevolution.EventSourcing\DotNetRevolution.EventSourcing.csproj", "{70DE9C4A-5578-434E-BC97-7B4CE66FE007}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DotNetRevolution.EventSourcing.Database", "src\DotNetRevolution.EventSourcing.Database\DotNetRevolution.EventSourcing.Database.sqlproj", "{B72E1786-2AD6-4504-8037-C2C6002991BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,7 +65,6 @@ Global
 		{8A3DFE60-6BDD-4E1C-A234-1E15E3BEF414}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60F78E1A-2A57-438D-AC8E-7204AC3D5A52}.Release|Any CPU.Deploy.0 = Release|Any CPU
@@ -103,6 +108,19 @@ Global
 		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D0BDE59-1510-47FE-A313-49DA714602FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E88787-D808-48E8-9D07-FE369525B52A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E88787-D808-48E8-9D07-FE369525B52A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E88787-D808-48E8-9D07-FE369525B52A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E88787-D808-48E8-9D07-FE369525B52A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70DE9C4A-5578-434E-BC97-7B4CE66FE007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70DE9C4A-5578-434E-BC97-7B4CE66FE007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70DE9C4A-5578-434E-BC97-7B4CE66FE007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70DE9C4A-5578-434E-BC97-7B4CE66FE007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -120,5 +138,8 @@ Global
 		{F4C0E5D1-2244-499B-856C-815CE3C458A3} = {7F327415-88E2-4E71-92FC-D0844EC6C5CA}
 		{90F8BCF4-EAD7-4F06-9E51-D4E627B92482} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 		{5D0BDE59-1510-47FE-A313-49DA714602FF} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
+		{C3E88787-D808-48E8-9D07-FE369525B52A} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
+		{70DE9C4A-5578-434E-BC97-7B4CE66FE007} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{B72E1786-2AD6-4504-8037-C2C6002991BB} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 	EndGlobalSection
 EndGlobal

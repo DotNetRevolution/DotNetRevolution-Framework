@@ -5,12 +5,12 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
     [ContractClassFor(typeof(IMessageDispatcher))]
     internal abstract class MessageDispatcherContract : IMessageDispatcher
     {
-        public void Dispatch(object message)
+        public void Dispatch(IMessage message)
         {
             Contract.Requires(message != null);
         }
 
-        public void Dispatch(object message, string correlationId)
+        public void Dispatch(IMessage message, string correlationId)
         {
             Contract.Requires(message != null);
         }

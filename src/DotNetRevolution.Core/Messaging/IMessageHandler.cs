@@ -7,12 +7,12 @@ namespace DotNetRevolution.Core.Messaging
     public interface IMessageHandler
     {
         bool Reusable { [Pure] get; }
-        void Handle(object message, string correlationId);
+        void Handle(IMessage message, string correlationId);
     }
 
     [ContractClass(typeof(MessageHandlerContract<>))]
     public interface IMessageHandler<in TMessage> : IMessageHandler
-        where TMessage : class
+        where TMessage : IMessage
     {
         void Handle(TMessage message, string correlationId);
     }

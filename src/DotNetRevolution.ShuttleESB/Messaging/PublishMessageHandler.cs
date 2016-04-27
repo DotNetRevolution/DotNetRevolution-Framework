@@ -5,7 +5,7 @@ using Shuttle.ESB.Core;
 namespace DotNetRevolution.ShuttleESB.Messaging
 {
     public class PublishMessageHandler<TMessage> : MessageHandler<TMessage>
-        where TMessage : class
+        where TMessage : IMessage
     {
         private readonly IServiceBus _bus;
 

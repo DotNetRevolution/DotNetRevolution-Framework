@@ -1,12 +1,13 @@
-﻿using System.Diagnostics.Contracts;
+﻿using DotNetRevolution.Core.Commanding;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Messaging
 {
-    public class ProcessCommandMessage
+    public class ProcessCommandMessage : Message
     {
-        public object Command { get; }
+        public ICommand Command { get; }
 
-        public ProcessCommandMessage(object command)
+        public ProcessCommandMessage(ICommand command)
         {
             Contract.Requires(command != null);
 

@@ -80,8 +80,8 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Entity2\TransactionAggregateRoot.cs" />
     <Compile Include="Entity\TransactionEventProvider.cs" />
-    <Compile Include="EventStoreAggregateRoot.cs" />
     <Compile Include="Command\Transaction\AnnounceCommand.cs" />
     <Compile Include="Entity\EventProvider.cs" />
     <Compile Include="Entity\EventProviderDescriptor.cs" />
@@ -94,8 +94,8 @@
     <Compile Include="Entity\TransactionCommandType.cs" />
     <Compile Include="Entity\TransactionEvent.cs" />
     <Compile Include="Entity\TransactionEventType.cs" />
-    <Compile Include="IEventStoreAggregateRoot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\EventStoreRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetRevolution.Core\DotNetRevolution.Core.csproj">

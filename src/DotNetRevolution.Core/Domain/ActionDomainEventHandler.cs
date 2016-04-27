@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain
 {
     public class ActionDomainEventHandler<TDomainEvent> : DomainEventHandler<TDomainEvent>
-        where TDomainEvent : class
+        where TDomainEvent : IDomainEvent
     {
         private readonly bool _reusable;
         private readonly Action<TDomainEvent> _action;

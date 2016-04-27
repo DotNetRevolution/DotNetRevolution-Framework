@@ -1,7 +1,7 @@
 ﻿namespace DotNetRevolution.Core.Domain
 {
     public abstract class DomainEventHandler<TDomainEvent> : IDomainEventHandler<TDomainEvent>
-        where TDomainEvent : class
+        where TDomainEvent : IDomainEvent
     {
         public virtual bool Reusable
         {
@@ -13,7 +13,7 @@
 
         public abstract void Handle(TDomainEvent domainEvent);
 
-        public void Handle(object domainEvent)
+        public void Handle(IDomainEvent domainEvent)
         {
             Handle((TDomainEvent)domainEvent);
         }

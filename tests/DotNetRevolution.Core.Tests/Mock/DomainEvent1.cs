@@ -1,6 +1,8 @@
-﻿namespace DotNetRevolution.Core.Tests.Mock
+﻿using DotNetRevolution.Core.Domain;
+
+namespace DotNetRevolution.Core.Tests.Mock
 {
-    public class DomainEvent1
+    public class DomainEvent1 : DomainEvent
     {
     }
 }

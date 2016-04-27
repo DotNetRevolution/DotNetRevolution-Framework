@@ -16,7 +16,7 @@ namespace DotNetRevolution.Core.Messaging
 
         public override void Handle(ProcessDomainEventMessage message, string correlationId)
         {
-            Contract.Requires(message.DomainEvent != null);
+            Contract.Requires(message?.DomainEvent != null);
 
             _dispatcher.Publish(message.DomainEvent);
         }

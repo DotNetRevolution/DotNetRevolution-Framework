@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Messaging
             _handlerFactory = handlerFactory;
         }
         
-        public void Dispatch(object message)
+        public void Dispatch(IMessage message)
         {
             var correlationId = Guid.NewGuid().ToString();            
             Contract.Assume(!string.IsNullOrWhiteSpace(correlationId));
@@ -22,13 +22,13 @@ namespace DotNetRevolution.Core.Messaging
             Dispatch(message, correlationId);
         }
 
-        public void Dispatch(object message, string correlationId)
+        public void Dispatch(IMessage message, string correlationId)
         {
             IMessageHandler handler = GetHandler(message);
             HandleMessage(message, handler, correlationId);
         }
 
-        private IMessageHandler GetHandler(object message)
+        private IMessageHandler GetHandler(IMessage message)
         {
             Contract.Requires(message != null);
             Contract.Ensures(Contract.Result<IMessageHandler>() != null);
@@ -45,7 +45,7 @@ namespace DotNetRevolution.Core.Messaging
             }
         }
 
-        private static void HandleMessage(object message, IMessageHandler handler, string correlationId)
+        private static void HandleMessage(IMessage message, IMessageHandler handler, string correlationId)
         {
             Contract.Requires(handler != null);
             Contract.Requires(message != null);

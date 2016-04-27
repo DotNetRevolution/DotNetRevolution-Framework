@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Tests.Mock
 {
     public class MockMessageHandler<TMessage> : MessageHandler<TMessage>
-        where TMessage : class
+        where TMessage : IMessage
     {
         public override bool Reusable
         {

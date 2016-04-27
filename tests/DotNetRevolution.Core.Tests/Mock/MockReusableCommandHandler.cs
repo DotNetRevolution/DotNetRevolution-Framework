@@ -1,9 +1,9 @@
-﻿using DotNetRevolution.Core.Command;
+﻿using DotNetRevolution.Core.Commanding;
 
 namespace DotNetRevolution.Core.Tests.Mock
 {
     public class MockReusableCommandHandler<TCommand> : CommandHandler<TCommand>
-        where TCommand : class
+        where TCommand : ICommand
     {
         public override void Handle(TCommand command)
         {

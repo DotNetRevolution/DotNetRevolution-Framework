@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     {
         public abstract bool Reusable { get; }
 
-        public void Handle(object domainEvent)
+        public void Handle(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);
         }
@@ -15,7 +15,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
 
     [ContractClassFor(typeof(IDomainEventHandler<>))]
     internal abstract class DomainEventHandlerContract<TDomainEvent> : IDomainEventHandler<TDomainEvent>
-        where TDomainEvent : class
+        where TDomainEvent : IDomainEvent
     {
         public abstract bool Reusable { get; }
 
@@ -24,7 +24,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             Contract.Requires(domainEvent != null);
         }
 
-        public void Handle(object domainEvent)
+        public void Handle(IDomainEvent domainEvent)
         {
         }
     }

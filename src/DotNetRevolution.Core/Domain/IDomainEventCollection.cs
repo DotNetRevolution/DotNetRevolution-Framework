@@ -5,8 +5,8 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Core.Domain
 {
     [ContractClass(typeof(DomainEventCollectionContract))]
-    public interface IDomainEventCollection : IReadOnlyCollection<object>
+    public interface IDomainEventCollection : IReadOnlyCollection<IDomainEvent>
     {
-        IAggregateRoot AggregateRoot { [Pure] get; }
+        object AggregateRoot { [Pure] get; }
     }
 }

@@ -30,7 +30,7 @@ namespace DotNetRevolution.Core.Domain
             DomainEventHandlerType = handler.GetType();
         }
 
-        public static DomainEventEntry New<TDomainEvent>(Action<TDomainEvent> action) where TDomainEvent : class
+        public static DomainEventEntry New<TDomainEvent>(Action<TDomainEvent> action) where TDomainEvent : IDomainEvent
         {
             Contract.Requires(action != null);
             Contract.Ensures(Contract.Result<DomainEventEntry>() != null);
@@ -38,7 +38,7 @@ namespace DotNetRevolution.Core.Domain
             return New(action, false);
         }
 
-        public static DomainEventEntry New<TDomainEvent>(Action<TDomainEvent> action, bool reusable) where TDomainEvent : class
+        public static DomainEventEntry New<TDomainEvent>(Action<TDomainEvent> action, bool reusable) where TDomainEvent : IDomainEvent
         {
             Contract.Requires(action != null);
             Contract.Ensures(Contract.Result<DomainEventEntry>() != null);

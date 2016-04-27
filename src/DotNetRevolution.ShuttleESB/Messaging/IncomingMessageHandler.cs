@@ -25,7 +25,7 @@ namespace DotNetRevolution.ShuttleESB.Messaging
         {
             Contract.Assume(context?.Message != null);
 
-            _dispatcher.Dispatch(context.Message);
+            _dispatcher.Dispatch((IMessage) context.Message);
         }
 
         [ContractInvariantMethod]

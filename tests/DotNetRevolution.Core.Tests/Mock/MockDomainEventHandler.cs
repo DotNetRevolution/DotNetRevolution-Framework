@@ -3,7 +3,7 @@
 namespace DotNetRevolution.Core.Tests.Mock
 {
     public class MockDomainEventHandler<TDomainEvent> : DomainEventHandler<TDomainEvent>
-        where TDomainEvent : class
+        where TDomainEvent : IDomainEvent
     {
         public override bool Reusable
         {

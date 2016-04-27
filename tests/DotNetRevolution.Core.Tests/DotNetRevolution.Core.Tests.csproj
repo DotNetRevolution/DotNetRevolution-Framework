@@ -53,16 +53,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Base\SequentialGuidTests.cs" />
     <Compile Include="Domain\DomainEventHandlerFactoryTests.cs" />
-    <Compile Include="Query\QueryCatalogTests.cs" />
-    <Compile Include="Query\QueryDispatcherTests.cs" />
-    <Compile Include="Query\QueryHandlerFactoryTests.cs" />
-    <Compile Include="Message\MessageCatalogTests.cs" />
-    <Compile Include="Message\MessageDispatcherTests.cs" />
-    <Compile Include="Message\MessageHandlerFactoryTests.cs" />
-    <Compile Include="Command\CommandCatalogTests.cs" />
-    <Compile Include="Command\CommandDispatcherTests.cs" />
-    <Compile Include="Command\CommandHandlerFactoryTests.cs" />
+    <Compile Include="Querying\QueryCatalogTests.cs" />
+    <Compile Include="Querying\QueryDispatcherTests.cs" />
+    <Compile Include="Querying\QueryHandlerFactoryTests.cs" />
+    <Compile Include="Messaging\MessageCatalogTests.cs" />
+    <Compile Include="Messaging\MessageDispatcherTests.cs" />
+    <Compile Include="Messaging\MessageHandlerFactoryTests.cs" />
+    <Compile Include="Commanding\CommandCatalogTests.cs" />
+    <Compile Include="Commanding\CommandDispatcherTests.cs" />
+    <Compile Include="Commanding\CommandHandlerFactoryTests.cs" />
     <Compile Include="Domain\DomainEventCatalogTests.cs" />
     <Compile Include="Mock\Command1.cs" />
     <Compile Include="Mock\Command2.cs" />

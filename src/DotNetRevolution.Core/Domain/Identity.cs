@@ -6,18 +6,13 @@ namespace DotNetRevolution.Core.Domain
 {
     public class Identity : ValueObject<Identity>
     {
-        private readonly Guid _id;
-
-        public Guid Id
+        public Guid Value { get; }
+                
+        public Identity(Guid value)
         {
-            get { return _id; }
-        }
+            Contract.Requires(value != Guid.Empty);
 
-        private Identity(Guid id)
-        {
-            Contract.Requires(id != Guid.Empty);
-
-            _id = id;
+            Value = value;
         }
 
         public static Identity New()

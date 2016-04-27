@@ -1,4 +1,4 @@
-﻿using DotNetRevolution.Core.Command;
+﻿using DotNetRevolution.Core.Commanding;
 using System.Diagnostics.Contracts;
 using System;
 using Ninject;

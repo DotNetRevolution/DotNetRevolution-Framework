@@ -1,5 +1,5 @@
 ﻿using System;
-using DotNetRevolution.Core.Query;
+using DotNetRevolution.Core.Querying;
 using Ninject;
 using System.Diagnostics.Contracts;
 

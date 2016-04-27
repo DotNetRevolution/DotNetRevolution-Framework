@@ -6,9 +6,9 @@ namespace DotNetRevolution.Core.Domain
 {
     public class DomainEventCollection : IDomainEventCollection
     {
-        private readonly IReadOnlyCollection<object> _domainEvents;
+        private readonly IReadOnlyCollection<IDomainEvent> _domainEvents;
 
-        public IAggregateRoot AggregateRoot { get; }
+        public object AggregateRoot { get; }
 
         public int Count
         {
@@ -18,16 +18,16 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        public DomainEventCollection(IAggregateRoot aggregateRoot, object domainEvent)
+        public DomainEventCollection(object aggregateRoot, IDomainEvent domainEvent)
         {
             Contract.Requires(aggregateRoot != null);
             Contract.Requires(domainEvent != null);
 
             AggregateRoot = aggregateRoot;
-            _domainEvents = new List<object> { domainEvent }.AsReadOnly();
+            _domainEvents = new List<IDomainEvent> { domainEvent }.AsReadOnly();
         }
 
-        public DomainEventCollection(IAggregateRoot aggregateRoot, IReadOnlyCollection<object> domainEvents)
+        public DomainEventCollection(object aggregateRoot, IReadOnlyCollection<IDomainEvent> domainEvents)
         {
             Contract.Requires(aggregateRoot != null);
             Contract.Requires(domainEvents != null);
@@ -36,7 +36,7 @@ namespace DotNetRevolution.Core.Domain
             _domainEvents = domainEvents;
         }
 
-        public IEnumerator<object> GetEnumerator()
+        public IEnumerator<IDomainEvent> GetEnumerator()
         {
             return _domainEvents.GetEnumerator();
         }

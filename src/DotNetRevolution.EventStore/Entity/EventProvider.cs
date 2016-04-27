@@ -27,44 +27,44 @@ namespace DotNetRevolution.EventStore.Entity
             get { return _descriptors as EntityCollection<EventProviderDescriptor>; }
         }
         
-        public EventProvider(IEventStoreAggregateRoot aggregateRoot)
-        {
-            Contract.Requires(aggregateRoot != null);
-            Contract.Requires(aggregateRoot.AggregateRootType != null);
+        //public EventProvider(IEventStoreAggregateRoot aggregateRoot)
+        //{
+        //    Contract.Requires(aggregateRoot != null);
+        //    Contract.Requires(aggregateRoot.AggregateRootType != null);
 
-            EventProviderGuid = aggregateRoot.Identity.Id;
-            EventProviderType = new EventProviderType(aggregateRoot.AggregateRootType.FullName);
-        }
+        //    EventProviderGuid = aggregateRoot.Identity.Value;
+        //    EventProviderType = new EventProviderType(aggregateRoot.AggregateRootType.FullName);
+        //}
         
-        public Transaction CreateNewTransaction(IEventStoreAggregateRoot aggregateRoot, string user, object command, Func<object, string> serializeData)
-        {
-            Contract.Requires(aggregateRoot != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(aggregateRoot.AggregateDescription));
-            Contract.Requires(command != null);
-            Contract.Requires(serializeData != null);
-            Contract.Ensures(Contract.Result<Transaction>() != null);
+        //public Transaction CreateNewTransaction(IEventStoreAggregateRoot aggregateRoot, string user, object command, Func<object, string> serializeData)
+        //{
+        //    Contract.Requires(aggregateRoot != null);
+        //    Contract.Requires(!string.IsNullOrWhiteSpace(aggregateRoot.AggregateDescriptor));
+        //    Contract.Requires(command != null);
+        //    Contract.Requires(serializeData != null);
+        //    Contract.Ensures(Contract.Result<Transaction>() != null);
 
-            var uncommittedEvents = aggregateRoot.UncommittedEvents;
-            Contract.Assume(uncommittedEvents != null);
+        //    var uncommittedEvents = aggregateRoot.UncommittedEvents;
+        //    Contract.Assume(uncommittedEvents != null);
 
-            // create a new transaction
-            var transaction = new Transaction(EventProviderId, user, command, uncommittedEvents, serializeData);
+        //    // create a new transaction
+        //    var transaction = new Transaction(EventProviderId, user, command, uncommittedEvents, serializeData);
             
-            // get current event provider description
-            var currentDescription = _descriptors.OrderByDescending(x => x.Transaction.Processed).FirstOrDefault();
+        //    // get current event provider description
+        //    var currentDescription = _descriptors.OrderByDescending(x => x.Transaction.Processed).FirstOrDefault();
 
-            // add new event provider description if description is different than latest description
-            if (currentDescription == null || currentDescription.Descriptor != aggregateRoot.AggregateDescription)
-            {
-                _descriptors.Add(new EventProviderDescriptor(this, transaction, aggregateRoot.AggregateDescription));
-            }
+        //    // add new event provider description if description is different than latest description
+        //    if (currentDescription == null || currentDescription.Descriptor != aggregateRoot.AggregateDescriptor)
+        //    {
+        //        _descriptors.Add(new EventProviderDescriptor(this, transaction, aggregateRoot.AggregateDescriptor));
+        //    }
 
-            // add transaction to collection
-            _transactions.Add(transaction);
+        //    // add transaction to collection
+        //    _transactions.Add(transaction);
 
-            // return new transaction
-            return transaction;
-        }
+        //    // return new transaction
+        //    return transaction;
+        //}
 
         [ContractInvariantMethod]
         private void ObjectInvariants()

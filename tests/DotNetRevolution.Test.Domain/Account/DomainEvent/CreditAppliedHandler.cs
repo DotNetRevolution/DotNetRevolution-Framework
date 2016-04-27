@@ -1,7 +1,7 @@
 ﻿using System;
 using DotNetRevolution.Core.Domain;
 
-namespace DotNetRevolution.Test.Domain.Account.DomainEvent
+namespace DotNetRevolution.Test.Domain.Account.DomainEvents
 {
     public class CreditAppliedHandler : DomainEventHandler<CreditApplied>
     {

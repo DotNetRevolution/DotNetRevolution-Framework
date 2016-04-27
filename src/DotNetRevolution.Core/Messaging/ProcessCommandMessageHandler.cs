@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
-using DotNetRevolution.Core.Command;
+using DotNetRevolution.Core.Commanding;
 
 namespace DotNetRevolution.Core.Messaging
 {
@@ -16,7 +16,7 @@ namespace DotNetRevolution.Core.Messaging
 
         public override void Handle(ProcessCommandMessage message, string correlationId)
         {
-            Contract.Requires(message.Command != null);
+            Contract.Requires(message?.Command != null);            
 
             _dispatcher.Dispatch(message.Command);
         }

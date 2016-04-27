@@ -8,13 +8,13 @@ namespace DotNetRevolution.Core.Domain
     public interface IDomainEventHandler
     {
         bool Reusable { [Pure] get; }
-        void Handle(object domainEvent);
+        void Handle(IDomainEvent domainEvent);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
     [ContractClass(typeof(DomainEventHandlerContract<>))]
     public interface IDomainEventHandler<in TDomainEvent> : IDomainEventHandler
-        where TDomainEvent : class
+        where TDomainEvent : IDomainEvent
     {
         void Handle(TDomainEvent domainEvent);
     }

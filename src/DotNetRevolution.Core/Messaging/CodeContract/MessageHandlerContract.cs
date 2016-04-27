@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
     {
         public abstract bool Reusable { get; }
 
-        public void Handle(object message, string correlationId)
+        public void Handle(IMessage message, string correlationId)
         {
             Contract.Requires(message != null);
         }
@@ -15,11 +15,11 @@ namespace DotNetRevolution.Core.Messaging.CodeContract
 
     [ContractClassFor(typeof(IMessageHandler<>))]
     internal abstract class MessageHandlerContract<TMessage> : IMessageHandler<TMessage>
-        where TMessage : class
+        where TMessage : IMessage
     {
         public abstract bool Reusable { get; }
 
-        public void Handle(object message, string correlationId)
+        public void Handle(IMessage message, string correlationId)
         {
         }
 

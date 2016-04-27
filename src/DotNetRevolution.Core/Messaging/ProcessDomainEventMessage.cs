@@ -1,12 +1,13 @@
-﻿using System.Diagnostics.Contracts;
+﻿using DotNetRevolution.Core.Domain;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Messaging
 {
-    public class ProcessDomainEventMessage
+    public class ProcessDomainEventMessage : Message
     {
-        public object DomainEvent { get; }
+        public IDomainEvent DomainEvent { get; }
 
-        public ProcessDomainEventMessage(object domainEvent)
+        public ProcessDomainEventMessage(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);
 

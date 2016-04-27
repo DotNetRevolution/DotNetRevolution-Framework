@@ -15,13 +15,13 @@ namespace DotNetRevolution.Core.Domain
             _handlerFactory = handlerFactory;
         }
         
-        public void Publish(object domainEvent)
+        public void Publish(IDomainEvent domainEvent)
         {
             var handlers = GetHandlers(domainEvent);
             HandleDomainEvent(domainEvent, handlers);
         }
         
-        public void PublishAll(IEnumerable<object> domainEvents)
+        public void PublishAll(IEnumerable<IDomainEvent> domainEvents)
         {
             // publish events
             foreach (var domainEvent in domainEvents)
@@ -30,7 +30,7 @@ namespace DotNetRevolution.Core.Domain
             }
         }
         
-        private IDomainEventHandlerCollection GetHandlers(object domainEvent)
+        private IDomainEventHandlerCollection GetHandlers(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);
             Contract.Ensures(Contract.Result<IDomainEventHandlerCollection>() != null);
@@ -47,7 +47,7 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        private static void HandleDomainEvent(object domainEvent, IDomainEventHandlerCollection handlers)
+        private static void HandleDomainEvent(IDomainEvent domainEvent, IDomainEventHandlerCollection handlers)
         {
             Contract.Requires(handlers != null);
             Contract.Requires(domainEvent != null);
@@ -75,7 +75,7 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        private static void HandleDomainEvent(object domainEvent, IDomainEventHandler handler)
+        private static void HandleDomainEvent(IDomainEvent domainEvent, IDomainEventHandler handler)
         {
             Contract.Requires(handler != null);
             Contract.Requires(domainEvent != null);
