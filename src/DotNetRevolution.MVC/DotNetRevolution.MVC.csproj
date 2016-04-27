@@ -89,7 +89,7 @@
     <Compile Include="MetadataProvider\InterfaceMetadataProvider.cs" />
     <Compile Include="MetadataProvider\MetadataAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReliaMaxController.cs" />
+    <Compile Include="DotNetRevolutionController.cs" />
     <Compile Include="ViewEngine\ActionPartialRazorViewEngine.cs" />
     <Compile Include="ViewEngine\PartialsSubfolderViewEngine.cs" />
   </ItemGroup>
