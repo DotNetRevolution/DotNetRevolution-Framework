@@ -28,7 +28,27 @@ namespace DotNetRevolution.Core.Serialization.CodeContract
         public object Deserialize(Type type, string data)
         {
             Contract.Requires(type != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(data));
+            Contract.Requires(string.IsNullOrWhiteSpace(data) == false);
+            Contract.Ensures(Contract.Result<object>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public object Deserialize(Type type, Stream data, Encoding encoding)
+        {
+            Contract.Requires(type != null);
+            Contract.Requires(data != null);
+            Contract.Requires(encoding != null);
+            Contract.Ensures(Contract.Result<object>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public object Deserialize(Type type, byte[] data, Encoding encoding)
+        {
+            Contract.Requires(type != null);
+            Contract.Requires(data != null);
+            Contract.Requires(encoding != null);
             Contract.Ensures(Contract.Result<object>() != null);
 
             throw new NotImplementedException();

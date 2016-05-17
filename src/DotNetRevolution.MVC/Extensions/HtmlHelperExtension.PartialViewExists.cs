@@ -8,7 +8,7 @@ namespace DotNetRevolution.MVC.Extensions
         public static bool PartialViewExists(this HtmlHelper helper, string viewName)
         {
             Contract.Requires(helper != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(viewName));
+            Contract.Requires(string.IsNullOrWhiteSpace(viewName) == false);
 
             var engines = ViewEngines.Engines;
             Contract.Assume(engines != null);

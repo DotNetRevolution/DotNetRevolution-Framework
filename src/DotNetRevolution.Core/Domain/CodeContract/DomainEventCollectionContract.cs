@@ -8,11 +8,11 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     [ContractClassFor(typeof(IDomainEventCollection))]
     internal abstract class DomainEventCollectionContract : IDomainEventCollection
     {
-        public object AggregateRoot
+        public IAggregateRoot AggregateRoot
         {
             get
             {
-                Contract.Ensures(Contract.Result<object>() != null);
+                Contract.Ensures(Contract.Result<IAggregateRoot>() != null);
 
                 throw new NotImplementedException();
             }

@@ -24,7 +24,7 @@ namespace DotNetRevolution.Core.Logging
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposing)
+            if (disposing == false)
             {
                 return;
             }

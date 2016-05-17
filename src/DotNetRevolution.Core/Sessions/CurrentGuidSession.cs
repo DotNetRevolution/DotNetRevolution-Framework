@@ -14,7 +14,7 @@ namespace DotNetRevolution.Core.Sessions
         public void RemoveVariable(string key)
         {
             InternalVariables.Remove(key);
-            Contract.Assume(!Variables.PureContainsKey(key));
+            Contract.Assume(Variables.PureContainsKey(key) == false);
         }
     }
 }

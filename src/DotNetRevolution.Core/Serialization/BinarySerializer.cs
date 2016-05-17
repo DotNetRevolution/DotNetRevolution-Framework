@@ -19,6 +19,16 @@ namespace DotNetRevolution.Core.Serialization
             throw new NotImplementedException();
         }
 
+        public object Deserialize(Type type, byte[] data, Encoding encoding)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Deserialize(Type type, Stream data, Encoding encoding)
+        {
+            throw new NotImplementedException();
+        }
+
         public string Serialize(object item)
         {
             throw new NotImplementedException();

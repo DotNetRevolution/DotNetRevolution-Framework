@@ -9,7 +9,7 @@ namespace DotNetRevolution.Core.Extension
         public static bool PureContainsKey<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             Contract.Requires(dictionary != null);
-            Contract.Requires(!ReferenceEquals(key, null));
+            Contract.Requires(ReferenceEquals(key, null) == false);
 
             return dictionary.ContainsKey(key);
         }
@@ -18,7 +18,7 @@ namespace DotNetRevolution.Core.Extension
         public static bool PureContainsKey<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
         {
             Contract.Requires(dictionary != null);
-            Contract.Requires(!ReferenceEquals(key, null));
+            Contract.Requires(ReferenceEquals(key, null) == false);
 
             return dictionary.ContainsKey(key);
         }

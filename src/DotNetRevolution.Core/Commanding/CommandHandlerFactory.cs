@@ -53,7 +53,7 @@ namespace DotNetRevolution.Core.Commanding
         private void CacheHandler(ICommandHandler handler)
         {
             Contract.Requires(handler != null);
-            Contract.Ensures((!handler.Reusable && GetCachedHandler(handler.GetType()) == null) ||
+            Contract.Ensures((handler.Reusable == false && GetCachedHandler(handler.GetType()) == null) ||
                              (handler.Reusable && _handlers[handler.GetType()] != null));
 
             // if handler is reusable, cache

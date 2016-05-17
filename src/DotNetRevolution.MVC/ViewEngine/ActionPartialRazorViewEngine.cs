@@ -83,7 +83,7 @@ namespace DotNetRevolution.MVC.ViewEngine
 
             if (routeData.Values.TryGetValue("action", out action))
             {
-                Contract.Assume(!string.IsNullOrWhiteSpace(path));
+                Contract.Assume(string.IsNullOrWhiteSpace(path) == false);
 
                 return path.Replace(ActionToken, action as string);
             }

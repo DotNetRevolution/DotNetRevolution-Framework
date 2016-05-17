@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Messaging
     {
         private readonly Guid _id = SequentialGuid.Create();
 
-        public Guid Id
+        public Guid MessageId
         {
             get
             {

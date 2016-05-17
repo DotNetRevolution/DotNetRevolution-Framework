@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Domain
     {
         private readonly IReadOnlyCollection<IDomainEvent> _domainEvents;
 
-        public object AggregateRoot { get; }
+        public IAggregateRoot AggregateRoot { get; }
 
         public int Count
         {
@@ -18,7 +18,7 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        public DomainEventCollection(object aggregateRoot, IDomainEvent domainEvent)
+        public DomainEventCollection(IAggregateRoot aggregateRoot, IDomainEvent domainEvent)
         {
             Contract.Requires(aggregateRoot != null);
             Contract.Requires(domainEvent != null);
@@ -27,7 +27,16 @@ namespace DotNetRevolution.Core.Domain
             _domainEvents = new List<IDomainEvent> { domainEvent }.AsReadOnly();
         }
 
-        public DomainEventCollection(object aggregateRoot, IReadOnlyCollection<IDomainEvent> domainEvents)
+        public DomainEventCollection(IAggregateRoot aggregateRoot, IReadOnlyCollection<IDomainEvent> domainEvents)
+        {
+            Contract.Requires(aggregateRoot != null);
+            Contract.Requires(domainEvents != null);
+
+            AggregateRoot = aggregateRoot;
+            _domainEvents = domainEvents;
+        }
+
+        public DomainEventCollection(IAggregateRoot aggregateRoot, params IDomainEvent[] domainEvents)
         {
             Contract.Requires(aggregateRoot != null);
             Contract.Requires(domainEvents != null);

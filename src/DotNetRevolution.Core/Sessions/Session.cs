@@ -20,7 +20,7 @@ namespace DotNetRevolution.Core.Sessions
 
         public Session(string identity)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(identity));
+            Contract.Requires(string.IsNullOrWhiteSpace(identity) == false);
 
             Id = identity;
             InternalVariables = new Dictionary<string, object>();

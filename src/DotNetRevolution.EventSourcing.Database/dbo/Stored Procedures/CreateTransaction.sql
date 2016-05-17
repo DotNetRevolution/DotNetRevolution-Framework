@@ -1,19 +1,20 @@
 ﻿CREATE PROCEDURE [dbo].[CreateTransaction]
-	  @user						NVARCHAR(256)	 NOT NULL
-	, @commandGuid				UNIQUEIDENTIFIER NOT NULL
-    , @commandType				VARCHAR (512)    NOT NULL
-    , @commandData		        VARBINARY (MAX)  NOT NULL
+	  @user						NVARCHAR(256)
+	, @commandGuid				UNIQUEIDENTIFIER
+    , @commandType				VARCHAR (512)
+    , @commandData		        VARBINARY (MAX)
 	, @eventProviders			udttEventProvider READONLY   	
 	, @events					udttEvent READONLY	    
 AS
 BEGIN
+
 	BEGIN TRAN
 
 	BEGIN TRY
 		
 		DECLARE @transactionId BIGINT
 			  , @commandTypeId INT
-		
+
 		-- insert new event provider types
 		INSERT INTO dbo.EventProviderType (FullName)
 		SELECT [Type] 
@@ -24,12 +25,12 @@ BEGIN
 
 		-- insert new event providers
 		INSERT INTO dbo.EventProvider (EventProviderTypeId, EventProviderGuid)
-		SELECT TypeId, [Guid]
+		SELECT EventProviderTypeId, [EventProviderGuid]
 		  FROM @eventProviders eps		  
 		  JOIN dbo.EventProviderType ept ON ept.FullName = eps.[Type]
 		 WHERE NOT EXISTS(SELECT EventProviderId
 						    FROM dbo.EventProvider ep
-						   WHERE ep.EventProviderGuid = eps.[Guid] 
+						   WHERE ep.EventProviderGuid = eps.[EventProviderGuid] 
 						     AND ep.EventProviderTypeId = ept.EventProviderTypeId)
 		
 		-- create transaction
@@ -42,27 +43,30 @@ BEGIN
 		INSERT INTO dbo.EventProviderDescriptor (TransactionId, EventProviderId, Descriptor)
 		SELECT @transactionId, ep.EventProviderId, eps.Descriptor
 		  FROM @eventProviders eps
-		  JOIN dbo.EventProviderType ept ON ept.FullName = ep.[Type]
+		  JOIN dbo.EventProviderType ept ON ept.FullName = eps.[Type]
 		  JOIN dbo.EventProvider ep ON  eps.EventProviderGuid = ep.EventProviderGuid
 									AND ept.EventProviderTypeId = ep.EventProviderTypeId
-		  JOIN (SELECT epd.EventProviderId, epd.Descriptor, ROW_NUMBER() OVER(PARTITION BY epd.EventProviderId ORDER BY t.[Processed] DESC) AS 'rownum'
-		          FROM dbo.[EventProviderDescriptor] epd
-				  JOIN dbo.[Transaction] t ON epd.TransactionId = t.TransactionId
-			  GROUP BY epd.EventProviderId) descriptors ON  ep.EventProviderId = descriptors.EventProviderId
-													    AND eps.Descriptor <> descriptors.Descriptor
-		 WHERE descriptors.rownum = 1
+	 LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY epd.EventProviderId ORDER BY t.Processed DESC) 'row_num'
+					 , epd.Descriptor
+					 , epd.EventProviderId
+				 FROM dbo.[EventProviderDescriptor] epd
+				 JOIN dbo.[Transaction] t ON epd.TransactionId = t.TransactionId) descriptors ON ep.EventProviderId = descriptors.EventProviderId
+		 WHERE descriptors.row_num IS NULL
+			OR (descriptors.row_num = 1 AND eps.Descriptor <> descriptors.Descriptor)		 
 		 
-		-- insert if not exists command type
-		IF (NOT EXISTS(SELECT TransactionCommandTypeId = @commandTypeId
-						 FROM dbo.TransactionCommandType
-						WHERE FullName = @commandType))
+		-- insert if command type does not exist		
+		SET @commandTypeId = (SELECT TransactionCommandTypeId 
+								FROM dbo.TransactionCommandType
+							   WHERE FullName = @commandType)
+
+		IF (@commandTypeId IS NULL)
 		BEGIN
 			INSERT INTO dbo.TransactionCommandType (FullName) 
 			VALUES (@commandType)
-
+	
 			SET @commandTypeId = SCOPE_IDENTITY()
 		END
-
+		
 		-- insert command
 		INSERT INTO dbo.TransactionCommand (TransactionId, TransactionCommandTypeId, TransactionCommandGuid, [Data])
 		VALUES (@transactionId, @commandTypeId, @commandGuid, @commandData)

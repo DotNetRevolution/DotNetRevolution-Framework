@@ -23,7 +23,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
                                       string logPath)
         {
             Contract.Requires(sessionManager != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(logPath));
+            Contract.Requires(string.IsNullOrWhiteSpace(logPath) == false);
 
             _sessionManager = sessionManager;
             _sessionManager.SessionRemoved += SessionRemoved;

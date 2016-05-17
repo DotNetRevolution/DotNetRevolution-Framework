@@ -1,21 +1,30 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.Domain;
 using System;
 
 namespace DotNetRevolution.Test.Domain.Account.DomainEvents
 {
-    public class CreditApplied : DomainEvent
+    public class CreditApplied : IDomainEvent
     {
-        public Guid AccountId { get; }
+        public Guid AccountId { get; private set; }
 
-        public decimal Amount { get; }
+        public decimal Amount { get; private set; }
 
-        public decimal Balance { get; }
+        public decimal Balance { get; private set; }
+
+        public Guid DomainEventId { get; private set; }
 
         public CreditApplied(Guid accountId, decimal amount, decimal balance)
         {
+            DomainEventId = SequentialGuid.Create();
             AccountId = accountId;
             Amount = amount;
             Balance = balance;
+        }
+
+        [UsedImplicitly]
+        private CreditApplied()
+        {
         }
     }
 }

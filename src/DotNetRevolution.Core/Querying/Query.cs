@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Querying
     {
         private readonly Guid _id = SequentialGuid.Create();
 
-        public Guid Id
+        public Guid QueryId
         {
             get
             {

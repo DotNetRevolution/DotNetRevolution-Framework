@@ -5,6 +5,6 @@ namespace DotNetRevolution.Core.Domain
 {
     public interface IDomainEvent
     {
-        Guid Id { [Pure] get; }
+        Guid DomainEventId { [Pure] get; }
     }
 }

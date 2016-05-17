@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\AccountAggregateRoot.cs" />
+    <Compile Include="Account\Commands\Create.cs" />
+    <Compile Include="Account\Commands\CreateHandler.cs" />
     <Compile Include="Account\Commands\Deposit.cs" />
     <Compile Include="Account\Commands\DepositHandler.cs" />
     <Compile Include="Account\Commands\TransferFunds.cs" />

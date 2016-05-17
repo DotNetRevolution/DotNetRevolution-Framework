@@ -18,7 +18,7 @@ namespace DotNetRevolution.Ninject.Serilog
         public SerilogModule(string serilogLogFilePath,
                              LogEventLevel defaultMinimumLevel)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(serilogLogFilePath));
+            Contract.Requires(string.IsNullOrWhiteSpace(serilogLogFilePath) == false);
 
             _defaultMinimumLevel = defaultMinimumLevel;
 
@@ -76,7 +76,7 @@ namespace DotNetRevolution.Ninject.Serilog
             Contract.Requires(serilogLogFilePath != null);
 
             var path = Path.Combine(serilogLogFilePath, string.Format("Serilog-Error-{0}.log", Guid.NewGuid()));
-            Contract.Assume(!string.IsNullOrWhiteSpace(path));
+            Contract.Assume(string.IsNullOrWhiteSpace(path) == false);
 
             // send Serilog errors to console
             SelfLog.Out = new StreamWriter(path, true);

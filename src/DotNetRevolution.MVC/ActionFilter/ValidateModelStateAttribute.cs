@@ -30,7 +30,7 @@ namespace DotNetRevolution.MVC.ActionFilter
             Contract.Assume(filterContext.Controller?.ViewData?.ModelState != null);
             Contract.Assume(filterContext.Controller.ViewData.ModelState.IsValid || filterContext.HttpContext != null);
 
-            if (!filterContext.Controller.ViewData.ModelState.IsValid)
+            if (filterContext.Controller.ViewData.ModelState.IsValid == false)
             {
                 if (filterContext.HttpContext.Request.IsAjaxRequest())
                 {

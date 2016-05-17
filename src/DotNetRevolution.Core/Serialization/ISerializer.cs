@@ -12,5 +12,7 @@ namespace DotNetRevolution.Core.Serialization
         string Serialize(object item);
         Stream Serialize(object item, Encoding encoding);
         object Deserialize(Type type, string data);
+        object Deserialize(Type type, Stream data, Encoding encoding);
+        object Deserialize(Type type, byte[] data, Encoding encoding);
     }
 }

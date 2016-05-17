@@ -8,10 +8,10 @@ namespace DotNetRevolution.Core.Extension
         public static string AsString(this Guid guid)
         {
             Contract.Ensures(Contract.Result<string>() != null);
-            Contract.Ensures(!string.IsNullOrWhiteSpace(Contract.Result<string>()));
+            Contract.Ensures(string.IsNullOrWhiteSpace(Contract.Result<string>()) == false);
 
             var guidString = Guid.NewGuid().ToString();
-            Contract.Assume(!string.IsNullOrWhiteSpace(guidString));
+            Contract.Assume(string.IsNullOrWhiteSpace(guidString) == false);
 
             return guidString;
         }

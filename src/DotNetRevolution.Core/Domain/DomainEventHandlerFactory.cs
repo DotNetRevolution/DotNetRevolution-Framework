@@ -96,7 +96,7 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Requires(handler != null);
             Contract.Requires(handlers != null);
-            Contract.Ensures((!handler.Reusable && GetCachedHandler(handler.GetType(), handlers) == null) ||
+            Contract.Ensures((handler.Reusable == false && GetCachedHandler(handler.GetType(), handlers) == null) ||
                              (handler.Reusable && handlers[handler.GetType()] != null));
 
             // if handler is reusable, cache
@@ -138,7 +138,7 @@ namespace DotNetRevolution.Core.Domain
             {
                 IReadOnlyCollection<IDomainEventEntry> entries;
 
-                if (!Catalog.TryGetEntries(domainEventType, out entries))
+                if (Catalog.TryGetEntries(domainEventType, out entries) == false)
                 {
                     // no entries, try base type if any
                     continue;

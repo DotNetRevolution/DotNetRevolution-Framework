@@ -4,9 +4,9 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStreamCollection : IReadOnlyCollection<EventStream>
+    public class EventStreamCollection : IReadOnlyCollection<EventProvider>
     {
-        private readonly IReadOnlyCollection<EventStream> _streams;
+        private readonly IReadOnlyCollection<EventProvider> _streams;
         
         public int Count
         {
@@ -16,14 +16,14 @@ namespace DotNetRevolution.EventSourcing
             }
         }
 
-        public EventStreamCollection(params EventStream[] streams)
+        public EventStreamCollection(params EventProvider[] streams)
         {
             Contract.Requires(streams != null);
             
-            _streams = new List<EventStream>(streams).AsReadOnly();
+            _streams = streams;
         }
 
-        IEnumerator<EventStream> IEnumerable<EventStream>.GetEnumerator()
+        IEnumerator<EventProvider> IEnumerable<EventProvider>.GetEnumerator()
         {
             return _streams.GetEnumerator();
         }

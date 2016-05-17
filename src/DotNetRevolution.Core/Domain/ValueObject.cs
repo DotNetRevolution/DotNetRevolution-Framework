@@ -57,7 +57,7 @@ namespace DotNetRevolution.Core.Domain
                         return false;
                     }
                 }
-                else if (!value1.Equals(value2))
+                else if (value1.Equals(value2) == false)
                 {
                     return false;
                 }

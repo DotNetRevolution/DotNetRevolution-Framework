@@ -1,41 +1,68 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStore
+    public abstract class EventStore : IEventStore
     {
+        private readonly IEventStreamProcessorProvider _eventStreamProcessorProvider;
         private readonly ISerializer _serializer;
 
-        public EventStore(ISerializer serializer)
+        public EventStore(IEventStreamProcessorProvider eventStreamProcessorProvider)
         {
-            Contract.Requires(serializer != null);
-
-            _serializer = serializer;
+            Contract.Requires(eventStreamProcessorProvider != null);
+                        
+            _eventStreamProcessorProvider = eventStreamProcessorProvider;
         }
 
-        public EventStream GetEventStream<TEventProvider>(Identity identity)
-        {
-            int minVersion;
-            int maxVersion;
+        public EventProvider GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class
+        {            
+            try
+            {
+                // create new event provider type
+                var eventProviderType = new EventProviderType(typeof(TAggregateRoot));
 
-            // get domain events
-            var domainEvents = GetDomainEvents(identity, out minVersion, out maxVersion);
+                EventProviderVersion version;
+                EventProviderDescriptor descriptor;
 
-            return null;
+                // get domain events
+                var eventStream = GetDomainEvents(eventProviderType, identity, out version, out descriptor);
+
+                // get event stream processor
+                var eventStreamProcessor = _eventStreamProcessorProvider.GetProcessor(eventProviderType);
+
+                // return new event provider with gathered information
+                return new EventProvider(eventProviderType, 
+                                         identity, 
+                                         version,
+                                         descriptor,
+                                         eventStream,
+                                         eventStreamProcessor);
+            }
+            catch (Exception ex)
+            {
+                throw new EventStoreException("Error processing request to get event stream.", ex);
+            }
         }
 
         public void Commit(Transaction transaction)
         {
-            throw new NotImplementedException();
+            Contract.Requires(transaction != null);
+
+            try
+            {
+                CommitTransaction(transaction);
+            }
+            catch (Exception ex)
+            {
+                throw new EventStoreException("Error processing request to commit transaction.", ex);
+            }
         }
 
-        private IEnumerable<IDomainEvent> GetDomainEvents(Identity identity, out int minVersion, out int maxVersion)
-        {
-            throw new NotImplementedException();
-        }
+        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor);
+
+        protected abstract void CommitTransaction(Transaction transaction);
     }
 }

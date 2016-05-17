@@ -5,6 +5,6 @@ namespace DotNetRevolution.Core.Messaging
 {
     public interface IMessage
     {
-        Guid Id { [Pure] get; }
+        Guid MessageId { [Pure] get; }
     }
 }

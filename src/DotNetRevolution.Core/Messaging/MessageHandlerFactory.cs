@@ -53,7 +53,7 @@ namespace DotNetRevolution.Core.Messaging
         {
             Contract.Requires(handler != null);
             Contract.Ensures((handler.Reusable && _handlers[handler.GetType()] != null) ||
-                             (!handler.Reusable && GetCachedHandler(handler.GetType()) == null));
+                             (handler.Reusable == false && GetCachedHandler(handler.GetType()) == null));
 
             // if handler is reusable, cache
             if (handler.Reusable)

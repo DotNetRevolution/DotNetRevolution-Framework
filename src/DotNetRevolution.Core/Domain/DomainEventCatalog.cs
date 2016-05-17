@@ -66,7 +66,7 @@ namespace DotNetRevolution.Core.Domain
 
                 entries.Remove(entry);
 
-                Contract.Assume(!_entries.TryGetValue(entry.DomainEventType, out entries) ||
+                Contract.Assume(_entries.TryGetValue(entry.DomainEventType, out entries) == false ||
                     (_entries.TryGetValue(entry.DomainEventType, out entries) && !entries.Contains(entry)));
             }
         }

@@ -5,6 +5,6 @@ namespace DotNetRevolution.Core.Commanding
 {
     public interface ICommand
     {
-        Guid Id { [Pure] get; }
+        Guid CommandId { [Pure] get; }
     }
 }

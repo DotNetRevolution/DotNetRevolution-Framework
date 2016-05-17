@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Commanding
     {
         private readonly Guid _id = SequentialGuid.Create();
 
-        public Guid Id
+        public Guid CommandId
         {
             get
             {

@@ -49,6 +49,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourc
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DotNetRevolution.EventSourcing.Database", "src\DotNetRevolution.EventSourcing.Database\DotNetRevolution.EventSourcing.Database.sqlproj", "{B72E1786-2AD6-4504-8037-C2C6002991BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Sql", "src\DotNetRevolution.EventSourcing.Sql\DotNetRevolution.EventSourcing.Sql.csproj", "{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.EventStourcing.Sql", "tests\DotNetRevolution.Test.EventStourcing.Sql\DotNetRevolution.Test.EventStourcing.Sql.csproj", "{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +125,14 @@ Global
 		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B72E1786-2AD6-4504-8037-C2C6002991BB}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,5 +153,7 @@ Global
 		{C3E88787-D808-48E8-9D07-FE369525B52A} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 		{70DE9C4A-5578-434E-BC97-7B4CE66FE007} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{B72E1786-2AD6-4504-8037-C2C6002991BB} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 	EndGlobalSection
 EndGlobal

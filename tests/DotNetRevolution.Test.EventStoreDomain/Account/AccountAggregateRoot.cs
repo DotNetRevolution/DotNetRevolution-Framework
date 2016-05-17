@@ -7,7 +7,7 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account
 {
-    public class AccountAggregateRoot
+    public class AccountAggregateRoot : IAggregateRoot
     {
         public Identity Identity { get; private set; }
 
@@ -24,11 +24,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             Identity = identity;
         }
-        
-        private AccountAggregateRoot(decimal beginningBalance)
-        {
-        }
-        
+                
         public IDomainEventCollection Credit(decimal amount, CanCreditAccount canCreditAccount)
         {
             Contract.Requires(canCreditAccount != null);
@@ -38,7 +34,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             if (canCreditAccount(this, amount, out declinationReason))
             {
-                var result = new CreditApplied(Identity.Value, amount);
+                var result = new CreditApplied(Identity, amount);
 
                 Apply(result);
 
@@ -57,7 +53,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             if (canDebitAccount(this, amount, out declinationReason))
             {
-                var result = new DebitApplied(Identity.Value, amount);
+                var result = new DebitApplied(Identity, amount);
 
                 Apply(result);
 
@@ -69,9 +65,9 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
         public static IDomainEventCollection Create(decimal beginningBalance)
         {
-            var account = new AccountAggregateRoot(beginningBalance);
+            var account = new AccountAggregateRoot();
 
-            var result = new Created(account.Identity.Value, account.Balance);
+            var result = new Created(Identity.New(), beginningBalance);
 
             account.Apply(result);
 
@@ -80,6 +76,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
         private void Apply(Created domainEvent)
         {
+            Identity = domainEvent.AccountId;
             Balance = domainEvent.Balance;
         }
 

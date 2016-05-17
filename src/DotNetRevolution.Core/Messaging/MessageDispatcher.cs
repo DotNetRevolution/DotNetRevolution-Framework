@@ -17,7 +17,7 @@ namespace DotNetRevolution.Core.Messaging
         public void Dispatch(IMessage message)
         {
             var correlationId = Guid.NewGuid().ToString();            
-            Contract.Assume(!string.IsNullOrWhiteSpace(correlationId));
+            Contract.Assume(string.IsNullOrWhiteSpace(correlationId) == false);
 
             Dispatch(message, correlationId);
         }

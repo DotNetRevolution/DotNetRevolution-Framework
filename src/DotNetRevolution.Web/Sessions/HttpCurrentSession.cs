@@ -22,7 +22,7 @@ namespace DotNetRevolution.Web.Sessions
         public void RemoveVariable(string key)
         {
             InternalHttpSession.Remove(key);
-            Contract.Assume(!Variables.PureContainsKey(key));
+            Contract.Assume(Variables.PureContainsKey(key) == false);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
 
             // convert bytes to string
             var data = Encoding.UTF8.GetString(bytes);
-            Contract.Assume(!string.IsNullOrWhiteSpace(data));
+            Contract.Assume(string.IsNullOrWhiteSpace(data) == false);
 
             // use serializer to deserialize the object
             return _serializer.Deserialize(type, data);

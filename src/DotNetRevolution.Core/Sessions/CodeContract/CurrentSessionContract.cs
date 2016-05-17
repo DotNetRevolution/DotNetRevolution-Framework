@@ -26,14 +26,14 @@ namespace DotNetRevolution.Core.Sessions.CodeContract
 
         public void SetVariable(string key, object variable)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(key));
+            Contract.Requires(string.IsNullOrWhiteSpace(key) == false);
             Contract.Ensures(Variables.PureContainsKey(key));
         }
 
         public void RemoveVariable(string key)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(key));
-            Contract.Ensures(!Variables.PureContainsKey(key));
+            Contract.Requires(string.IsNullOrWhiteSpace(key) == false);
+            Contract.Ensures(Variables.PureContainsKey(key) == false);
         }
     }
 }

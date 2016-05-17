@@ -11,8 +11,8 @@ namespace DotNetRevolution.Logging.Serilog.Helper
         {
             Contract.Requires(smtpSection != null);
             Contract.Requires(smtpSection.Network != null);
-            Contract.Requires(!string.IsNullOrWhiteSpace(subject));
-            Contract.Requires(!string.IsNullOrWhiteSpace(toEmail));
+            Contract.Requires(string.IsNullOrWhiteSpace(subject) == false);
+            Contract.Requires(string.IsNullOrWhiteSpace(toEmail) == false);
             Contract.Ensures(Contract.Result<EmailConnectionInfo>() != null);
 
             var info = new EmailConnectionInfo
@@ -25,7 +25,7 @@ namespace DotNetRevolution.Logging.Serilog.Helper
                 ToEmail = toEmail
             };
 
-            if (!smtpSection.Network.DefaultCredentials)
+            if (smtpSection.Network.DefaultCredentials == false)
             {
                 info.NetworkCredentials = new NetworkCredential(smtpSection.Network.UserName, smtpSection.Network.Password);
             }

@@ -1,35 +1,43 @@
 ﻿using DotNetRevolution.Core.Commanding;
-using System.Collections.Generic;
+using DotNetRevolution.Core.Domain;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
     public class Transaction
     {
-        private readonly List<EventStream> _eventStreams = new List<EventStream>();
+        private readonly Collection<EventProvider> _eventProviders;
 
         public ICommand Command { [Pure] get; }
-
-        public EventStreamCollection EventStreams
+        
+        public EntityCollection<EventProvider> EventProviders
         {
             [Pure]
             get
             {
-                return new EventStreamCollection(_eventStreams.ToArray());
+                return _eventProviders as EntityCollection<EventProvider>;
             }
         }
 
-        public Transaction(ICommand command, params EventStream[] eventStreams)
+        public string User { [Pure] get; }
+        
+        public Transaction(string user, ICommand command, params EventProvider[] eventProviders)
         {
+            Contract.Requires(string.IsNullOrWhiteSpace(user) == false);
             Contract.Requires(command != null);
-            Contract.Requires(eventStreams != null);
+            Contract.Requires(eventProviders != null);
 
+            User = user;
             Command = command;
+            _eventProviders = new EntityCollection<EventProvider>(eventProviders);
+        }
 
-            foreach(var stream in eventStreams)
-            {
-                _eventStreams.Add(stream);
-            }
+        public void AddEventProvider(EventProvider eventProvider)
+        {
+            Contract.Requires(eventProvider != null);
+            
+            _eventProviders.Add(eventProvider);
         }
     }
 }

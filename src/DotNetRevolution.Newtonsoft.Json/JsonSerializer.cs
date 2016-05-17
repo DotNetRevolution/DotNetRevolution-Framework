@@ -23,12 +23,9 @@ namespace DotNetRevolution.Json
 
                 // use custom contract resolver to serialize/deserialize public get/private set properties
                 ContractResolver = new ReadOnlyPropertyContractResolver(),
-
+                   
                 // save references to protect against stack overflow exceptions with self referencing property loops
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-
-                // indent children for readability
-                Formatting = Formatting.Indented
+                PreserveReferencesHandling = PreserveReferencesHandling.All
             })
         {
         }
@@ -51,30 +48,30 @@ namespace DotNetRevolution.Json
         public Stream Serialize(object item, Encoding encoding)
         {
             // get item as a string
-            var messageAsString = item as string;
-
-            if (messageAsString == null)
+            if (item is string)
             {
-                // item is not a string, serialize as json
-                var serializedObject = Serialize(item);
-                Contract.Assume(!string.IsNullOrWhiteSpace(serializedObject));
-                
-                return new MemoryStream(encoding.GetBytes(serializedObject));
+                var messageAsString = item as string;
+
+                try
+                {
+                    // validate item is json string
+                    JToken.Parse(messageAsString);
+
+                    // return item as memory stream
+                    return new MemoryStream(encoding.GetBytes(messageAsString));
+                }
+                catch (JsonReaderException)
+                {
+                    // item is not valid json, serialize as json
+                    return new MemoryStream(encoding.GetBytes(Serialize(item)));
+                }
             }
 
-            try
-            {
-                // validate item is json string
-                JToken.Parse(messageAsString);
+            // item is not a string, serialize as json
+            var serializedObject = Serialize(item);
+            Contract.Assume(string.IsNullOrWhiteSpace(serializedObject) == false);
 
-                // return item as memory stream
-                return new MemoryStream(encoding.GetBytes(messageAsString));
-            }
-            catch (JsonReaderException)
-            {
-                // item is not valid json, serialize as json
-                return new MemoryStream(encoding.GetBytes(Serialize(item)));
-            }
+            return new MemoryStream(encoding.GetBytes(serializedObject));
         }
 
         public object Deserialize(Type type, string data)
@@ -84,6 +81,33 @@ namespace DotNetRevolution.Json
             Contract.Assume(returnValue != null);
 
             return returnValue;
+        }
+
+        public object Deserialize(Type type, Stream data, Encoding encoding)
+        {
+            Contract.Assume(type != null);
+            Contract.Assume(data != null);
+            Contract.Assume(encoding != null);
+
+            var bytes = new byte[data.Length];
+            data.Read(bytes, 0, bytes.Length);
+
+            var dataString = encoding.GetString(bytes);
+            Contract.Assume(string.IsNullOrWhiteSpace(dataString) == false);
+            
+            return Deserialize(type, dataString);
+        }
+
+        public object Deserialize(Type type, byte[] data, Encoding encoding)
+        {
+            Contract.Assume(type != null);
+            Contract.Assume(data != null);
+            Contract.Assume(encoding != null);
+
+            var dataString = encoding.GetString(data);
+            Contract.Assume(string.IsNullOrWhiteSpace(dataString) == false);
+
+            return Deserialize(type, dataString);
         }
     }
 }

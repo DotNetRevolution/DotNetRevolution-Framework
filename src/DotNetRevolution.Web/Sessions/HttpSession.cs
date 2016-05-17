@@ -22,7 +22,7 @@ namespace DotNetRevolution.Web.Sessions
             get
             {
                 var id = InternalHttpSession.SessionID;
-                Contract.Assume(!string.IsNullOrWhiteSpace(id));
+                Contract.Assume(string.IsNullOrWhiteSpace(id) == false);
 
                 return InternalHttpSession.SessionID;
             }

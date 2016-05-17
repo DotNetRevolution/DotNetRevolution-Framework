@@ -18,8 +18,8 @@ namespace DotNetRevolution.Ninject.Serilog
                                      string tableName,
                                      LogEventLevel defaultMinimumLevel)
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
-            Contract.Requires(!string.IsNullOrWhiteSpace(tableName));
+            Contract.Requires(string.IsNullOrWhiteSpace(connectionString) == false);
+            Contract.Requires(string.IsNullOrWhiteSpace(tableName) == false);
 
             _defaultMinimumLevel = defaultMinimumLevel;
             _connectionString = connectionString;

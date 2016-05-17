@@ -28,7 +28,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
         public DatabaseSink(string connectionString)
             : base(50, TimeSpan.FromSeconds(5))
         {
-            Contract.Requires(!string.IsNullOrWhiteSpace(connectionString));
+            Contract.Requires(string.IsNullOrWhiteSpace(connectionString) == false);
 
             _connectionString = connectionString;
         }
@@ -119,7 +119,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             var propertiesToSave = properties.Where(property => !IgnoreProperties.Contains(property.Key))
                                              .ToList();
 
-            if (!propertiesToSave.Any())
+            if (propertiesToSave.Any() == false)
             {
                 return null;
             }
