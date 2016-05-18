@@ -151,112 +151,139 @@ namespace DotNetRevolution.EventSourcing.Sql
             // create connection
             using (var conn = new SqlConnection(_connectionString))
             {
+                SqlParameter returnParameter;
+
                 // establish command
-                SqlCommand command = CreateWriteCommand(conn, transaction.Command, transaction.EventProviders, transaction.User);
+                SqlCommand command = CreateWriteCommand(conn, transaction.Command, transaction.EventProviders, transaction.User, out returnParameter);
 
                 // connection needs to be open before executing
                 conn.Open();
 
                 // execute
                 command.ExecuteNonQuery();
+
+                // check for error
+                CheckForError(returnParameter);                
             }            
         }
 
-        private SqlCommand CreateWriteCommand(SqlConnection conn, ICommand command, EntityCollection<EventProvider> eventProviders, string user)
+        private void CheckForError(SqlParameter returnParameter)
+        {
+            // return value will be 0 for success, any other value will be an error
+            if ((int)returnParameter.Value != 0)
+            {
+                throw new InvalidOperationException(string.Format("Error executing command. Return code: {0}", (int)returnParameter.Value));
+            }
+        }
+
+        private SqlCommand CreateWriteCommand(SqlConnection conn, ICommand command, EntityCollection<EventProvider> eventProviders, string user, out SqlParameter returnParameter)
         {
             var sqlCommand = new SqlCommand("[dbo].[CreateTransaction]", conn);
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
+            var commandType = new TransactionCommandType(command.GetType());
+
             // set parameters
             sqlCommand.Parameters.Add("@user", SqlDbType.NVarChar, 256).Value = user;
             sqlCommand.Parameters.Add("@commandGuid", SqlDbType.UniqueIdentifier).Value = command.CommandId;
-            sqlCommand.Parameters.Add("@commandType", SqlDbType.VarChar, 512).Value = new TransactionCommandType(command.GetType()).FullName;
+            sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
             sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _encoding.GetBytes(_serializer.Serialize(command));
+
+            // add return value parameter
+            returnParameter = sqlCommand.Parameters.Add(new SqlParameter("@retval", SqlDbType.Int)
+                {
+                    Direction = ParameterDirection.ReturnValue
+                });
+
+            DataTable eventProviderDataTable;
+            DataTable eventDataTable;
+
+            GetDataTables(eventProviders, out eventProviderDataTable, out eventDataTable);
 
             // event provider user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@eventProviders", SqlDbType.Structured)
                 {
                     TypeName = "[dbo].[udttEventProvider]",                    
-                    Value = GetEventProviderDataTable(eventProviders)
+                    Value = eventProviderDataTable
                 });
 
             // event user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@events", SqlDbType.Structured)
                 {
                     TypeName = "[dbo].[udttEvent]",
-                    Value = GetEventDataTable(eventProviders)
+                    Value = eventDataTable
                 });
             
             return sqlCommand;
         }
 
-        private DataTable GetEventDataTable(EntityCollection<EventProvider> eventProviders)
+        private void GetDataTables(EntityCollection<EventProvider> eventProviders, out DataTable eventProviderDataTable, out DataTable eventDataTable)
         {
-            // get event data table
-            var dataTable = CreateEventDataTable();
+            // create data tables
+            eventProviderDataTable = CreateEventProviderDataTable();
+            eventDataTable = CreateEventDataTable();
 
-            // go through each data provider adding its events
-            foreach (var eventProvider in eventProviders)
-            {
-                // new sequence object to keep track of the sequence per event provider
-                var sequence = new TransactionEventSequence();
-
-                // cache id for minor performance increase
-                var eventProviderGuid = eventProvider.Identity.Value;
-
-                // go through each domain event in the event provider
-                foreach (var domainEvent in eventProvider.DomainEvents)
-                {
-                    // add row to the data table
-                    var dataRow = dataTable.NewRow();
-
-                    // populate data row
-                    dataRow["EventProviderGuid"] = eventProviderGuid;
-                    dataRow["EventGuid"] = domainEvent.DomainEventId;
-                    dataRow["Sequence"] = sequence.Increment();
-                    dataRow["Type"] = new TransactionEventType(domainEvent.GetType()).FullName;
-                    dataRow["Data"] = _encoding.GetBytes(_serializer.Serialize(domainEvent));
-
-                    // add new row to table
-                    dataTable.Rows.Add(dataRow);
-                }
-            }
-
-            return dataTable;
-        }
-
-        private DataTable GetEventProviderDataTable(EntityCollection<EventProvider> eventProviders)
-        {
-            // get event data table
-            var dataTable = CreateEventProviderDataTable();
+            // variable to create temporary ids
+            var eventProviderTempId = -1;
 
             // go through each data provider
             foreach (var eventProvider in eventProviders)
-            {                
-                // add row to the data table
-                var dataRow = dataTable.NewRow();
+            {
+                AddEventProviderRow(eventProviderDataTable, ++eventProviderTempId, eventProvider);
 
-                // populate data row
-                dataRow["EventProviderGuid"] = eventProvider.Identity.Value;
-                dataRow["Descriptor"] = eventProvider.Descriptor.Value;
-                dataRow["Type"] = eventProvider.EventProviderType.FullName;
-                dataRow["Version"] = eventProvider.Version.Value;
+                // new sequence object to keep track of the sequence per event provider
+                var sequence = new TransactionEventSequence();
                 
-                // add new row to table
-                dataTable.Rows.Add(dataRow);
-            }
-
-            return dataTable;
+                // go through each domain event in the event provider
+                foreach (var domainEvent in eventProvider.DomainEvents)
+                {
+                    AddEventRow(eventDataTable, eventProviderTempId, sequence.Increment(), domainEvent);
+                }
+            }            
         }
 
+        private void AddEventRow(DataTable dataTable, int eventProviderTempId, int sequence, IDomainEvent domainEvent)
+        {
+            // add row to the data table
+            var dataRow = dataTable.NewRow();
+
+            var eventType = new TransactionEventType(domainEvent.GetType());
+
+            // populate data row
+            dataRow["EventProviderTempId"] = eventProviderTempId;
+            dataRow["EventGuid"] = domainEvent.DomainEventId;
+            dataRow["Sequence"] = sequence;
+            dataRow["TypeFullName"] = eventType.FullName;
+            dataRow["Data"] = _encoding.GetBytes(_serializer.Serialize(domainEvent));
+
+            // add new row to table
+            dataTable.Rows.Add(dataRow);
+        }
+
+        private static void AddEventProviderRow(DataTable dataTable, int eventProviderTempId, EventProvider eventProvider)
+        {
+            // add row to the data table
+            var dataRow = dataTable.NewRow();
+
+            // populate data row
+            dataRow["TempId"] = eventProviderTempId;
+            dataRow["EventProviderGuid"] = eventProvider.Identity.Value;
+            dataRow["Descriptor"] = eventProvider.Descriptor.Value;
+            dataRow["TypeFullName"] = eventProvider.EventProviderType.FullName;
+            dataRow["Version"] = eventProvider.Version.Value;
+
+            // add new row to table
+            dataTable.Rows.Add(dataRow);
+        }
+                
         private DataTable CreateEventDataTable()
         {
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("EventProviderGuid", typeof(Guid));
+            dataTable.Columns.Add("EventProviderTempId", typeof(int));
             dataTable.Columns.Add("EventGuid", typeof(Guid));
             dataTable.Columns.Add("Sequence", typeof(int));
-            dataTable.Columns.Add("Type", typeof(string));
+            dataTable.Columns.Add("TypeFullName", typeof(string));
             dataTable.Columns.Add("Data", typeof(byte[]));
 
             return dataTable;
@@ -265,10 +292,11 @@ namespace DotNetRevolution.EventSourcing.Sql
         private DataTable CreateEventProviderDataTable()
         {
             var dataTable = new DataTable();
-
+            
+            dataTable.Columns.Add("TempId", typeof(int));
             dataTable.Columns.Add("EventProviderGuid", typeof(Guid));
             dataTable.Columns.Add("Descriptor", typeof(string));
-            dataTable.Columns.Add("Type", typeof(string));
+            dataTable.Columns.Add("TypeFullName", typeof(string));
             dataTable.Columns.Add("Version", typeof(int));
 
             return dataTable;

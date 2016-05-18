@@ -6,22 +6,31 @@ DECLARE	@return_value Int,
 		@events udttevent,
 		@commandData varbinary(max),
 		@eventProviderGuid uniqueidentifier,
-		@commandId uniqueidentifier
+		@commandId uniqueidentifier,
+		@commandTypeId uniqueidentifier,
+		@eventTypeId uniqueidentifier,
+		@providerTypeId uniqueidentifier,
+		@commandFullName varchar(255)
 
 set @eventProviderGuid = NEWID()
+set @eventTypeId = NEWID()
+set @providerTypeId = NEWID()
 set @commandId = NEWID()
+set @commandTypeId = NEWID()
+set @commandFullName = 'Test_' + CONVERT(varchar(250), @commandTypeId)
 select @commandData = CONVERT(VARBINARY(MAX), 'CommandData')
 
-insert into @events (EventProviderGuid, EventGuid, Type, Sequence, Data)
-SELECT @eventProviderGuid, NEWID(), 'TestEvent', 0, CONVERT(VARBINARY(MAX), 'EventData')
+insert into @events (EventProviderGuid, EventGuid, TypeId, TypeFullName, Sequence, Data)
+SELECT @eventProviderGuid, NEWID(), @eventTypeId, 'TestEvent_' + CONVERT(varchar(250), @eventTypeId), 0, CONVERT(VARBINARY(MAX), 'EventData')
 
-insert into @eventProviders (EventProviderGuid, Type, Version, Descriptor)
-SELECT @eventProviderGuid, 'TestProvider', 0, 'Test Provider Desc1'
+insert into @eventProviders (EventProviderGuid, TypeId, TypeFullName, Version, Descriptor)
+SELECT @eventProviderGuid, @providerTypeId, 'TestProvider_' + CONVERT(varchar(250), @providerTypeId), 0, 'Test Provider Desc1'
 
 EXEC	@return_value = [dbo].[CreateTransaction]
 		@user = N'Test',
 		@commandGuid = @commandId,
-		@commandType = 'Test',
+		@commandTypeId = @commandTypeId,
+		@commandTypeFullName = @commandFullName,
 		@commandData = @commandData,
 		@eventProviders = @eventProviders,
 		@events = @events

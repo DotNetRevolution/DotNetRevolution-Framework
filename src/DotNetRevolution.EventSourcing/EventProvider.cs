@@ -16,9 +16,9 @@ namespace DotNetRevolution.EventSourcing
         public EventStream DomainEvents { get; }
 
         public EventProviderDescriptor Descriptor { get; }
-                
-        public EventProvider(EventProviderType type, 
-            Identity identity, 
+
+        public EventProvider(EventProviderType type,
+            Identity identity,
             EventProviderVersion version,
             EventProviderDescriptor descriptor,
             EventStream domainEvents,
@@ -37,6 +37,18 @@ namespace DotNetRevolution.EventSourcing
             Descriptor = descriptor;
             DomainEvents = domainEvents;
             _eventStreamProcessor = eventStreamProcessor;
+        }
+
+        public EventProvider(IDomainEventCollection domainEventCollection, IEventStreamProcessor eventStreamProcessor)
+            : this(new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
+                   domainEventCollection.AggregateRoot.Identity,
+                   EventProviderVersion.Initial,
+                   new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),
+                   new EventStream(domainEventCollection),
+                   eventStreamProcessor)
+        {
+            Contract.Requires(domainEventCollection != null);
+            Contract.Requires(eventStreamProcessor != null);            
         }
 
         public TAggregateRoot CreateAggregateRoot<TAggregateRoot>() where TAggregateRoot : class

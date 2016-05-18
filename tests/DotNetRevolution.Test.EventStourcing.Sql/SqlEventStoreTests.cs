@@ -32,12 +32,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             _eventStore.Commit(new Transaction("UnitTester",
                 command,
-                new EventProvider(new EventProviderType(typeof(AccountAggregateRoot)),
-                    domainEvents.AggregateRoot.Identity,
-                    EventProviderVersion.Initial,
-                    new EventProviderDescriptor(domainEvents.AggregateRoot.Identity.Value.ToString()),
-                    new EventStream(domainEvents),
-                    _eventStreamProcessor)));
+                new EventProvider(domainEvents, _eventStreamProcessor)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -45,26 +40,12 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         }
 
         [TestMethod]
-        public void CanCommit1000Transactions()
+        public void CanCommitMultipleEventProvidersUsingOneTransaction()
         {
-            for (var i = 0; i < 1000; i++)
-            {
-                var command = new Create(100);
-                var domainEvents = AccountAggregateRoot.Create(100);
-
-                _eventStore.Commit(new Transaction("UnitTester",
-                    command,
-                    new EventProvider(new EventProviderType(typeof(AccountAggregateRoot)),
-                        domainEvents.AggregateRoot.Identity,
-                        EventProviderVersion.Initial,
-                        new EventProviderDescriptor(domainEvents.AggregateRoot.Identity.Value.ToString()),
-                        new EventStream(domainEvents),
-                        _eventStreamProcessor)));
-
-                //var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
-
-                //Assert.IsNotNull(eventProvider);
-            }
-        }
+            _eventStore.Commit(new Transaction("UnitTester",
+                new Create(100),
+                new EventProvider(AccountAggregateRoot.Create(100), _eventStreamProcessor),
+                new EventProvider(AccountAggregateRoot.Create(100), _eventStreamProcessor)));            
+        }        
     }
 }

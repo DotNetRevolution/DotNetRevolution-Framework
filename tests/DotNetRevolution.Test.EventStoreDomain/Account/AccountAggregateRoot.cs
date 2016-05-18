@@ -24,7 +24,12 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             Identity = identity;
         }
-                
+
+        public override string ToString()
+        {
+            return string.Format("AccountID: {0}", Identity.Value.ToString());
+        }
+
         public IDomainEventCollection Credit(decimal amount, CanCreditAccount canCreditAccount)
         {
             Contract.Requires(canCreditAccount != null);
