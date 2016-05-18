@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventProvider
+    public class EventProvider : IEventProvider
     {
         public EventProviderType EventProviderType { get; }
 
@@ -41,7 +41,9 @@ namespace DotNetRevolution.EventSourcing
                    new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),
                    new EventStream(domainEventCollection))
         {
-            Contract.Requires(domainEventCollection != null);            
+            Contract.Requires(domainEventCollection?.AggregateRoot != null);
+            Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
+            Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
         }
     }
 }

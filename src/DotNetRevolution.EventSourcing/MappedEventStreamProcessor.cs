@@ -16,7 +16,18 @@ namespace DotNetRevolution.EventSourcing
 
         protected override string GetMethodName(string domainEventName)
         {
-            return _mappings.First(x => x.DomainEventType.Name == domainEventName).MethodName;
+            Contract.Assume(_mappings.Any());
+
+            var mapping = _mappings.First(x => x.DomainEventType.Name == domainEventName);
+            Contract.Assume(mapping != null);
+
+            return mapping.MethodName;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_mappings != null);
         }
     }
 }

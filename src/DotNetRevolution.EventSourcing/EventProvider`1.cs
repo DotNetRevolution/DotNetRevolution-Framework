@@ -3,9 +3,8 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-
-    public class EventProvider<TAggregateRoot> : EventProvider
-         where TAggregateRoot : class
+    public class EventProvider<TAggregateRoot> : EventProvider, IEventProvider<TAggregateRoot>
+        where TAggregateRoot : class
     {
         private readonly IEventStreamProcessor _eventStreamProcessor;
 
@@ -35,32 +34,40 @@ namespace DotNetRevolution.EventSourcing
                    new EventStream(domainEventCollection),
                    eventStreamProcessor)
         {
-            Contract.Requires(domainEventCollection != null);
+            Contract.Requires(domainEventCollection?.AggregateRoot != null);
+            Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
             Contract.Requires(eventStreamProcessor != null);
+            Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
         }
 
         public TAggregateRoot CreateAggregateRoot()
         {
+            Contract.Assume(Contract.ForAll(DomainEvents, o => o != null));
+
             return _eventStreamProcessor.Process<TAggregateRoot>(DomainEvents);
         }
 
-        public EventProvider CreateNewVersion(IDomainEventCollection domainEvents)
+        public EventProvider<TAggregateRoot> CreateNewVersion(IDomainEventCollection domainEvents)
         {
-            Contract.Requires(domainEvents != null);
-
-            var aggregateRootType = new EventProviderType(domainEvents.AggregateRoot.GetType());
+            var aggregateRootType = new EventProviderType(domainEvents.AggregateRoot.GetType());            
 
             if (aggregateRootType != EventProviderType)
             {
                 throw new System.Exception();
             }
-
+            
             return new EventProvider<TAggregateRoot>(EventProviderType,
                 Identity,
                 Version.Increment(),
                 new EventProviderDescriptor(domainEvents.AggregateRoot.ToString()),
                 new EventStream(domainEvents),
                 _eventStreamProcessor);
+        }
+        
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_eventStreamProcessor != null);
         }
     }
 }

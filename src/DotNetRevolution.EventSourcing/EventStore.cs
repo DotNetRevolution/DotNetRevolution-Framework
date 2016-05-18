@@ -29,6 +29,9 @@ namespace DotNetRevolution.EventSourcing
 
                 // get domain events
                 var eventStream = GetDomainEvents(eventProviderType, identity, out version, out descriptor);
+                Contract.Assume(eventStream != null);
+                Contract.Assume(version != null);
+                Contract.Assume(descriptor != null);
 
                 // get event stream processor
                 var eventStreamProcessor = _eventStreamProcessorProvider.GetProcessor(eventProviderType);
@@ -49,8 +52,6 @@ namespace DotNetRevolution.EventSourcing
 
         public void Commit(Transaction transaction)
         {
-            Contract.Requires(transaction != null);
-
             try
             {
                 CommitTransaction(transaction);
@@ -64,5 +65,11 @@ namespace DotNetRevolution.EventSourcing
         protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor);
 
         protected abstract void CommitTransaction(Transaction transaction);
+        
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_eventStreamProcessorProvider != null);
+        }
     }
 }

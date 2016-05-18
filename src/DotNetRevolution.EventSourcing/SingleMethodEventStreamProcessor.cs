@@ -8,7 +8,7 @@ namespace DotNetRevolution.EventSourcing
 
         public SingleMethodEventStreamProcessor(string methodName)
         {
-            Contract.Requires(string.IsNullOrWhiteSpace(methodName) != false);
+            Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);
 
             _methodName = methodName;
         }

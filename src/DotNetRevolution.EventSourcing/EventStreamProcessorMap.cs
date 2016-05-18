@@ -12,7 +12,7 @@ namespace DotNetRevolution.EventSourcing
         public EventStreamProcessorMap(Type domainEventType, string methodName)
         {
             Contract.Requires(domainEventType != null);
-            Contract.Requires(string.IsNullOrWhiteSpace(methodName) != false);
+            Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);
 
             DomainEventType = domainEventType;
             MethodName = methodName;

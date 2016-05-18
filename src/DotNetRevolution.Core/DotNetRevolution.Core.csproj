@@ -96,8 +96,10 @@
     <Compile Include="Commanding\CodeContract\CommandCatalogContract.cs" />
     <Compile Include="Commanding\CodeContract\CommandDispatcherContract.cs" />
     <Compile Include="Commanding\CodeContract\CommandEntryContract.cs" />
+    <Compile Include="Commanding\CodeContract\CommandHandlerBaseContract.cs" />
     <Compile Include="Commanding\CodeContract\CommandHandlerContract.cs" />
     <Compile Include="Commanding\CodeContract\CommandHandlerFactoryContract.cs" />
+    <Compile Include="Commanding\CodeContract\CommandHandlerContract`1.cs" />
     <Compile Include="Commanding\Command.cs" />
     <Compile Include="Commanding\CommandCatalog.cs" />
     <Compile Include="Commanding\CommandDispatcher.cs" />
@@ -111,6 +113,7 @@
     <Compile Include="Commanding\ICommandEntry.cs" />
     <Compile Include="Commanding\ICommandHandler.cs" />
     <Compile Include="Commanding\ICommandHandlerFactory.cs" />
+    <Compile Include="Commanding\ICommandHandler`1.cs" />
     <Compile Include="Domain\ActionDomainEventHandler.cs" />
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootContract.cs" />
@@ -121,6 +124,7 @@
     <Compile Include="Domain\CodeContract\DomainEventEntryRegistrationContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerCollectionContract.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerContract.cs" />
+    <Compile Include="Domain\CodeContract\DomainEventHandlerContract`1.cs" />
     <Compile Include="Domain\CodeContract\DomainEventHandlerFactoryContract.cs" />
     <Compile Include="Domain\DomainEventCatalog.cs" />
     <Compile Include="Domain\DomainEventCollection.cs" />
@@ -145,11 +149,14 @@
     <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
     <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
     <Compile Include="Base\SequentialGuid.cs" />
+    <Compile Include="Domain\IDomainEventHandler`1.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
     <Compile Include="Extension\GuidExtension.AsString.cs" />
+    <Compile Include="Messaging\CodeContract\MessageHandlerContract`1.cs" />
     <Compile Include="Messaging\IMessage.cs" />
+    <Compile Include="Messaging\IMessageHandler`1.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
@@ -199,6 +206,7 @@
     <Compile Include="Querying\CodeContract\QueryDispatcherContract.cs" />
     <Compile Include="Querying\CodeContract\QueryEntryContract.cs" />
     <Compile Include="Querying\CodeContract\QueryHandlerContract.cs" />
+    <Compile Include="Querying\CodeContract\QueryHandlerContract`2.cs" />
     <Compile Include="Querying\CodeContract\QueryHandlerFactoryContract.cs" />
     <Compile Include="Querying\IQuery.cs" />
     <Compile Include="Querying\IQueryCatalog.cs" />
@@ -206,6 +214,7 @@
     <Compile Include="Querying\IQueryEntry.cs" />
     <Compile Include="Querying\IQueryHandler.cs" />
     <Compile Include="Querying\IQueryHandlerFactory.cs" />
+    <Compile Include="Querying\IQueryHandler`2.cs" />
     <Compile Include="Querying\Query.cs" />
     <Compile Include="Querying\QueryCatalog.cs" />
     <Compile Include="Querying\QueryDispatcher.cs" />

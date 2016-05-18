@@ -17,8 +17,6 @@ namespace DotNetRevolution.EventSourcing
 
         public TAggregateRoot Process<TAggregateRoot>(EventStream eventStream) where TAggregateRoot : class
         {
-            Contract.Requires(eventStream != null);
-
             var aggregateRootType = typeof(TAggregateRoot);
 
             var aggregateRoot = Activator.CreateInstance(aggregateRootType, true) as TAggregateRoot;
@@ -30,6 +28,8 @@ namespace DotNetRevolution.EventSourcing
 
             foreach (var domainEvent in eventStream)
             {
+                Contract.Assume(domainEvent != null);
+
                 var methodName = GetMethodName(domainEvent.GetType().Name);
 
                 var methodInfo = aggregateRootType.GetMethod(methodName, DefaultBindingFlags, null, new[] { domainEvent.GetType() }, null);

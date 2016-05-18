@@ -39,5 +39,11 @@ namespace DotNetRevolution.EventSourcing
             
             _eventProviders.Add(eventProvider);
         }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_eventProviders != null);
+        }
     }
 }
