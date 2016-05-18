@@ -11,15 +11,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
     [TestClass]
     public class SqlEventStoreTests
     {
-        private IEventStore _eventStore;        
-        private IEventStreamProcessor _eventStreamProcessor = new EventStreamProcessor();
+        private IEventStore _eventStore;                
 
         [TestInitialize]
         public void Init()
         {         
             _eventStore = new SqlEventStore(
                 new EventStreamProcessorProvider(
-                    _eventStreamProcessor),
+                    new SingleMethodEventStreamProcessor("Apply")),
                     new JsonSerializer(),
                     ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
         }
@@ -32,7 +31,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             _eventStore.Commit(new Transaction("UnitTester",
                 command,
-                new EventProvider(domainEvents, _eventStreamProcessor)));
+                new EventProvider(domainEvents)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -44,8 +43,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         {
             _eventStore.Commit(new Transaction("UnitTester",
                 new Create(100),
-                new EventProvider(AccountAggregateRoot.Create(100), _eventStreamProcessor),
-                new EventProvider(AccountAggregateRoot.Create(100), _eventStreamProcessor)));            
+                new EventProvider(AccountAggregateRoot.Create(100)),
+                new EventProvider(AccountAggregateRoot.Create(100))));            
         }        
     }
 }

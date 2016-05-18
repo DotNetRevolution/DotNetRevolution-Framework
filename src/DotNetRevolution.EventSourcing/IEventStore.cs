@@ -5,6 +5,6 @@ namespace DotNetRevolution.EventSourcing
     public interface IEventStore
     {
         void Commit(Transaction transaction);
-        EventProvider GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class;
+        EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class;
     }
 }

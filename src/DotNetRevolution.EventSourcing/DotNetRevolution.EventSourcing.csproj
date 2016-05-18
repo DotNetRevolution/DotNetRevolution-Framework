@@ -39,10 +39,15 @@
     <Compile Include="EventProviderDescriptor.cs" />
     <Compile Include="EventProviderNotFoundException.cs" />
     <Compile Include="EventProviderType.cs" />
+    <Compile Include="EventProvider[TAggregateRoot].cs" />
     <Compile Include="EventStore.cs" />
     <Compile Include="EventStream.cs" />
     <Compile Include="EventStreamCollection.cs" />
     <Compile Include="EventStreamProcessor.cs" />
+    <Compile Include="EventStreamProcessorMap.cs" />
+    <Compile Include="MappedEventStreamProcessor.cs" />
+    <Compile Include="OnConventionEventStreamProcessor.cs" />
+    <Compile Include="SingleMethodEventStreamProcessor.cs" />
     <Compile Include="EventStreamProcessorProvider.cs" />
     <Compile Include="EventStoreException.cs" />
     <Compile Include="IEventStore.cs" />

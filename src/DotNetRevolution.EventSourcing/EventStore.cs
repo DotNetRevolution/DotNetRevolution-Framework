@@ -17,7 +17,7 @@ namespace DotNetRevolution.EventSourcing
             _eventStreamProcessorProvider = eventStreamProcessorProvider;
         }
 
-        public EventProvider GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class
+        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class
         {            
             try
             {
@@ -34,7 +34,7 @@ namespace DotNetRevolution.EventSourcing
                 var eventStreamProcessor = _eventStreamProcessorProvider.GetProcessor(eventProviderType);
 
                 // return new event provider with gathered information
-                return new EventProvider(eventProviderType, 
+                return new EventProvider<TAggregateRoot>(eventProviderType, 
                                          identity, 
                                          version,
                                          descriptor,

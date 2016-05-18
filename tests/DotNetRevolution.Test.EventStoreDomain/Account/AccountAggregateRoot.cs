@@ -85,6 +85,12 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
             Balance = domainEvent.Balance;
         }
 
+        private void OnCreated(Created domainEvent)
+        {
+            Identity = domainEvent.AccountId;
+            Balance = domainEvent.Balance;
+        }
+
         private void Apply(DebitApplied domainEvent)
         {
             Balance -= domainEvent.Amount;

@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.EventStourcing.Sql", "tests\DotNetRevolution.Test.EventStourcing.Sql\DotNetRevolution.Test.EventStourcing.Sql.csproj", "{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.EventSourcing", "tests\DotNetRevolution.Test.EventSourcing\DotNetRevolution.Test.EventSourcing.csproj", "{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,5 +161,6 @@ Global
 		{B72E1786-2AD6-4504-8037-C2C6002991BB} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
+		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 	EndGlobalSection
 EndGlobal
