@@ -1,5 +1,7 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Serialization;
+using DotNetRevolution.EventSourcing.AggregateRoot;
+using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Diagnostics.Contracts;
 
@@ -7,17 +9,26 @@ namespace DotNetRevolution.EventSourcing
 {
     public abstract class EventStore : IEventStore
     {
-        private readonly IEventStreamProcessorProvider _eventStreamProcessorProvider;
-        private readonly ISerializer _serializer;
+        private readonly IAggregateRootProcessorFactory _aggregateRootProcessorFactory;
+        private readonly ISnapshotPolicyFactory _snapshotPolicyFactory;
+        private readonly ISnapshotProviderFactory _snapshotProviderFactory;
 
-        public EventStore(IEventStreamProcessorProvider eventStreamProcessorProvider)
+        public EventStore(IAggregateRootProcessorFactory aggregateRootProcessorFactory,
+                          ISnapshotPolicyFactory snapshotPolicyFactory,
+                          ISnapshotProviderFactory snapshotProviderFactory,
+                          ISerializer serializer)
         {
-            Contract.Requires(eventStreamProcessorProvider != null);
-                        
-            _eventStreamProcessorProvider = eventStreamProcessorProvider;
+            Contract.Requires(aggregateRootProcessorFactory != null);
+            Contract.Requires(snapshotPolicyFactory != null);
+            Contract.Requires(snapshotProviderFactory != null);
+            Contract.Requires(serializer != null);
+
+            _aggregateRootProcessorFactory = aggregateRootProcessorFactory;
+            _snapshotPolicyFactory = snapshotPolicyFactory;
+            _snapshotProviderFactory = snapshotProviderFactory;
         }
 
-        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class
+        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
         {            
             try
             {
@@ -26,15 +37,19 @@ namespace DotNetRevolution.EventSourcing
 
                 EventProviderVersion version;
                 EventProviderDescriptor descriptor;
+                Snapshot snapshot;
 
                 // get domain events
-                var eventStream = GetDomainEvents(eventProviderType, identity, out version, out descriptor);
+                var eventStream = GetDomainEvents(eventProviderType, identity, out version, out descriptor, out snapshot);
                 Contract.Assume(eventStream != null);
                 Contract.Assume(version != null);
                 Contract.Assume(descriptor != null);
 
-                // get event stream processor
-                var eventStreamProcessor = _eventStreamProcessorProvider.GetProcessor(eventProviderType);
+                // get processor
+                var aggregateRootProcessor = _aggregateRootProcessorFactory.GetProcessor(eventProviderType);
+
+                // get snapshot provider
+                var snapshotProvider = _snapshotProviderFactory.GetProvider(eventProviderType);
 
                 // return new event provider with gathered information
                 return new EventProvider<TAggregateRoot>(eventProviderType, 
@@ -42,7 +57,8 @@ namespace DotNetRevolution.EventSourcing
                                          version,
                                          descriptor,
                                          eventStream,
-                                         eventStreamProcessor);
+                                         aggregateRootProcessor,
+                                         snapshotProvider);
             }
             catch (Exception ex)
             {
@@ -53,7 +69,7 @@ namespace DotNetRevolution.EventSourcing
         public void Commit(Transaction transaction)
         {
             try
-            {
+            {                
                 CommitTransaction(transaction);
             }
             catch (Exception ex)
@@ -61,15 +77,35 @@ namespace DotNetRevolution.EventSourcing
                 throw new EventStoreException("Error processing request to commit transaction.", ex);
             }
         }
+        
+        public Snapshot GetSnapshotIfPolicySatisfied(IEventProvider eventProvider)
+        {
+            Contract.Requires(eventProvider != null);
 
-        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor);
+            // get snapshot policy
+            var snapshotPolicy = _snapshotPolicyFactory.GetPolicy(eventProvider.EventProviderType);
+
+            // check event provider against policy
+            if (snapshotPolicy.Check(eventProvider))
+            {
+                // ask event provider for a snapshot
+                return eventProvider.GetSnapshot();
+            }
+
+            // policy determined no snapshot needed
+            return null;
+        }
+        
+        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot);
 
         protected abstract void CommitTransaction(Transaction transaction);
         
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_eventStreamProcessorProvider != null);
+            Contract.Invariant(_aggregateRootProcessorFactory != null);
+            Contract.Invariant(_snapshotPolicyFactory != null);
+            Contract.Invariant(_snapshotProviderFactory != null);
         }
     }
 }

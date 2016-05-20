@@ -12,7 +12,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             Contract.Requires(transaction != null);
         }
 
-        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class
+        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<EventProvider<TAggregateRoot>>() != null);

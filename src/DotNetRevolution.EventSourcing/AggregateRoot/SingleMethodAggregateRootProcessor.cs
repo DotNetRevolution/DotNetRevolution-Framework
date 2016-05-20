@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.EventSourcing
+namespace DotNetRevolution.EventSourcing.AggregateRoot
 {
-    public class SingleMethodEventStreamProcessor : EventStreamProcessor
+    public class SingleMethodAggregateRootProcessor : AggregateRootProcessor
     {        
         private readonly string _methodName;
 
-        public SingleMethodEventStreamProcessor(string methodName)
+        public SingleMethodAggregateRootProcessor(string methodName)
         {
             Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);
 

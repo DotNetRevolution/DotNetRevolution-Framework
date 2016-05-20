@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.EventSourcing.Snapshotting;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
@@ -14,7 +15,7 @@ namespace DotNetRevolution.EventSourcing
         public EventStream DomainEvents { get; }
 
         public EventProviderDescriptor Descriptor { get; }
-
+        
         public EventProvider(EventProviderType type,
             Identity identity,
             EventProviderVersion version,
@@ -44,6 +45,11 @@ namespace DotNetRevolution.EventSourcing
             Contract.Requires(domainEventCollection?.AggregateRoot != null);
             Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
             Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
+        }
+
+        public virtual Snapshot GetSnapshot()
+        {
+            return null;
         }
     }
 }

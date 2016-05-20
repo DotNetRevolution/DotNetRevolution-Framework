@@ -6,9 +6,8 @@ namespace DotNetRevolution.EventSourcing
 {    
     [ContractClass(typeof(EventProviderContract<>))]
     public interface IEventProvider<TAggregateRoot> : IEventProvider
-        where TAggregateRoot : class
+        where TAggregateRoot : class, IAggregateRoot
     {
-        [Pure]
         TAggregateRoot CreateAggregateRoot();
 
         [Pure]

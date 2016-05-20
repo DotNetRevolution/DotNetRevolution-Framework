@@ -21,5 +21,19 @@ namespace DotNetRevolution.EventSourcing
 
             return new EventProviderVersion(Value + 1);
         }
+
+        public static implicit operator int(EventProviderVersion identity)
+        {
+            Contract.Requires(identity != null);
+
+            return identity.Value;
+        }
+
+        public static implicit operator EventProviderVersion(int value)
+        {
+            Contract.Ensures(Contract.Result<EventProviderVersion>() != null);
+
+            return new EventProviderVersion(value);
+        }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Domain;
+using DotNetRevolution.EventSourcing.Snapshotting;
 
 namespace DotNetRevolution.EventSourcing.CodeContract
 {
     [ContractClassFor(typeof(IEventProvider<>))]
     internal abstract class EventProviderContract<TAggregateRoot> : IEventProvider<TAggregateRoot>
-        where TAggregateRoot : class
+        where TAggregateRoot : class, IAggregateRoot
     {
         public abstract EventProviderDescriptor Descriptor { get; }
         public abstract EventStream DomainEvents { get; }
@@ -28,6 +29,11 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             Contract.Requires(Contract.ForAll(domainEvents, o => o != null));
             Contract.Ensures(Contract.Result<EventProvider>() != null);
 
+            throw new NotImplementedException();
+        }
+
+        public Snapshot GetSnapshot()
+        {
             throw new NotImplementedException();
         }
     }

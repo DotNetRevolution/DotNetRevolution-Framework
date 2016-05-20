@@ -13,29 +13,28 @@ namespace DotNetRevolution.Core.Helper
         {
             Contract.Requires(typeFullName != null);
 
+            Type type;
+            
+            if (Types.TryGetValue(typeFullName, out type))
+            {
+                return type;
+            }
+
             lock (Types)
             {
-                Type type;
-
                 if (Types.TryGetValue(typeFullName, out type))
                 {
                     return type;
                 }
 
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    type = assembly.GetTypes().FirstOrDefault(x => x.FullName == typeFullName);
+                type = Type.GetType(typeFullName) ??
+                       AppDomain.CurrentDomain.GetAssemblies()
+                                .Select(a => a.GetType(typeFullName))
+                                .FirstOrDefault(t => t != null);
 
-                    if (type == null)
-                    {
-                        continue;
-                    }
+                Types.Add(typeFullName, type);
 
-                    Types[typeFullName] = type;
-                    return type;
-                }
-
-                return null;
+                return type;
             }
         }
     }

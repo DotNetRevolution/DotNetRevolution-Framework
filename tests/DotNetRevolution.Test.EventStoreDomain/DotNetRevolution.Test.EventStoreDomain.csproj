@@ -65,10 +65,13 @@
       <Project>{d65e8739-5f05-46d9-8b5e-47008f848257}</Project>
       <Name>DotNetRevolution.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\DotNetRevolution.EventStore\DotNetRevolution.EventStore.csproj">
-      <Project>{2bccce1f-ea7c-46c8-b8b1-794e340589ad}</Project>
-      <Name>DotNetRevolution.EventStore</Name>
+    <ProjectReference Include="..\..\src\DotNetRevolution.EventSourcing\DotNetRevolution.EventSourcing.csproj">
+      <Project>{70de9c4a-5578-434e-bc97-7b4ce66fe007}</Project>
+      <Name>DotNetRevolution.EventSourcing</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Account\Snapshots\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

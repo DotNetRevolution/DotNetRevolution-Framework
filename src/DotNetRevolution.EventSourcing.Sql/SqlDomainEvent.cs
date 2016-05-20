@@ -1,6 +1,6 @@
 ﻿namespace DotNetRevolution.EventSourcing.Sql
 {
-    public class SqlDomainEvent
+    internal class SqlDomainEvent
     {
         public int EventProviderVersion { get; }
 

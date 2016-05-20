@@ -81,8 +81,13 @@
     <Compile Include="CodeContract\EventProviderContract.cs" />
     <Compile Include="CodeContract\EventProviderContract`1.cs" />
     <Compile Include="CodeContract\EventStoreContract.cs" />
-    <Compile Include="CodeContract\EventStreamProcessorContract.cs" />
-    <Compile Include="CodeContract\EventStreamProcessorProviderContract.cs" />
+    <Compile Include="EventStreamDomainEventCollection.cs" />
+    <Compile Include="IEventStreamDomainEventCollection.cs" />
+    <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorContract.cs" />
+    <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorFactoryContract.cs" />
+    <Compile Include="IEventStream.cs" />
+    <Compile Include="Snapshotting\CodeContract\SnapshotPolicyContract.cs" />
+    <Compile Include="Snapshotting\CodeContract\SnapshotPolicyFactoryContract.cs" />
     <Compile Include="DomainEventSerializationException.cs" />
     <Compile Include="EventProvider.cs" />
     <Compile Include="EventProviderDescriptor.cs" />
@@ -92,19 +97,34 @@
     <Compile Include="EventStore.cs" />
     <Compile Include="EventStream.cs" />
     <Compile Include="EventStreamCollection.cs" />
-    <Compile Include="EventStreamProcessor.cs" />
-    <Compile Include="EventStreamProcessorMap.cs" />
+    <Compile Include="AggregateRoot\AggregateRootProcessor.cs" />
+    <Compile Include="AggregateRoot\AggregateRootProcessorMap.cs" />
     <Compile Include="IEventProvider.cs" />
     <Compile Include="IEventProvider`1.cs" />
-    <Compile Include="MappedEventStreamProcessor.cs" />
-    <Compile Include="OnConventionEventStreamProcessor.cs" />
-    <Compile Include="SingleMethodEventStreamProcessor.cs" />
-    <Compile Include="EventStreamProcessorProvider.cs" />
+    <Compile Include="Snapshotting\CodeContract\SnapshotProviderContract.cs" />
+    <Compile Include="Snapshotting\CodeContract\SnapshotProviderContract`1.cs" />
+    <Compile Include="Snapshotting\CodeContract\SnapshotProviderFactoryContract.cs" />
+    <Compile Include="Snapshotting\Snapshot.cs" />
+    <Compile Include="Snapshotting\ISnapshotPolicyFactory.cs" />
+    <Compile Include="AggregateRoot\MappedAggregateRootProcessor.cs" />
+    <Compile Include="AggregateRoot\OnConventionAggregateRootProcessor.cs" />
+    <Compile Include="AggregateRoot\SingleMethodAggregateRootProcessor.cs" />
+    <Compile Include="AggregateRoot\AggregateRootProcessorFactory.cs" />
     <Compile Include="EventStoreException.cs" />
     <Compile Include="IEventStore.cs" />
-    <Compile Include="IEventStreamProcessor.cs" />
-    <Compile Include="IEventStreamProcessorProvider.cs" />
+    <Compile Include="AggregateRoot\IAggregateRootProcessor.cs" />
+    <Compile Include="AggregateRoot\IAggregateRootProcessorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Snapshotting\ISnapshotPolicy.cs" />
+    <Compile Include="Snapshotting\ISnapshotProvider.cs" />
+    <Compile Include="Snapshotting\ISnapshotProviderFactory.cs" />
+    <Compile Include="Snapshotting\ISnapshotProvider`1.cs" />
+    <Compile Include="Snapshotting\NoSnapshotPolicy.cs" />
+    <Compile Include="Snapshotting\SnapshotPolicyFactory.cs" />
+    <Compile Include="Snapshotting\SnapshotProvider.cs" />
+    <Compile Include="Snapshotting\SnapshotProviderFactory.cs" />
+    <Compile Include="Snapshotting\SnapshotSerializationException.cs" />
+    <Compile Include="Snapshotting\VersionSnapshotPolicy.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="EventProviderVersion.cs" />
     <Compile Include="TransactionCommandType.cs" />
@@ -120,6 +140,7 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

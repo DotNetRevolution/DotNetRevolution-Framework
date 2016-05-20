@@ -2,6 +2,8 @@
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.EventSourcing;
+using DotNetRevolution.EventSourcing.Snapshotting;
+using DotNetRevolution.EventSourcing.AggregateRoot;
 
 namespace DotNetRevolution.Test.EventSourcing
 {
@@ -14,7 +16,7 @@ namespace DotNetRevolution.Test.EventSourcing
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            var eventProvider = new EventProvider<AccountAggregateRoot>(domainEvents, new SingleMethodEventStreamProcessor("Apply"));
+            var eventProvider = new EventProvider<AccountAggregateRoot>(domainEvents, new SingleMethodAggregateRootProcessor("Apply"));
 
             var aggregateRoot = eventProvider.CreateAggregateRoot();
 

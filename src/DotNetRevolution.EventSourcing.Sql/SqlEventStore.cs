@@ -5,27 +5,32 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Collections.ObjectModel;
 using System.Linq;
-using DotNetRevolution.Core.Helper;
-using System.Text;
 using System.Data;
 using System;
 using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.EventSourcing.Snapshotting;
+using System.Text;
+using DotNetRevolution.EventSourcing.AggregateRoot;
+using DotNetRevolution.Core.Helper;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
     public class SqlEventStore : EventStore
     {
-        private readonly Encoding _encoding = Encoding.UTF8;
+        private static readonly Encoding _encoding = Encoding.UTF8;
 
-        private readonly string _connectionString;
         private readonly ISerializer _serializer;
+        private readonly string _connectionString;
 
-        public SqlEventStore(IEventStreamProcessorProvider eventStreamProcessorProvider,
+        public SqlEventStore(IAggregateRootProcessorFactory eventStreamProcessorProvider,
+                             ISnapshotPolicyFactory snapshotPolicyProvider,
+                             ISnapshotProviderFactory snapshotProviderFactory,
                              ISerializer serializer,
                              string connectionString)
-            : base(eventStreamProcessorProvider)
+            : base(eventStreamProcessorProvider, snapshotPolicyProvider, snapshotProviderFactory, serializer)
         {
             Contract.Requires(eventStreamProcessorProvider != null);
+            Contract.Requires(snapshotPolicyProvider != null);
             Contract.Requires(serializer != null);
             Contract.Requires(string.IsNullOrEmpty(connectionString) == false);
             
@@ -33,9 +38,11 @@ namespace DotNetRevolution.EventSourcing.Sql
             _serializer = serializer;
         }
 
-        protected override EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor)
+        protected override EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot)
         {
             Collection<SqlDomainEvent> sqlDomainEvents;
+
+            SqlSnapshot sqlSnapshot;
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -47,8 +54,13 @@ namespace DotNetRevolution.EventSourcing.Sql
                 conn.Open();
 
                 // execute
-                sqlDomainEvents = ExecuteQueryCommand(command, out eventProviderDescriptor);
+                sqlDomainEvents = ExecuteQueryCommand(command, out eventProviderDescriptor, out sqlSnapshot);
             }
+                 
+            // set snapshot       
+            snapshot = sqlSnapshot == null 
+                ? null
+                : new Snapshot(DeserializeSnapshot(sqlSnapshot));
 
             // set version output parameter
             version = new EventProviderVersion(sqlDomainEvents.Max(x => x.EventProviderVersion));
@@ -62,29 +74,14 @@ namespace DotNetRevolution.EventSourcing.Sql
             return new ReadOnlyCollection<IDomainEvent>(sqlDomainEvents
                 .OrderBy(x => x.EventProviderVersion)
                 .ThenBy(x => x.Sequence)
-                .Select(x =>
-                {
-                    var deserializedObject = _serializer.Deserialize(TypeHelper.Find(x.EventType), x.Data, _encoding);
-
-                    if (deserializedObject == null)
-                    {
-                        throw new DomainEventSerializationException(string.Format("Could not deserialize {0}", x.EventType));
-                    }
-
-                    if (deserializedObject is IDomainEvent)
-                    {
-                        return deserializedObject as IDomainEvent;
-                    }
-
-                    throw new DomainEventSerializationException("Deserialized object is not a domain event.");
-                })
+                .Select(x => DeserializeDomainEvent(x.EventType, x.Data))
                 .ToList());
         }
 
-        private static Collection<SqlDomainEvent> ExecuteQueryCommand(SqlCommand command, out EventProviderDescriptor eventProviderDescriptor)
+        private static Collection<SqlDomainEvent> ExecuteQueryCommand(SqlCommand command, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot)
         {
             var sqlDomainEvents = new Collection<SqlDomainEvent>();
-
+            
             using (var dataReader = command.ExecuteReader())
             {
                 // throw exception if no rows
@@ -92,7 +89,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                 {
                     throw new EventProviderNotFoundException();
                 }
-                
+
                 // check for event provider descriptor
                 if (dataReader.Read() == false)
                 {
@@ -101,6 +98,16 @@ namespace DotNetRevolution.EventSourcing.Sql
 
                 // get descriptor
                 eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(0));
+
+                // check for snapshot
+                if (dataReader.NextResult() == false ||
+                    dataReader.Read() == false)
+                {
+                    throw new InvalidOperationException("No event provider snapshot result returned.");
+                }
+
+                // read snapshot
+                snapshot = GetSnapshot(dataReader);
 
                 // move reader to next result set
                 if (dataReader.NextResult())
@@ -117,12 +124,12 @@ namespace DotNetRevolution.EventSourcing.Sql
                         // add sql domain event to collection
                         sqlDomainEvents.Add(sqlDomainEvent);
                     }
-                } 
+                }
                 else
                 {
                     // no events returned
                     throw new InvalidOperationException("No event result returned.");
-                }               
+                }
             }
 
             // check if any events were returned
@@ -132,6 +139,30 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
             
             return sqlDomainEvents;
+        }
+
+        private static SqlSnapshot GetSnapshot(SqlDataReader dataReader)
+        {
+            SqlSnapshot snapshot = null;
+
+            // check if snapshot result is null
+            if (dataReader.IsDBNull(0) == false && dataReader.IsDBNull(1) == false)
+            {
+                // get snapshot
+                snapshot = new SqlSnapshot(dataReader.GetString(0), (byte[])dataReader[1]);
+            }
+            else if (dataReader.IsDBNull(0) == true && dataReader.IsDBNull(1) == false)
+            {
+                // throw error
+                throw new InvalidOperationException("Snapshot type is null but data is not");
+            }
+            else if (dataReader.IsDBNull(0) == false && dataReader.IsDBNull(1) == true)
+            {
+                // throw error
+                throw new InvalidOperationException("Snapshot data is null but type is not");
+            }
+            
+            return snapshot;
         }
 
         private static SqlCommand CreateQueryCommand(SqlConnection conn, EventProviderType eventProviderType, Identity identity)
@@ -176,6 +207,62 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
+        private Snapshot DeserializeSnapshot(SqlSnapshot sqlSnapshot)
+        {
+            Contract.Requires(sqlSnapshot != null);
+
+            // deserialize snapshot data
+            var deserializedObject = _serializer.Deserialize(TypeHelper.Find(sqlSnapshot.FullName), sqlSnapshot.Data, _encoding);
+
+            // make sure object was deserialized
+            if (deserializedObject != null)
+            {
+                return new Snapshot(deserializedObject);
+            }
+
+            throw new SnapshotSerializationException("Could not deserialize snapshot data");
+        }
+
+        private IDomainEvent DeserializeDomainEvent(string domainEventType, byte[] data)
+        {
+            Contract.Requires(string.IsNullOrWhiteSpace(domainEventType) == false);
+            Contract.Requires(data != null);
+            Contract.Requires(data.Length > 0);
+            Contract.Ensures(Contract.Result<IDomainEvent>() != null);
+
+            // deserialize domain event
+            var deserializedObject = _serializer.Deserialize(TypeHelper.Find(domainEventType), data, _encoding);
+
+            // make sure deserialization was successful
+            if (deserializedObject == null)
+            {
+                throw new DomainEventSerializationException(string.Format("Could not deserialize {0}", domainEventType));
+            }
+
+            // make sure deserialized object is a domain event
+            if (deserializedObject is IDomainEvent)
+            {
+                return deserializedObject as IDomainEvent;
+            }
+
+            // error deserializing domain event
+            throw new DomainEventSerializationException("Deserialized object is not a domain event.");
+        }
+
+        private byte[] SerializeObject(object objectToSerialize)
+        {
+            Contract.Requires(objectToSerialize != null);
+            Contract.Ensures(Contract.Result<byte[]>() != null);
+            Contract.Ensures(Contract.Result<byte[]>().Length > 0);
+
+            // serialize object to bytes for storage
+            var bytes = _encoding.GetBytes(_serializer.Serialize(objectToSerialize));
+            Contract.Assume(bytes != null);
+            Contract.Assume(bytes.Length > 0);
+
+            return bytes;
+        }
+
         private SqlCommand CreateWriteCommand(SqlConnection conn, ICommand command, EntityCollection<EventProvider> eventProviders, string user, out SqlParameter returnParameter)
         {
             var sqlCommand = new SqlCommand("[dbo].[CreateTransaction]", conn);
@@ -187,7 +274,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@user", SqlDbType.NVarChar, 256).Value = user;
             sqlCommand.Parameters.Add("@commandGuid", SqlDbType.UniqueIdentifier).Value = command.CommandId;
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
-            sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _encoding.GetBytes(_serializer.Serialize(command));
+            sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = SerializeObject(command);
 
             // add return value parameter
             returnParameter = sqlCommand.Parameters.Add(new SqlParameter("@retval", SqlDbType.Int)
@@ -254,7 +341,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             dataRow["EventGuid"] = domainEvent.DomainEventId;
             dataRow["Sequence"] = sequence;
             dataRow["TypeFullName"] = eventType.FullName;
-            dataRow["Data"] = _encoding.GetBytes(_serializer.Serialize(domainEvent));
+            dataRow["Data"] = SerializeObject(domainEvent);
 
             // add new row to table
             dataTable.Rows.Add(dataRow);

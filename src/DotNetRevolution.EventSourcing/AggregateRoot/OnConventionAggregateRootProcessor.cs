@@ -1,6 +1,6 @@
-﻿namespace DotNetRevolution.EventSourcing
+﻿namespace DotNetRevolution.EventSourcing.AggregateRoot
 {
-    public class OnConventionEventStreamProcessor : EventStreamProcessor
+    public class OnConventionAggregateRootProcessor : AggregateRootProcessor
     {
         protected override string GetMethodName(string domainEventName)
         {

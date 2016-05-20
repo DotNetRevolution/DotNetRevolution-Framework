@@ -3,13 +3,15 @@
 	, @commandGuid				UNIQUEIDENTIFIER	
     , @commandTypeFullName		VARCHAR (512)	
     , @commandData		        VARBINARY (MAX)
-	, @eventProviders			udttEventProvider READONLY   	
-	, @events					udttEvent READONLY	    
+	, @eventProviders			dbo.udttEventProvider READONLY   	
+	, @eventProviderSnapshots	dbo.udttEventProviderSnapshot READONLY
+	, @events					dbo.udttEvent READONLY	    
 AS
 BEGIN
 
 	DECLARE @transactionId BIGINT
 		  , @commandTypeId INT
+		  , @snapshotTypeId INT
 
 	DECLARE @eventProviderTable AS TABLE(
 										  TempId INT
@@ -28,11 +30,18 @@ BEGIN
 												, New BIT
 												)
 
+	DECLARE @snapshotTypeTable AS TABLE(
+										 Id INT
+									   , FullName VARCHAR (512)
+									   , New BIT
+									   )
+
 	DECLARE @transactionEventProviders AS TABLE(
 												  Id INT
 												, [EventProviderId] INT
 												)
 
+	-- event providers
 	INSERT INTO @eventProviderTable (TempId, TableId, [Guid], [TypeId], FullName, [NewProvider], [NewType], [Version])
 	SELECT tep.TempId
 			, ep.EventProviderId
@@ -55,6 +64,7 @@ BEGIN
 			TypeId = NEXT VALUE FOR dbo.EventProviderTypeSequence
 		WHERE NewType = 1			 
 
+	-- transaction event types
 	INSERT INTO @transactionEventTypeTable (Id, FullName, New)
 	SELECT DISTINCT tet.TransactionEventTypeId			 
 			, e.TypeFullName
@@ -65,7 +75,20 @@ BEGIN
 	UPDATE @transactionEventTypeTable SET
 			Id = NEXT VALUE FOR dbo.TransactionEventTypeSequence
 		WHERE New = 1
+		
+	-- snapshot types
+	INSERT INTO @snapshotTypeTable (Id, FullName, New)
+	SELECT DISTINCT epst.EventProviderSnapshotTypeId			 
+			, epss.TypeFullName
+			, CASE WHEN epst.EventProviderSnapshotTypeId IS NULL THEN 1 ELSE 0 END
+		FROM @eventProviderSnapshots epss
+	LEFT JOIN dbo.EventProviderSnapshotType epst ON epss.TypeFullName = epst.FullName
 
+	UPDATE @snapshotTypeTable SET
+			Id = NEXT VALUE FOR dbo.EventProviderSnapshotTypeSequence
+		WHERE New = 1
+		
+	-- command
 	SET @commandTypeId = (SELECT TransactionCommandTypeId 
 						FROM dbo.TransactionCommandType
 						WHERE FullName = @commandTypeFullName)
@@ -85,6 +108,12 @@ BEGIN
 		SELECT tett.Id, tett.FullName 
 		  FROM @transactionEventTypeTable tett
 		 WHERE tett.New = 1
+		 				   
+		-- insert event provider snapshot types  
+		INSERT INTO dbo.EventProviderSnapshotType(EventProviderSnapshotTypeId, FullName)
+		SELECT stt.Id, stt.FullName 
+		  FROM @snapshotTypeTable stt
+		 WHERE stt.New = 1
 		 		   		 
 		-- insert if command type does not exist				
 		IF (@commandTypeId IS NULL)
@@ -130,6 +159,14 @@ BEGIN
 		  INTO @transactionEventProviders (EventProviderId, Id)
 		SELECT @transactionId, ept.TableId, ept.[Version]
 		  FROM @eventProviderTable ept
+
+		-- insert snapshot
+		INSERT INTO dbo.EventProviderSnapshot (TransactionEventProviderId, EventProviderSnapshotTypeId, [Data])
+		SELECT tep.Id, stt.Id, eps.[Data]
+		  FROM @eventProviderSnapshots eps
+		  JOIN @snapshotTypeTable stt ON eps.TypeFullName = stt.FullName
+		  JOIN @eventProviderTable ept ON eps.EventProviderTempId = ept.TempId
+		  JOIN @transactionEventProviders tep ON ept.TableId = tep.EventProviderId
 
 		-- insert transaction events
 		INSERT INTO dbo.TransactionEvent (TransactionEventProviderId, TransactionEventTypeId, TransactionEventGuid, [Sequence], [Data])

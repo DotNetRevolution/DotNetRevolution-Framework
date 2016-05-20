@@ -2,29 +2,41 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Collections;
+using DotNetRevolution.EventSourcing.Snapshotting;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStream : ValueObject<EventStream>, IEnumerable<IDomainEvent>
+    public class EventStream : IEventStream
     {
-        private readonly IReadOnlyCollection<IDomainEvent> _domainEvents;
+        private readonly IEventStreamDomainEventCollection _domainEvents;
 
-        public IReadOnlyCollection<IDomainEvent> DomainEvents
+        public IEventStreamDomainEventCollection DomainEvents
         {
             get
             {
-                Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEvent>>() != null);
+                Contract.Ensures(Contract.Result<IEventStreamDomainEventCollection>() != null);
 
                 return _domainEvents;
             }
         }
+
+        public Snapshot Snapshot { get; }
 
         public EventStream(IReadOnlyCollection<IDomainEvent> domainEvents)
         {
             Contract.Requires(domainEvents != null);
             Contract.Requires(Contract.ForAll(domainEvents, o => o != null));
 
-            _domainEvents = domainEvents;
+            _domainEvents = new EventStreamDomainEventCollection(this, domainEvents);
+        }
+
+        public EventStream(IReadOnlyCollection<IDomainEvent> domainEvents, Snapshot snapshot)
+            : this(domainEvents)
+        {
+            Contract.Requires(domainEvents != null);
+            Contract.Requires(Contract.ForAll(domainEvents, o => o != null));
+
+            Snapshot = snapshot;
         }
 
         public IEnumerator<IDomainEvent> GetEnumerator()

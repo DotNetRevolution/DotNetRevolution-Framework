@@ -1,4 +1,6 @@
 ﻿using DotNetRevolution.EventSourcing;
+using DotNetRevolution.EventSourcing.AggregateRoot;
+using DotNetRevolution.EventSourcing.Snapshotting;
 using DotNetRevolution.EventSourcing.Sql;
 using DotNetRevolution.Json;
 using DotNetRevolution.Test.EventStoreDomain.Account;
@@ -17,8 +19,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         public void Init()
         {         
             _eventStore = new SqlEventStore(
-                new EventStreamProcessorProvider(
-                    new SingleMethodEventStreamProcessor("Apply")),
+                new AggregateRootProcessorFactory(
+                    new SingleMethodAggregateRootProcessor("Apply")),
+                    new SnapshotPolicyFactory(new VersionSnapshotPolicy(10)),
+                    new SnapshotProviderFactory(),
                     new JsonSerializer(),
                     ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
         }

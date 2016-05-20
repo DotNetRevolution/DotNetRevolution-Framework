@@ -10,4 +10,4 @@
 
 GO
 
-CREATE UNIQUE NONCLUSTERED INDEX [IX_EventProviderDescriptor_TransactionId] ON [dbo].[EventProviderDescriptor] ([TransactionId],[EventProviderId]) INCLUDE ([Descriptor])
+CREATE UNIQUE NONCLUSTERED INDEX [IX_EventProviderDescriptor_TransactionId_EventProviderId] ON [dbo].[EventProviderDescriptor] ([TransactionId],[EventProviderId]) INCLUDE ([Descriptor])

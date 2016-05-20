@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace DotNetRevolution.EventSourcing
+namespace DotNetRevolution.EventSourcing.AggregateRoot
 {
-    public class MappedEventStreamProcessor : EventStreamProcessor
+    public class MappedEventStreamProcessor : AggregateRootProcessor
     {
-        private readonly EventStreamProcessorMap[] _mappings;
+        private readonly AggregateRootProcessorMap[] _mappings;
 
-        public MappedEventStreamProcessor(params EventStreamProcessorMap[] mappings)
+        public MappedEventStreamProcessor(params AggregateRootProcessorMap[] mappings)
         {
             Contract.Requires(mappings != null);
 

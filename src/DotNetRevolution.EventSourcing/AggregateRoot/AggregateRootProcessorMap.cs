@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.EventSourcing
+namespace DotNetRevolution.EventSourcing.AggregateRoot
 {
-    public class EventStreamProcessorMap
+    public class AggregateRootProcessorMap
     {
         public Type DomainEventType { get; }
 
         public string MethodName { get; }
 
-        public EventStreamProcessorMap(Type domainEventType, string methodName)
+        public AggregateRootProcessorMap(Type domainEventType, string methodName)
         {
             Contract.Requires(domainEventType != null);
             Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);

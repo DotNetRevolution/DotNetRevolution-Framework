@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.EventSourcing;
+using DotNetRevolution.EventSourcing.AggregateRoot;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
@@ -15,7 +16,8 @@ namespace DotNetRevolution.Test.EventSourcing
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            var eventProvider = new EventProvider<AccountAggregateRoot>(domainEvents, new MappedEventStreamProcessor(new EventStreamProcessorMap(typeof(Created), "Apply")));
+            var eventProvider = new EventProvider<AccountAggregateRoot>(domainEvents, 
+                new MappedEventStreamProcessor(new AggregateRootProcessorMap(typeof(Created), "Apply")));
 
             var aggregateRoot = eventProvider.CreateAggregateRoot();
 
