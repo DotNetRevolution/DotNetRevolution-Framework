@@ -176,7 +176,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
             // set parameters
-            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = identity.Value;
+            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = identity.Value;
             sqlCommand.Parameters.Add("@eventProviderType", SqlDbType.VarChar, 512).Value = eventProviderType.FullName;
 
             return sqlCommand;

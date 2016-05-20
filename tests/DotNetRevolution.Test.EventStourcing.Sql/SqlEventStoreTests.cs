@@ -8,6 +8,7 @@ using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Test.EventStoreDomain.Account.Snapshots;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
+using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -27,7 +28,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             _eventStore = new SqlEventStore(
                 new AggregateRootProcessorFactory(
                     _processor = new SingleMethodAggregateRootProcessor("Apply")),
-                    new SnapshotPolicyFactory(new VersionSnapshotPolicy(1)),
+                    new SnapshotPolicyFactory(new ExplicitVersionSnapshotPolicy(1)),
                     snapshotProviderFactory,
                     new JsonSerializer(),
                     ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
@@ -81,6 +82,78 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(eventProvider);
+        }
+
+        [TestMethod]
+        public void CanAppendEventsToExistingEventProviderWithSnapshot()
+        {
+            var command = new Create(100);
+            var domainEvents = AccountAggregateRoot.Create(100);
+
+            _eventStore.Commit(new Transaction("UnitTester",
+                command,
+                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+
+            var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
+
+            Assert.IsNotNull(eventProvider);
+
+            var aggregateRoot = eventProvider.CreateAggregateRoot();
+
+            Assert.IsNotNull(aggregateRoot);
+
+            var command2 = new Deposit(domainEvents.AggregateRoot.Identity, 200);
+
+            eventProvider = eventProvider.CreateNewVersion(aggregateRoot.Credit(command2.Amount, new CanCreditAccount(CanDepositAmount)));
+
+            var newVersion = eventProvider.Version;
+
+            _eventStore.Commit(new Transaction("UnitTester", command2, eventProvider));            
+        }
+
+        [TestMethod]
+        public void CanAppendEventsToExistingEventProviderWithSnapshotAndGetAggregateRoot()
+        {
+            var command = new Create(100);
+            var domainEvents = AccountAggregateRoot.Create(100);
+
+            _eventStore.Commit(new Transaction("UnitTester",
+                command,
+                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+
+            var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
+
+            Assert.IsNotNull(eventProvider);
+
+            var aggregateRoot = eventProvider.CreateAggregateRoot();
+
+            Assert.IsNotNull(aggregateRoot);
+
+            var command2 = new Deposit(domainEvents.AggregateRoot.Identity, 200);
+
+            eventProvider = eventProvider.CreateNewVersion(aggregateRoot.Credit(command2.Amount, new CanCreditAccount(CanDepositAmount)));
+
+            var newBalance = aggregateRoot.Balance;
+            var newVersion = eventProvider.Version;
+
+            _eventStore.Commit(new Transaction("UnitTester", command2, eventProvider));
+
+            eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
+
+            Assert.IsNotNull(eventProvider);
+            Assert.IsTrue(eventProvider.Version == newVersion);
+
+            aggregateRoot = eventProvider.CreateAggregateRoot();
+
+            Assert.IsNotNull(aggregateRoot);
+            Assert.AreEqual(aggregateRoot.Balance, newBalance);
+        }
+
+        private bool CanDepositAmount(AccountAggregateRoot account, decimal amount, out string declinationReason)
+        {
+            declinationReason = string.Empty;
+
+            return true;
         }
     }
 }

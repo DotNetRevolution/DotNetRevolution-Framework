@@ -176,15 +176,6 @@ BEGIN
 		 WHERE ep.CurrentDescriptor IS NULL
 		    OR eps.Descriptor <> ep.CurrentDescriptor
 		 
-		-- update event provider with latest descriptor and version
-		UPDATE dbo.EventProvider SET
-			   CurrentEventProviderDescriptorId = tep.Id
-			 , CurrentVersion = ept.[Version]
-		  FROM @transactionEventProviders tep
-		  JOIN @eventProviderTable ept ON tep.EventProviderId = ept.TableId
-		  JOIN @eventProviderDescriptors epd ON epd.Id = tep.Id		 
-		 WHERE EventProvider.EventProviderId = ept.TableId
-
 		-- insert snapshot
 		INSERT INTO dbo.EventProviderSnapshot (TransactionEventProviderId, EventProviderSnapshotTypeId, [Data])
 		OUTPUT inserted.TransactionEventProviderId
@@ -195,13 +186,15 @@ BEGIN
 		  JOIN @eventProviderTable ept ON eps.EventProviderTempId = ept.TempId
 		  JOIN @transactionEventProviders tep ON ept.TableId = tep.EventProviderId
 		  
-		-- update event provider with latest snapshot
+		-- update event provider with latest information
 		UPDATE dbo.EventProvider SET
-			   LatestSnapshotId = tep.Id
+			   LatestSnapshotId = CASE WHEN st.Id IS NULL THEN LatestSnapshotId ELSE st.Id END
+			 , CurrentEventProviderDescriptorId = CASE WHEN epd.Id IS NULL THEN CurrentEventProviderDescriptorId ELSE epd.Id END
+			 , CurrentVersion = ept.[Version]
 		  FROM @transactionEventProviders tep
 		  JOIN @eventProviderTable ept ON tep.EventProviderId = ept.TableId
-		  JOIN @eventProviderDescriptors epd ON epd.Id = tep.Id		 
-		  JOIN @snapshotTable st ON tep.Id = st.Id
+	 LEFT JOIN @eventProviderDescriptors epd ON epd.Id = tep.Id		 
+	 LEFT JOIN @snapshotTable st ON tep.Id = st.Id
 		 WHERE EventProvider.EventProviderId = ept.TableId
 
 		-- insert transaction events

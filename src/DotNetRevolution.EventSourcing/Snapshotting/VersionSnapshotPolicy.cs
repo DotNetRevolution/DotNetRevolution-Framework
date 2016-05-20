@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+
 namespace DotNetRevolution.EventSourcing.Snapshotting
 {
     public class VersionSnapshotPolicy : ISnapshotPolicy

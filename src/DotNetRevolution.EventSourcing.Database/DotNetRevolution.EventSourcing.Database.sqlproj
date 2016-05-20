@@ -91,7 +91,6 @@
     <Build Include="dbo\Tables\EventProviderSnapshotType.sql" />
     <Build Include="dbo\User Defined Types\udttEventProviderSnapshot.sql" />
     <Build Include="dbo\Sequences\EventProviderSnapshotTypeSequence.sql" />
-    <Build Include="dbo\GetEventProviderId.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\test commit proc.sql" />

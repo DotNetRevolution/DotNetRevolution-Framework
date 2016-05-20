@@ -104,6 +104,7 @@
     <Compile Include="Snapshotting\CodeContract\SnapshotProviderContract.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotProviderContract`1.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotProviderFactoryContract.cs" />
+    <Compile Include="Snapshotting\ExplicitVersionSnapshotPolicy.cs" />
     <Compile Include="Snapshotting\Snapshot.cs" />
     <Compile Include="Snapshotting\ISnapshotPolicyFactory.cs" />
     <Compile Include="AggregateRoot\MappedAggregateRootProcessor.cs" />
