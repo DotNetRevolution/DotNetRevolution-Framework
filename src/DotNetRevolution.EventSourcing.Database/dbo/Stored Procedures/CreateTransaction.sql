@@ -13,36 +13,52 @@ BEGIN
 		  , @commandTypeId INT
 		  , @snapshotTypeId INT
 
-	DECLARE @eventProviderTable AS TABLE(
-										  TempId INT
-										, TableId INT
-										, [Guid] UNIQUEIDENTIFIER
-										, [TypeId] INT 
-										, FullName VARCHAR (512)
-										, NewProvider BIT
-										, NewType BIT
-										, [Version] INT
-										)
+	DECLARE @eventProviderTable AS TABLE
+	(
+		  TempId INT
+		, TableId INT
+		, [Guid] UNIQUEIDENTIFIER
+		, [TypeId] INT 
+		, FullName VARCHAR (512)
+		, NewProvider BIT
+		, NewType BIT
+		, [Version] INT
+		, [CurrentDescriptor] VARCHAR (MAX)
+	)
 										
-	DECLARE @transactionEventTypeTable AS TABLE(
-												  Id INT
-												, FullName VARCHAR (512)
-												, New BIT
-												)
+	DECLARE @transactionEventTypeTable AS TABLE
+	(
+		  Id INT
+		, FullName VARCHAR (512)
+		, New BIT
+	)
+	
+	DECLARE @snapshotTypeTable AS TABLE
+	(
+		  Id INT
+		, FullName VARCHAR (512)
+		, New BIT
+	)
 
-	DECLARE @snapshotTypeTable AS TABLE(
-										 Id INT
-									   , FullName VARCHAR (512)
-									   , New BIT
-									   )
+	DECLARE @snapshotTable AS TABLE
+	(
+		  Id INT
+	)
+	
+	DECLARE @transactionEventProviders AS TABLE
+	(
+		  Id INT
+		, [EventProviderId] INT
+	)
 
-	DECLARE @transactionEventProviders AS TABLE(
-												  Id INT
-												, [EventProviderId] INT
-												)
+	DECLARE @eventProviderDescriptors AS TABLE
+	(
+		  Id INT
+		, [Descriptor] VARCHAR (MAX)
+	)
 
 	-- event providers
-	INSERT INTO @eventProviderTable (TempId, TableId, [Guid], [TypeId], FullName, [NewProvider], [NewType], [Version])
+	INSERT INTO @eventProviderTable (TempId, TableId, [Guid], [TypeId], FullName, [NewProvider], [NewType], [Version], [CurrentDescriptor])
 	SELECT tep.TempId
 			, ep.EventProviderId
 			, tep.EventProviderGuid
@@ -51,10 +67,12 @@ BEGIN
 			, CASE WHEN ep.EventProviderId IS NULL THEN 1 ELSE 0 END
 			, CASE WHEN ept.EventProviderTypeId IS NULL THEN 1 ELSE 0 END
 			, tep.[Version]
+			, epd.Descriptor
 		FROM @eventProviders tep
 	LEFT JOIN dbo.EventProviderType ept ON tep.TypeFullName = ept.FullName
 	LEFT JOIN dbo.EventProvider ep ON  tep.EventProviderGuid = ep.EventProviderGuid
-								AND ept.EventProviderTypeId = ep.EventProviderTypeId
+								   AND ept.EventProviderTypeId = ep.EventProviderTypeId
+	LEFT JOIN dbo.EventProviderDescriptor epd ON ep.CurrentEventProviderDescriptorId = epd.TransactionEventProviderId
 
 	UPDATE @eventProviderTable SET
 			TableId = NEXT VALUE FOR dbo.EventProviderSequence
@@ -136,19 +154,6 @@ BEGIN
 
 		SET @transactionId = SCOPE_IDENTITY()
 		
-		-- insert event provider descriptors if changed from last transaction
-		INSERT INTO dbo.EventProviderDescriptor (TransactionId, EventProviderId, Descriptor)
-		SELECT @transactionId, ep.TableId, eps.Descriptor
-		  FROM @eventProviders eps		  
-		  JOIN @eventProviderTable ep ON eps.TempId = ep.TempId
-	 LEFT JOIN (SELECT ROW_NUMBER() OVER (PARTITION BY epd.EventProviderId ORDER BY t.Processed DESC) 'row_num'
-					 , epd.Descriptor
-					 , epd.EventProviderId
-				 FROM dbo.[EventProviderDescriptor] epd
-				 JOIN dbo.[Transaction] t ON epd.TransactionId = t.TransactionId) descriptors ON ep.TableId = descriptors.EventProviderId
-		 WHERE descriptors.row_num IS NULL
-			OR (descriptors.row_num = 1 AND eps.Descriptor <> descriptors.Descriptor)		 
-		 
 		-- insert command
 		INSERT INTO dbo.TransactionCommand (TransactionId, TransactionCommandTypeId, TransactionCommandGuid, [Data])
 		VALUES (@transactionId, @commandTypeId, @commandGuid, @commandData)
@@ -159,14 +164,45 @@ BEGIN
 		  INTO @transactionEventProviders (EventProviderId, Id)
 		SELECT @transactionId, ept.TableId, ept.[Version]
 		  FROM @eventProviderTable ept
+		  
+		-- insert event provider descriptors if changed
+		INSERT INTO dbo.EventProviderDescriptor (TransactionEventProviderId, Descriptor)
+		OUTPUT inserted.TransactionEventProviderId, inserted.Descriptor 
+		  INTO @eventProviderDescriptors (Id, Descriptor)
+		SELECT tep.Id, eps.Descriptor
+		  FROM @eventProviders eps		  
+		  JOIN @eventProviderTable ep ON eps.TempId = ep.TempId
+		  JOIN @transactionEventProviders tep ON ep.TableId = tep.EventProviderId	 
+		 WHERE ep.CurrentDescriptor IS NULL
+		    OR eps.Descriptor <> ep.CurrentDescriptor
+		 
+		-- update event provider with latest descriptor and version
+		UPDATE dbo.EventProvider SET
+			   CurrentEventProviderDescriptorId = tep.Id
+			 , CurrentVersion = ept.[Version]
+		  FROM @transactionEventProviders tep
+		  JOIN @eventProviderTable ept ON tep.EventProviderId = ept.TableId
+		  JOIN @eventProviderDescriptors epd ON epd.Id = tep.Id		 
+		 WHERE EventProvider.EventProviderId = ept.TableId
 
 		-- insert snapshot
 		INSERT INTO dbo.EventProviderSnapshot (TransactionEventProviderId, EventProviderSnapshotTypeId, [Data])
+		OUTPUT inserted.TransactionEventProviderId
+		INTO @snapshotTable
 		SELECT tep.Id, stt.Id, eps.[Data]
 		  FROM @eventProviderSnapshots eps
 		  JOIN @snapshotTypeTable stt ON eps.TypeFullName = stt.FullName
 		  JOIN @eventProviderTable ept ON eps.EventProviderTempId = ept.TempId
 		  JOIN @transactionEventProviders tep ON ept.TableId = tep.EventProviderId
+		  
+		-- update event provider with latest snapshot
+		UPDATE dbo.EventProvider SET
+			   LatestSnapshotId = tep.Id
+		  FROM @transactionEventProviders tep
+		  JOIN @eventProviderTable ept ON tep.EventProviderId = ept.TableId
+		  JOIN @eventProviderDescriptors epd ON epd.Id = tep.Id		 
+		  JOIN @snapshotTable st ON tep.Id = st.Id
+		 WHERE EventProvider.EventProviderId = ept.TableId
 
 		-- insert transaction events
 		INSERT INTO dbo.TransactionEvent (TransactionEventProviderId, TransactionEventTypeId, TransactionEventGuid, [Sequence], [Data])

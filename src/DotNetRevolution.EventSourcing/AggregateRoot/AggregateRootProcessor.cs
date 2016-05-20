@@ -54,7 +54,7 @@ namespace DotNetRevolution.EventSourcing.AggregateRoot
         }
 
         private TAggregateRoot CreateAggregateRoot<TAggregateRoot>(Type aggregateRootType, Snapshot snapshot) where TAggregateRoot : class, IAggregateRoot
-        {
+        {            
             Contract.Requires(aggregateRootType != null);
             Contract.Ensures(Contract.Result<TAggregateRoot>() != null);
 
@@ -66,18 +66,18 @@ namespace DotNetRevolution.EventSourcing.AggregateRoot
                 aggregateRoot = Activator.CreateInstance(aggregateRootType, true) as TAggregateRoot;
             }
             else
-            {
+            {                
                 // find ctor from snapshot type
-                var ctor = aggregateRootType.GetConstructor(DefaultBindingFlags, Type.DefaultBinder, new[] { snapshot.GetType() }, null);
-
+                var ctor = aggregateRootType.GetConstructor(DefaultBindingFlags, Type.DefaultBinder, new[] { snapshot.Data.GetType() }, null);
+                                
                 // make sure ctor was found
                 if (ctor == null)
                 {
-                    throw new InvalidOperationException(string.Format("Aggregate root does not have a constructor with a snapshot parameter of {0}", snapshot.GetType().FullName));
+                    throw new InvalidOperationException(string.Format("Aggregate root does not have a constructor with a snapshot parameter of {0}", snapshot.Data.GetType().FullName));
                 }
 
                 // invoke ctor with snapshot
-                aggregateRoot = ctor.Invoke(new[] { snapshot }) as TAggregateRoot;
+                aggregateRoot = ctor.Invoke(new[] { snapshot.Data }) as TAggregateRoot;
             }
 
             // need to make sure aggregate root was created

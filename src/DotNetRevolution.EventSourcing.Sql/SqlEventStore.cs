@@ -54,19 +54,23 @@ namespace DotNetRevolution.EventSourcing.Sql
                 conn.Open();
 
                 // execute
-                sqlDomainEvents = ExecuteQueryCommand(command, out eventProviderDescriptor, out sqlSnapshot);
+                sqlDomainEvents = ExecuteQueryCommand(command, out eventProviderDescriptor, out sqlSnapshot, out version);
             }
                  
             // set snapshot       
             snapshot = sqlSnapshot == null 
                 ? null
-                : new Snapshot(DeserializeSnapshot(sqlSnapshot));
-
-            // set version output parameter
-            version = new EventProviderVersion(sqlDomainEvents.Max(x => x.EventProviderVersion));
+                : DeserializeSnapshot(sqlSnapshot);
 
             // return deserialized events
-            return new EventStream(DeserializeDomainEvents(sqlDomainEvents));
+            if (sqlDomainEvents.Any() == false)
+            {
+                // return event stream with no events, snapshot only
+                return new EventStream(new Collection<IDomainEvent>(), snapshot);
+            }
+
+            // return event stream with events and snapshot
+            return new EventStream(DeserializeDomainEvents(sqlDomainEvents), snapshot);
         }
 
         private IReadOnlyCollection<IDomainEvent> DeserializeDomainEvents(Collection<SqlDomainEvent> sqlDomainEvents)
@@ -78,7 +82,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                 .ToList());
         }
 
-        private static Collection<SqlDomainEvent> ExecuteQueryCommand(SqlCommand command, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot)
+        private static Collection<SqlDomainEvent> ExecuteQueryCommand(SqlCommand command, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
         {
             var sqlDomainEvents = new Collection<SqlDomainEvent>();
             
@@ -96,18 +100,8 @@ namespace DotNetRevolution.EventSourcing.Sql
                     throw new InvalidOperationException("No event provider descriptor result returned.");
                 }
 
-                // get descriptor
-                eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(0));
-
-                // check for snapshot
-                if (dataReader.NextResult() == false ||
-                    dataReader.Read() == false)
-                {
-                    throw new InvalidOperationException("No event provider snapshot result returned.");
-                }
-
-                // read snapshot
-                snapshot = GetSnapshot(dataReader);
+                // get event provider information
+                GetEventProviderInformation(dataReader, out eventProviderDescriptor, out snapshot, out version);
 
                 // move reader to next result set
                 if (dataReader.NextResult())
@@ -132,13 +126,24 @@ namespace DotNetRevolution.EventSourcing.Sql
                 }
             }
 
-            // check if any events were returned
-            if (sqlDomainEvents.Any() == false)
+            // check if snapshot or events were returned
+            if (snapshot == null && sqlDomainEvents.Any() == false)
             {
-                throw new InvalidOperationException("No events returned.");
+                throw new InvalidOperationException("No snapshot or events returned.");
             }
             
             return sqlDomainEvents;
+        }
+
+        private static void GetEventProviderInformation(SqlDataReader dataReader, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
+        {
+            // get descriptor
+            eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(0));
+
+            version = new EventProviderVersion(dataReader.GetInt32(1));
+
+            // read snapshot
+            snapshot = GetSnapshot(dataReader);
         }
 
         private static SqlSnapshot GetSnapshot(SqlDataReader dataReader)
@@ -146,17 +151,17 @@ namespace DotNetRevolution.EventSourcing.Sql
             SqlSnapshot snapshot = null;
 
             // check if snapshot result is null
-            if (dataReader.IsDBNull(0) == false && dataReader.IsDBNull(1) == false)
+            if (dataReader.IsDBNull(2) == false && dataReader.IsDBNull(3) == false)
             {
                 // get snapshot
-                snapshot = new SqlSnapshot(dataReader.GetString(0), (byte[])dataReader[1]);
+                snapshot = new SqlSnapshot(dataReader.GetString(2), (byte[])dataReader[3]);
             }
-            else if (dataReader.IsDBNull(0) == true && dataReader.IsDBNull(1) == false)
+            else if (dataReader.IsDBNull(2) == true && dataReader.IsDBNull(3) == false)
             {
                 // throw error
                 throw new InvalidOperationException("Snapshot type is null but data is not");
             }
-            else if (dataReader.IsDBNull(0) == false && dataReader.IsDBNull(1) == true)
+            else if (dataReader.IsDBNull(2) == false && dataReader.IsDBNull(3) == true)
             {
                 // throw error
                 throw new InvalidOperationException("Snapshot data is null but type is not");
@@ -284,8 +289,9 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             DataTable eventProviderDataTable;
             DataTable eventDataTable;
+            DataTable snapshotDataTable;
 
-            GetDataTables(eventProviders, out eventProviderDataTable, out eventDataTable);
+            GetDataTables(eventProviders, out eventProviderDataTable, out eventDataTable, out snapshotDataTable);
 
             // event provider user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@eventProviders", SqlDbType.Structured)
@@ -300,15 +306,23 @@ namespace DotNetRevolution.EventSourcing.Sql
                     TypeName = "[dbo].[udttEvent]",
                     Value = eventDataTable
                 });
-            
+
+            // snapshot user defined table type
+            sqlCommand.Parameters.Add(new SqlParameter("@eventProviderSnapshots", SqlDbType.Structured)
+                {
+                    TypeName = "[dbo].[udttEventProviderSnapshot]",
+                    Value = snapshotDataTable
+                });
+
             return sqlCommand;
         }
 
-        private void GetDataTables(EntityCollection<EventProvider> eventProviders, out DataTable eventProviderDataTable, out DataTable eventDataTable)
+        private void GetDataTables(EntityCollection<EventProvider> eventProviders, out DataTable eventProviderDataTable, out DataTable eventDataTable, out DataTable snapshotDataTable)
         {
             // create data tables
             eventProviderDataTable = CreateEventProviderDataTable();
             eventDataTable = CreateEventDataTable();
+            snapshotDataTable = CreateSnapshotDataTable();
 
             // variable to create temporary ids
             var eventProviderTempId = -1;
@@ -318,15 +332,30 @@ namespace DotNetRevolution.EventSourcing.Sql
             {
                 AddEventProviderRow(eventProviderDataTable, ++eventProviderTempId, eventProvider);
 
+                // add snapshot
+                AddSnapshot(snapshotDataTable, eventProviderTempId, eventProvider);
+
                 // new sequence object to keep track of the sequence per event provider
                 var sequence = new TransactionEventSequence();
-                
+
                 // go through each domain event in the event provider
                 foreach (var domainEvent in eventProvider.DomainEvents)
                 {
                     AddEventRow(eventDataTable, eventProviderTempId, sequence.Increment(), domainEvent);
                 }
-            }            
+            }
+        }
+
+        private void AddSnapshot(DataTable snapshotDataTable, int eventProviderTempId, EventProvider eventProvider)
+        {
+            // get snapshot if policy satisfied
+            var snapshot = GetSnapshotIfPolicySatisfied(eventProvider);
+
+            // add snapshot was returned
+            if (snapshot != null)
+            {
+                AddSnapshotRow(snapshotDataTable, eventProviderTempId, snapshot);
+            }
         }
 
         private void AddEventRow(DataTable dataTable, int eventProviderTempId, int sequence, IDomainEvent domainEvent)
@@ -362,7 +391,21 @@ namespace DotNetRevolution.EventSourcing.Sql
             // add new row to table
             dataTable.Rows.Add(dataRow);
         }
-                
+        
+        private void AddSnapshotRow(DataTable dataTable, int eventProviderTempId, Snapshot snapshot)
+        {
+            // add row to the data table
+            var dataRow = dataTable.NewRow();
+
+            // populate data row            
+            dataRow["EventProviderTempId"] = eventProviderTempId;            
+            dataRow["TypeFullName"] = snapshot.SnapshotType.FullName;
+            dataRow["Data"] = SerializeObject(snapshot.Data);
+
+            // add new row to table
+            dataTable.Rows.Add(dataRow);
+        }
+
         private DataTable CreateEventDataTable()
         {
             var dataTable = new DataTable();
@@ -379,12 +422,23 @@ namespace DotNetRevolution.EventSourcing.Sql
         private DataTable CreateEventProviderDataTable()
         {
             var dataTable = new DataTable();
-            
+
             dataTable.Columns.Add("TempId", typeof(int));
             dataTable.Columns.Add("EventProviderGuid", typeof(Guid));
             dataTable.Columns.Add("Descriptor", typeof(string));
             dataTable.Columns.Add("TypeFullName", typeof(string));
             dataTable.Columns.Add("Version", typeof(int));
+
+            return dataTable;
+        }
+
+        private DataTable CreateSnapshotDataTable()
+        {
+            var dataTable = new DataTable();
+
+            dataTable.Columns.Add("EventProviderTempId", typeof(int));            
+            dataTable.Columns.Add("TypeFullName", typeof(string));
+            dataTable.Columns.Add("Data", typeof(byte[]));
 
             return dataTable;
         }

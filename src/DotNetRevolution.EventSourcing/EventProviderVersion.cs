@@ -5,7 +5,7 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventProviderVersion : ValueObject<EventProviderVersion>
     {
-        public static EventProviderVersion Initial = new EventProviderVersion(0);
+        public static EventProviderVersion Initial = new EventProviderVersion(1);
 
         public int Value { [Pure] get; }
 

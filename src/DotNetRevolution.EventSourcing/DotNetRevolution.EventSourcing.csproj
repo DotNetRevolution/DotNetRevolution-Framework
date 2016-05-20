@@ -81,6 +81,7 @@
     <Compile Include="CodeContract\EventProviderContract.cs" />
     <Compile Include="CodeContract\EventProviderContract`1.cs" />
     <Compile Include="CodeContract\EventStoreContract.cs" />
+    <Compile Include="EventProviderNotFoundException.cs" />
     <Compile Include="EventStreamDomainEventCollection.cs" />
     <Compile Include="IEventStreamDomainEventCollection.cs" />
     <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorContract.cs" />
@@ -91,7 +92,6 @@
     <Compile Include="DomainEventSerializationException.cs" />
     <Compile Include="EventProvider.cs" />
     <Compile Include="EventProviderDescriptor.cs" />
-    <Compile Include="EventProviderNotFoundException.cs" />
     <Compile Include="EventProviderType.cs" />
     <Compile Include="EventProvider`1.cs" />
     <Compile Include="EventStore.cs" />
@@ -124,6 +124,7 @@
     <Compile Include="Snapshotting\SnapshotProvider.cs" />
     <Compile Include="Snapshotting\SnapshotProviderFactory.cs" />
     <Compile Include="Snapshotting\SnapshotSerializationException.cs" />
+    <Compile Include="Snapshotting\SnapshotType.cs" />
     <Compile Include="Snapshotting\VersionSnapshotPolicy.cs" />
     <Compile Include="Transaction.cs" />
     <Compile Include="EventProviderVersion.cs" />

@@ -3,6 +3,7 @@ using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
 using DotNetRevolution.Test.EventStoreDomain.Account.Exceptions;
+using DotNetRevolution.Test.EventStoreDomain.Account.Snapshots;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account
@@ -16,6 +17,14 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
         [UsedImplicitly]
         private AccountAggregateRoot()
         {
+        }
+
+        public AccountAggregateRoot(AccountSnapshot snapshot)
+            : this(new Identity(snapshot.Id))
+        {
+            Contract.Requires(snapshot != null);
+            
+            Balance = snapshot.Balance;
         }
 
         public AccountAggregateRoot(Identity identity)
