@@ -143,8 +143,8 @@ BEGIN
 		END
 
 		-- insert new event providers
-		INSERT INTO dbo.EventProvider (EventProviderId, EventProviderGuid, EventProviderTypeId)		
-		SELECT ept.TableId, ept.[Guid], ept.TypeId
+		INSERT INTO dbo.EventProvider (EventProviderId, EventProviderGuid, EventProviderTypeId, CurrentVersion)		
+		SELECT ept.TableId, ept.[Guid], ept.TypeId, ept.[Version]
 		  FROM @eventProviderTable ept
 		 WHERE ept.NewProvider = 1
 		
