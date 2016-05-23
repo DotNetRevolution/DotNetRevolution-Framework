@@ -9,6 +9,7 @@ using DotNetRevolution.Test.EventStoreDomain.Account.Snapshots;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -82,6 +83,15 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(eventProvider);
+        }
+
+        [TestMethod]
+        public void AddManyRecords()
+        {
+            Parallel.For(0, 1000, i =>
+                {
+                    CanAppendEventsToExistingEventProviderWithSnapshot();
+                });
         }
 
         [TestMethod]

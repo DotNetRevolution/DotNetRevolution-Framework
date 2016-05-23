@@ -36,9 +36,14 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CommitTransactionCommand.cs" />
+    <Compile Include="GetDomainEventsCommand.cs" />
+    <Compile Include="GetSnapshotIfPolicySatisfiedDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlDomainCommand.cs" />
     <Compile Include="SqlDomainEvent.cs" />
     <Compile Include="SqlEventStore.cs" />
+    <Compile Include="SqlSerializer.cs" />
     <Compile Include="SqlSnapshot.cs" />
   </ItemGroup>
   <ItemGroup>

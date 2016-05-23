@@ -220,10 +220,11 @@ BEGIN
 	BEGIN CATCH
 		-- something failed
 		ROLLBACK TRAN
-		
-		-- print error
-		PRINT ERROR_MESSAGE() 
 
+		DECLARE @errText VARCHAR(MAX) = ERROR_MESSAGE()
+
+		RAISERROR(@errText, 16, 1)
+		
 		-- return failure to caller
 		RETURN 1
 		
