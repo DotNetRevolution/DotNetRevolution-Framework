@@ -9,6 +9,8 @@ namespace DotNetRevolution.EventSourcing
     {
         private readonly Collection<EventProvider> _eventProviders;
 
+        public Identity Identity { [Pure] get; }
+
         public ICommand Command { [Pure] get; }
         
         public EntityCollection<EventProvider> EventProviders
@@ -27,6 +29,8 @@ namespace DotNetRevolution.EventSourcing
             Contract.Requires(string.IsNullOrWhiteSpace(user) == false);
             Contract.Requires(command != null);
             Contract.Requires(eventProviders != null);
+
+            Identity = Identity.New();
 
             User = user;
             Command = command;

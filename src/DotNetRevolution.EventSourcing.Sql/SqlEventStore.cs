@@ -55,9 +55,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             // establish command
             var command = new CommitTransactionCommand(_serializer, 
                 _getSnapshotIfPolicySatisfiedDelegate,
-                transaction.Command, 
-                transaction.EventProviders, 
-                transaction.User);
+                transaction);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))

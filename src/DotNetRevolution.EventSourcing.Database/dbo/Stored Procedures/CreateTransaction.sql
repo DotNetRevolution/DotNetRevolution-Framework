@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[CreateTransaction]
-	  @user						NVARCHAR(256)
+	  @transactionGuid			UNIQUEIDENTIFIER
+	, @user						NVARCHAR(256)
 	, @commandGuid				UNIQUEIDENTIFIER	
     , @commandTypeFullName		VARCHAR (512)	
     , @commandData		        VARBINARY (MAX)
@@ -12,6 +13,7 @@ BEGIN
 	DECLARE @transactionId BIGINT
 		  , @commandTypeId INT
 		  , @snapshotTypeId INT
+		  , @errText VARCHAR(MAX)
 
 	DECLARE @eventProviderTable AS TABLE
 	(
@@ -88,7 +90,7 @@ BEGIN
 			, e.TypeFullName
 			, CASE WHEN tet.TransactionEventTypeId IS NULL THEN 1 ELSE 0 END
 		FROM @events e
-	LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName
+	LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName 
 
 	UPDATE @transactionEventTypeTable SET
 			Id = NEXT VALUE FOR dbo.TransactionEventTypeSequence
@@ -142,6 +144,27 @@ BEGIN
 			SET @commandTypeId = SCOPE_IDENTITY()
 		END
 
+		COMMIT TRAN
+		
+	END TRY
+
+	BEGIN CATCH
+		-- something failed
+		ROLLBACK TRAN
+
+		SET @errText = ERROR_MESSAGE()
+
+		RAISERROR(@errText, 16, 1)
+		
+		-- return failure to caller
+		RETURN 1
+		
+	END CATCH
+	
+	BEGIN TRAN
+	
+	BEGIN TRY
+		
 		-- insert new event providers
 		INSERT INTO dbo.EventProvider (EventProviderId, EventProviderGuid, EventProviderTypeId, CurrentVersion)		
 		SELECT ept.TableId, ept.[Guid], ept.TypeId, ept.[Version]
@@ -149,8 +172,8 @@ BEGIN
 		 WHERE ept.NewProvider = 1
 		
 		-- create transaction
-		INSERT INTO dbo.[Transaction] ([User])
-		VALUES (@user)
+		INSERT INTO dbo.[Transaction] ([TransactionGuid], [User])
+		VALUES (@transactionGuid, @user)
 
 		SET @transactionId = SCOPE_IDENTITY()
 		
@@ -221,7 +244,7 @@ BEGIN
 		-- something failed
 		ROLLBACK TRAN
 
-		DECLARE @errText VARCHAR(MAX) = ERROR_MESSAGE()
+		SET @errText = ERROR_MESSAGE()
 
 		RAISERROR(@errText, 16, 1)
 		

@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.Event
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.Test.EventSourcing", "tests\DotNetRevolution.Test.EventSourcing\DotNetRevolution.Test.EventSourcing.csproj", "{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Web", "src\DotNetRevolution.EventSourcing.Web\DotNetRevolution.EventSourcing.Web.csproj", "{6FE2C1E1-5388-4E45-80F4-08ED8A446091}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +141,10 @@ Global
 		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FE2C1E1-5388-4E45-80F4-08ED8A446091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FE2C1E1-5388-4E45-80F4-08ED8A446091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FE2C1E1-5388-4E45-80F4-08ED8A446091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FE2C1E1-5388-4E45-80F4-08ED8A446091}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,5 +168,6 @@ Global
 		{FAC36EE1-DFF2-4A8C-8D96-4A4DCE79A5C3} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{2DFF7B71-44E4-45B0-BFE6-E1D4718CF42C} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
+		{6FE2C1E1-5388-4E45-80F4-08ED8A446091} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 	EndGlobalSection
 EndGlobal

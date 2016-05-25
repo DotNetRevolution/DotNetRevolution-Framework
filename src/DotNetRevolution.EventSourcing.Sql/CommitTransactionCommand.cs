@@ -17,20 +17,16 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         public CommitTransactionCommand(SqlSerializer serializer,
             GetSnapshotIfPolicySatisfiedDelegate getSnapshotIfPolicySatisfiedDelegate,            
-            ICommand command, 
-            IReadOnlyCollection<EventProvider> eventProviders, 
-            string user)
+            Transaction transaction)
         {
             Contract.Requires(serializer != null);
             Contract.Requires(getSnapshotIfPolicySatisfiedDelegate != null);
-            Contract.Requires(command != null);
-            Contract.Requires(eventProviders != null);
-            Contract.Requires(string.IsNullOrWhiteSpace(user) == false);
+            Contract.Requires(transaction != null);
 
             _serializer = serializer;
             _getSnapshotIfPolicySatisfiedDelegate = getSnapshotIfPolicySatisfiedDelegate;
 
-            _command = CreateSqlCommand(command, eventProviders, user);            
+            _command = CreateSqlCommand(transaction.Identity, transaction.Command, transaction.EventProviders, transaction.User);            
         }
 
         public void Execute(SqlConnection conn)
@@ -44,14 +40,15 @@ namespace DotNetRevolution.EventSourcing.Sql
             _command.ExecuteNonQuery();
         }
         
-        private SqlCommand CreateSqlCommand(ICommand command, IReadOnlyCollection<EventProvider> eventProviders, string user)
+        private SqlCommand CreateSqlCommand(Identity transactionId, ICommand command, IReadOnlyCollection<EventProvider> eventProviders, string user)
         {
             var sqlCommand = new SqlCommand("[dbo].[CreateTransaction]");
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
             var commandType = new TransactionCommandType(command.GetType());
-            
+
             // set parameters
+            sqlCommand.Parameters.Add("@transactionGuid", SqlDbType.UniqueIdentifier).Value = transactionId.Value;
             sqlCommand.Parameters.Add("@user", SqlDbType.NVarChar, 256).Value = user;
             sqlCommand.Parameters.Add("@commandGuid", SqlDbType.UniqueIdentifier).Value = command.CommandId;
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;

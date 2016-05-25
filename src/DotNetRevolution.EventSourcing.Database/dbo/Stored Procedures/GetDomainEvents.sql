@@ -2,8 +2,6 @@
 	  @eventProviderGuid UNIQUEIDENTIFIER	
 	, @eventProviderType VARCHAR(512)
 AS	
-	IF OBJECT_ID('tempdb..#events') IS NOT NULL DROP TABLE #events
-
 	DECLARE @snapshotId INT
 		  , @snapshotFullName VARCHAR(512)
 		  , @snapshotData VARBINARY(MAX)
@@ -27,19 +25,6 @@ AS
  LEFT JOIN dbo.EventProviderSnapshotType epst ON eps.EventProviderSnapshotTypeId = epst.EventProviderSnapshotTypeId
 	 WHERE ep.EventProviderId = @eventProviderId
 	  	  
-    -- load events in temp table
-	SELECT tep.EventProviderVersion
-		 , te.[Sequence]
-		 , tet.FullName
-		 , te.[Data]
-	  INTO #events
-	  FROM dbo.TransactionEventProvider tep	
-	  JOIN dbo.EventProvider ep ON ep.EventProviderId = tep.EventProviderId 	  
-	  JOIN dbo.TransactionEvent te ON te.TransactionEventProviderId = tep.TransactionEventProviderId
-	  JOIN dbo.TransactionEventType tet ON te.TransactionEventTypeId = tet.TransactionEventTypeId 
-     WHERE ep.EventProviderId = @eventProviderId
-	   AND (@snapshotId IS NULL OR tep.TransactionEventProviderId > @snapshotId)
-
 	-- select event provider data
 	SELECT epd.Descriptor 'descriptor'
 		 , @eventProviderVersion 'currentVersion'
@@ -50,12 +35,15 @@ AS
 	 WHERE ep.EventProviderId = @eventProviderId
 
 	-- select events
-	SELECT e.EventProviderVersion
-		 , e.[Sequence]
-		 , e.FullName
-	 	 , e.[Data]
-	  FROM #events e
-
-	DROP TABLE #events
-
+	SELECT tep.EventProviderVersion
+		 , te.[Sequence]
+		 , tet.FullName
+		 , te.[Data]
+	  FROM dbo.TransactionEventProvider tep	
+	  JOIN dbo.EventProvider ep ON ep.EventProviderId = tep.EventProviderId 	  
+	  JOIN dbo.TransactionEvent te ON te.TransactionEventProviderId = tep.TransactionEventProviderId
+	  JOIN dbo.TransactionEventType tet ON te.TransactionEventTypeId = tet.TransactionEventTypeId 
+     WHERE ep.EventProviderId = @eventProviderId
+	   AND (@snapshotId IS NULL OR tep.TransactionEventProviderId > @snapshotId)
+	   
 RETURN 0
