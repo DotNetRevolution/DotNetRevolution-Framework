@@ -48,7 +48,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             if (canCreditAccount(this, amount, out declinationReason))
             {
-                var result = new CreditApplied(Identity, amount);
+                var result = new CreditApplied(Identity, amount, Balance + amount);
 
                 Apply(result);
 
@@ -67,7 +67,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
             if (canDebitAccount(this, amount, out declinationReason))
             {
-                var result = new DebitApplied(Identity, amount);
+                var result = new DebitApplied(Identity, amount, Balance - amount);
 
                 Apply(result);
 
@@ -102,12 +102,12 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
 
         private void Apply(DebitApplied domainEvent)
         {
-            Balance -= domainEvent.Amount;
+            Balance = domainEvent.NewBalance;
         }
 
         private void Apply(CreditApplied domainEvent)
         {
-            Balance += domainEvent.Amount;
+            Balance = domainEvent.NewBalance;
         }        
     }
 }
