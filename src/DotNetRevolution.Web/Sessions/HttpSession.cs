@@ -2,7 +2,7 @@
 using DotNetRevolution.Core.Sessions;
 using System.Diagnostics.Contracts;
 using System.Web.SessionState;
-using System.Collections.ObjectModel;
+using DotNetRevolution.Core.Extension;
 
 namespace DotNetRevolution.Web.Sessions
 {
@@ -34,7 +34,7 @@ namespace DotNetRevolution.Web.Sessions
             {
                 Contract.Assume(InternalHttpSession.Keys != null);
 
-                var dictionary = new Dictionary<string, object>();                
+                var dictionary = new Dictionary<string, object>();
                 
                 foreach (var key in InternalHttpSession.Keys)
                 {
@@ -45,7 +45,10 @@ namespace DotNetRevolution.Web.Sessions
                     dictionary[keyString] = InternalHttpSession[keyString];
                 }
 
-                return new ReadOnlyDictionary<string, object>(dictionary);
+                var readonlyDictionary = dictionary.AsReadOnly();
+                Contract.Assume(readonlyDictionary != null);
+
+                return readonlyDictionary;
             }
         }
 

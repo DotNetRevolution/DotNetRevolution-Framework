@@ -151,6 +151,7 @@
     <Compile Include="Base\SequentialGuid.cs" />
     <Compile Include="Domain\IDomainEventHandler`1.cs" />
     <Compile Include="Domain\ValueObject.cs" />
+    <Compile Include="Extension\DictionaryExtension.AsReadOnly.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
     <Compile Include="Extension\GuidExtension.AsString.cs" />
@@ -248,6 +249,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extension\DictionaryExtension.PureContainsKey.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Application\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
