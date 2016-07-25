@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
 using System.Threading.Tasks;
+using DotNetRevolution.EventSourcing.Hashing;
+using System;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -23,6 +25,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestInitialize]
         public void Init()
         {
+            var typeFactory = new DefaultTypeFactory(new MD5HashProvider());
             var snapshotProviderFactory = new SnapshotProviderFactory();
             snapshotProviderFactory.AddProvider(new EventProviderType(typeof(AccountAggregateRoot)), _snapshotProvider = new AccountSnapshotProvider());
             
@@ -32,6 +35,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                     new SnapshotPolicyFactory(new ExplicitVersionSnapshotPolicy(1)),
                     snapshotProviderFactory,
                     new JsonSerializer(),
+                    typeFactory,
                     ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
         }
 
@@ -49,16 +53,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             Assert.IsNotNull(eventProvider);
         }
-
-        [TestMethod]
-        public void CanCommitMultipleEventProvidersUsingOneTransaction()
-        {
-            _eventStore.Commit(new Transaction("UnitTester",
-                new Create(100),
-                new EventProvider(AccountAggregateRoot.Create(100)),
-                new EventProvider(AccountAggregateRoot.Create(100))));            
-        }
-
+        
         [TestMethod]
         public void CanCommitTransactionWithSnapshot()
         {
@@ -88,14 +83,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 10, i =>
+            Parallel.For(0, 500000, i =>
                 {
                     try
                     {
-                        CanAppendEventsToExistingEventProviderWithSnapshot();
+                        CanCommitTransactionAndGetEventProvider();
                     }
-                    catch
-                    { }
+                    catch (Exception e)
+                    { Assert.Fail(e.ToString()); }
                 });
         }
 

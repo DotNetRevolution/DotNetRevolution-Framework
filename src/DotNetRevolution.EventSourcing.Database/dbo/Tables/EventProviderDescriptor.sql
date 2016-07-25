@@ -1,10 +1,8 @@
 ﻿CREATE TABLE [dbo].[EventProviderDescriptor]
 (
-    [TransactionEventProviderId] BIGINT NOT NULL PRIMARY KEY,
+    [TransactionId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Descriptor] VARCHAR(MAX) NOT NULL, 
-    CONSTRAINT [FK_EventProviderDescription_TransactionEventProvider] FOREIGN KEY ([TransactionEventProviderId]) REFERENCES [dbo].[TransactionEventProvider]([TransactionEventProviderId]), 
+    CONSTRAINT [FK_EventProviderDescription_Transaction] FOREIGN KEY ([TransactionId]) REFERENCES [dbo].[Transaction]([TransactionId]), 
 )
 
 GO
-
-CREATE NONCLUSTERED INDEX [IX_EventProviderDescriptor_TransactionId_EventProviderId] ON [dbo].[EventProviderDescriptor] ([TransactionEventProviderId]) INCLUDE ([Descriptor])

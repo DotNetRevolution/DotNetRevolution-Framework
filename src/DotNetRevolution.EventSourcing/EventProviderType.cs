@@ -6,13 +6,13 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventProviderType : ValueObject<EventProviderType>
     {
-        public string FullName { get; }
+        public Type Type { get; }
 
         public EventProviderType(Type eventProviderType)
-        {
+        {            
             Contract.Requires(eventProviderType != null);
 
-            FullName = eventProviderType.FullName;
+            Type = eventProviderType;
         }
     }
 }

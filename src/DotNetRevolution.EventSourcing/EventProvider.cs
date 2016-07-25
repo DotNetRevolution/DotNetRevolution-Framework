@@ -1,11 +1,14 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.Snapshotting;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
     public class EventProvider : IEventProvider
     {
+        public Guid GlobalId { get; }
+
         public EventProviderType EventProviderType { get; }
 
         public Identity Identity { get; }
@@ -27,7 +30,7 @@ namespace DotNetRevolution.EventSourcing
             Contract.Requires(version != null);
             Contract.Requires(descriptor != null);
             Contract.Requires(domainEvents != null);
-
+            
             EventProviderType = type;
             Identity = identity;
             Version = version;

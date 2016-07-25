@@ -6,18 +6,18 @@
 
         public int Sequence { get; }
 
-        public string EventType { get; }
+        public byte[] EventTypeId { get; }
 
         public byte[] Data { get; }
 
         public SqlDomainEvent(int eventProviderVersion,
                               int sequence,
-                              string eventType,
+                              byte[] eventTypeId,
                               byte[] data)
         {
             EventProviderVersion = eventProviderVersion;
             Sequence = sequence;
-            EventType = eventType;
+            EventTypeId = eventTypeId;
             Data = data;
         }
     }

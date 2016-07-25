@@ -12,30 +12,34 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly GetSnapshotIfPolicySatisfiedDelegate _getSnapshotIfPolicySatisfiedDelegate;
 
         private readonly SqlSerializer _serializer;
+        private readonly ITypeFactory _typeFactory;
         private readonly string _connectionString;
 
         public SqlEventStore(IAggregateRootProcessorFactory eventStreamProcessorProvider,
                              ISnapshotPolicyFactory snapshotPolicyProvider,
                              ISnapshotProviderFactory snapshotProviderFactory,
                              ISerializer serializer,
+                             ITypeFactory typeFactory,
                              string connectionString)
             : base(eventStreamProcessorProvider, snapshotPolicyProvider, snapshotProviderFactory, serializer)
         {
             Contract.Requires(eventStreamProcessorProvider != null);
             Contract.Requires(snapshotPolicyProvider != null);
             Contract.Requires(serializer != null);
+            Contract.Requires(typeFactory != null);
             Contract.Requires(string.IsNullOrEmpty(connectionString) == false);
             
             _connectionString = connectionString;
-            _serializer = new SqlSerializer(serializer);
-            
+            _serializer = new SqlSerializer(serializer, typeFactory);
+            _typeFactory = typeFactory;
+
             _getSnapshotIfPolicySatisfiedDelegate = new GetSnapshotIfPolicySatisfiedDelegate(GetSnapshotIfPolicySatisfied);
         }
 
         protected override EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot)
         {
             // establish command
-            var command = new GetDomainEventsCommand(_serializer, eventProviderType, identity);
+            var command = new GetDomainEventsCommand(_serializer, _typeFactory, eventProviderType, identity);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -55,6 +59,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             // establish command
             var command = new CommitTransactionCommand(_serializer, 
                 _getSnapshotIfPolicySatisfiedDelegate,
+                _typeFactory,
                 transaction);
 
             // create connection

@@ -2,13 +2,13 @@
 {
     internal class SqlSnapshot
     {
-        public string FullName { get; }
+        public byte[] TypeId { get; }
 
         public byte[] Data { get; }
 
-        public SqlSnapshot(string fullName, byte[] data)
+        public SqlSnapshot(byte[] typeId, byte[] data)
         {
-            FullName = fullName;
+            TypeId = typeId;
             Data = data;
         }
     }

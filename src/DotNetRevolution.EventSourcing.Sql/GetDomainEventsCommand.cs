@@ -12,6 +12,7 @@ namespace DotNetRevolution.EventSourcing.Sql
     internal class GetDomainEventsCommand
     {
         private readonly SqlSerializer _serializer;
+        private readonly ITypeFactory _typeFactory;
         private readonly SqlCommand _command;
 
         private bool _executed;
@@ -21,14 +22,17 @@ namespace DotNetRevolution.EventSourcing.Sql
         private EventProviderVersion _eventProviderVersion;
 
         public GetDomainEventsCommand(SqlSerializer serializer, 
+            ITypeFactory typeFactory,
             EventProviderType eventProviderType, 
             Identity identity)
         {
             Contract.Requires(serializer != null);
             Contract.Requires(eventProviderType != null);
+            Contract.Requires(typeFactory != null);
             Contract.Requires(identity != null);
 
             _serializer = serializer;
+            _typeFactory = typeFactory;
             _command = CreateSqlCommand(eventProviderType, identity);
         }
         
@@ -70,14 +74,14 @@ namespace DotNetRevolution.EventSourcing.Sql
             return new EventStream(_serializer.DeserializeDomainEvents(_sqlDomainEvents), snapshot);
         }
 
-        private static SqlCommand CreateSqlCommand(EventProviderType eventProviderType, Identity identity)
+        private SqlCommand CreateSqlCommand(EventProviderType eventProviderType, Identity identity)
         {
             var sqlCommand = new SqlCommand("[dbo].[GetDomainEvents]");
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
             // set parameters
-            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = identity.Value;
-            sqlCommand.Parameters.Add("@eventProviderType", SqlDbType.VarChar, 512).Value = eventProviderType.FullName;
+            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = identity.Value;
+            sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProviderType.Type);
 
             return sqlCommand;
         }
@@ -112,7 +116,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                         // create new sql domain event
                         var sqlDomainEvent = new SqlDomainEvent(dataReader.GetInt32(0),
                             dataReader.GetInt32(1),
-                            dataReader.GetString(2),
+                            (byte[])dataReader[2],
                             (byte[])dataReader[3]);
 
                         // add sql domain event to collection
@@ -154,7 +158,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             if (dataReader.IsDBNull(2) == false && dataReader.IsDBNull(3) == false)
             {
                 // get snapshot
-                snapshot = new SqlSnapshot(dataReader.GetString(2), (byte[])dataReader[3]);
+                snapshot = new SqlSnapshot((byte[])dataReader[2], (byte[])dataReader[3]);
             }
             else if (dataReader.IsDBNull(2) == true && dataReader.IsDBNull(3) == false)
             {

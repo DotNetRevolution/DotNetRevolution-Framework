@@ -1,6 +1,9 @@
 ﻿CREATE TABLE [dbo].[TransactionCommandType]
 (
-	[TransactionCommandTypeId] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [FullName] VARCHAR(512) NOT NULL, 
-    CONSTRAINT [AK_TransactionCommandType_FullName] UNIQUE ([FullName])
+	[TransactionCommandTypeId] BINARY(16) NOT NULL PRIMARY KEY NONCLUSTERED, 
+    [FullName] VARCHAR(512) NOT NULL
 )
+
+GO
+
+CREATE UNIQUE CLUSTERED INDEX [IX_TransactionCommandType] ON [dbo].[TransactionCommandType] ([FullName])

@@ -1,6 +1,9 @@
 ﻿CREATE TABLE [dbo].[EventProviderSnapshotType]
 (
-	[EventProviderSnapshotTypeId] INT NOT NULL PRIMARY KEY, 
-    [FullName] VARCHAR(512) NOT NULL, 
-    CONSTRAINT [AK_EventProviderSnapshotType_FullName] UNIQUE ([FullName]) 
+	[EventProviderSnapshotTypeId] BINARY(16) NOT NULL PRIMARY KEY NONCLUSTERED, 
+    [FullName] VARCHAR(512) NOT NULL
 )
+
+GO
+
+CREATE UNIQUE CLUSTERED INDEX [IX_EventProviderSnapshotType] ON [dbo].[EventProviderSnapshotType] ([FullName])
