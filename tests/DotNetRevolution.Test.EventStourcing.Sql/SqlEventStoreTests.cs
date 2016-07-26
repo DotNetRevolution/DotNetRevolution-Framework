@@ -83,7 +83,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 500000, i =>
+            Parallel.For(0, 100000, i =>
                 {
                     try
                     {

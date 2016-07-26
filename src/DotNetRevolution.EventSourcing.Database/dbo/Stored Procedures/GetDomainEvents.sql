@@ -2,6 +2,8 @@
 	  @eventProviderId UNIQUEIDENTIFIER	
 	, @eventProviderTypeId BINARY(16)
 AS	
+	SET NOCOUNT ON;
+
 	DECLARE @snapshotId UNIQUEIDENTIFIER
 		  , @snapshotTypeId BINARY(16)
 		  , @snapshotData VARBINARY(MAX)

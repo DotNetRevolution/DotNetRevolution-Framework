@@ -79,17 +79,11 @@
     <Build Include="dbo\Tables\TransactionEventType.sql" />
     <Build Include="dbo\Stored Procedures\GetDomainEvents.sql" />
     <Build Include="dbo\Stored Procedures\CreateTransaction.sql" />
-    <Build Include="dbo\User Defined Types\udttEventProvider.sql" />
     <Build Include="dbo\User Defined Types\udttEvent.sql" />
     <Build Include="dbo\Tables\Domain.sql" />
     <Build Include="dbo\Tables\DomainLibrary.sql" />
-    <Build Include="dbo\Sequences\EventProviderSequence.sql" />
-    <Build Include="dbo\Sequences\EventProviderTypeSequence.sql" />
-    <Build Include="dbo\Sequences\TransactionEventTypeSequence.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshot.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshotType.sql" />
-    <Build Include="dbo\User Defined Types\udttEventProviderSnapshot.sql" />
-    <Build Include="dbo\Sequences\EventProviderSnapshotTypeSequence.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\test commit proc.sql" />

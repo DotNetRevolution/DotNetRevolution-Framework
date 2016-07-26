@@ -11,10 +11,13 @@
 	, @eventProviderTypeFullName	VARCHAR (512)   
 	, @eventProviderDescriptor		VARCHAR (MAX)   
     , @eventProviderVersion			INT             
-	, @eventProviderSnapshot		dbo.udttEventProviderSnapshot READONLY
+	, @snapshotTypeId				BINARY(16) = NULL
+	, @snapshotTypeFullName			VARCHAR (512) = NULL
+	, @snapshotData					VARBINARY (MAX) = NULL
 	, @events						dbo.udttEvent READONLY	    
 AS
 BEGIN
+	SET NOCOUNT ON;
 
 	DECLARE @errText VARCHAR(MAX)
 		  , @tempEventProviderGuid UNIQUEIDENTIFIER
@@ -23,13 +26,7 @@ BEGIN
 	BEGIN TRAN
 	
 	BEGIN TRY
-
-		-- make sure only one snapshot was given
-		IF (SELECT COUNT(1) FROM @eventProviderSnapshot) > 1
-		BEGIN
-			; THROW 51000, 'Only one snapshot allowed.', 1;			
-		END
-
+	
 		-- event provider type
 		INSERT INTO dbo.EventProviderType (EventProviderTypeId, FullName)
 		SELECT @eventProviderTypeId, @eventProviderTypeFullName
@@ -98,23 +95,22 @@ BEGIN
 		END
 		 
 		-- snapshot provided?
-		IF (SELECT COUNT(1) FROM @eventProviderSnapshot) = 1
-		BEGIN
-				
+		IF (@snapshotTypeId IS NOT NULL AND
+		    @snapshotTypeFullName IS NOT NULL AND
+			@snapshotData IS NOT NULL)
+		BEGIN				
 			-- snapshot type
 			IF NOT EXISTS (SELECT EventProviderSnapshotTypeId 
 							 FROM dbo.EventProviderSnapshotType 
-							WHERE EventProviderSnapshotTypeId = (SELECT TypeId FROM @eventProviderSnapshot))
+							WHERE EventProviderSnapshotTypeId = @snapshotTypeId)
 			BEGIN
 				INSERT INTO dbo.EventProviderSnapshotType (EventProviderSnapshotTypeId, FullName)
-				SELECT TypeId, TypeFullName
-				  FROM @eventProviderSnapshot
+				VALUES (@snapshotTypeId, @snapshotTypeFullName)
 			END
 		   	
 			-- insert snapshot
 			INSERT INTO dbo.EventProviderSnapshot (TransactionId, EventProviderSnapshotTypeId, [Data])					
-			SELECT @transactionId, eps.TypeId, eps.[Data]
-			  FROM @eventProviderSnapshot eps		  
+			VALUES (@transactionId, @snapshotTypeId, @snapshotData)
 		END
 
 		-- insert transaction events
@@ -122,13 +118,6 @@ BEGIN
 		SELECT @transactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
 		  FROM @events e
 		  
-		-- update event provider with latest information
-		--UPDATE dbo.EventProvider SET
-		--	   LatestTransactionId = @transactionId	
-		--	 , CurrentSnapshotId = CASE WHEN (SELECT COUNT(1) FROM @eventProviderSnapshot) = 1 THEN @transactionId ELSE CurrentSnapshotId END
-		--	 , CurrentDescriptorId = CASE WHEN @descriptorRowsInserted > 0 THEN @transactionId ELSE CurrentDescriptorId  END		  
-		-- WHERE EventProviderGuid = @eventProviderGuid
-
 		IF @@ROWCOUNT = 0		
 		BEGIN
 			; THROW 51000, 'No transaction events were written.', 1;

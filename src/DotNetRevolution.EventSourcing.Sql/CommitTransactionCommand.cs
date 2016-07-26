@@ -1,7 +1,6 @@
 ﻿using DotNetRevolution.Core.Base;
 using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
-using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -67,48 +66,20 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@eventProviderDescriptor", SqlDbType.VarChar).Value = eventProvider.Descriptor.Value;
             sqlCommand.Parameters.Add("@eventProviderVersion", SqlDbType.Int).Value = eventProvider.Version.Value;
             
-            DataTable eventDataTable;
-            DataTable snapshotDataTable;
-
-            GetDataTables(eventProvider, out eventDataTable, out snapshotDataTable);
-            
             // event user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@events", SqlDbType.Structured)
             {
                 TypeName = "[dbo].[udttEvent]",
-                Value = eventDataTable
+                Value = GetEventDataTable(eventProvider)
             });
 
-            // snapshot user defined table type
-            sqlCommand.Parameters.Add(new SqlParameter("@eventProviderSnapshot", SqlDbType.Structured)
-            {
-                TypeName = "[dbo].[udttEventProviderSnapshot]",
-                Value = snapshotDataTable
-            });
+            // snapshot
+            AddSnapshotParameters(sqlCommand, eventProvider);
 
             return sqlCommand;
         }
 
-        private void GetDataTables(EventProvider eventProvider, out DataTable eventDataTable, out DataTable snapshotDataTable)
-        {
-            // create data tables            
-            eventDataTable = CreateEventDataTable();
-            snapshotDataTable = CreateSnapshotDataTable();
-                        
-            // add snapshot
-            AddSnapshot(snapshotDataTable, eventProvider);
-
-            // new sequence object to keep track of the sequence per event provider
-            var sequence = new TransactionEventSequence();
-
-            // go through each domain event in the event provider
-            foreach (var domainEvent in eventProvider.DomainEvents)
-            {
-                AddEventRow(eventDataTable, eventProvider, sequence.Increment(), domainEvent);
-            }
-        }
-
-        private void AddSnapshot(DataTable snapshotDataTable, EventProvider eventProvider)
+        private void AddSnapshotParameters(SqlCommand sqlCommand, EventProvider eventProvider)
         {
             // get snapshot if policy satisfied
             var snapshot = _getSnapshotIfPolicySatisfiedDelegate(eventProvider);
@@ -116,11 +87,30 @@ namespace DotNetRevolution.EventSourcing.Sql
             // add snapshot was returned
             if (snapshot != null)
             {
-                AddSnapshotRow(snapshotDataTable, eventProvider, snapshot);
+                sqlCommand.Parameters.Add("@snapshotTypeId", SqlDbType.Binary).Value = _typeFactory.GetHash(snapshot.SnapshotType.Type);
+                sqlCommand.Parameters.Add("@snapshotTypeFullName", SqlDbType.VarChar).Value = snapshot.SnapshotType.Type.FullName;
+                sqlCommand.Parameters.Add("@snapshotData", SqlDbType.VarBinary).Value = _serializer.SerializeObject(snapshot.Data);
             }
         }
 
-        private void AddEventRow(DataTable dataTable, EventProvider eventProvider, int sequence, IDomainEvent domainEvent)
+        private DataTable GetEventDataTable(EventProvider eventProvider)
+        {
+            // create data tables            
+            var eventDataTable = CreateEventDataTable();
+                        
+            // new sequence object to keep track of the sequence per event provider
+            var sequence = new TransactionEventSequence();
+
+            // go through each domain event in the event provider
+            foreach (var domainEvent in eventProvider.DomainEvents)
+            {
+                AddEventRow(eventDataTable, sequence.Increment(), domainEvent);
+            }
+
+            return eventDataTable;
+        }
+        
+        private void AddEventRow(DataTable dataTable, int sequence, IDomainEvent domainEvent)
         {
             // add row to the data table
             var dataRow = dataTable.NewRow();
@@ -128,7 +118,6 @@ namespace DotNetRevolution.EventSourcing.Sql
             var eventType = new TransactionEventType(domainEvent.GetType());
 
             // populate data row
-            dataRow["EventProviderGuid"] = eventProvider.Identity.Value;
             dataRow["EventId"] = domainEvent.DomainEventId;
             dataRow["Sequence"] = sequence;
             dataRow["TypeId"] = _typeFactory.GetHash(domainEvent.GetType());
@@ -137,27 +126,12 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             // add new row to table
             dataTable.Rows.Add(dataRow);
-        }
-                
-        private void AddSnapshotRow(DataTable dataTable, EventProvider eventProvider, Snapshot snapshot)
-        {
-            // add row to the data table
-            var dataRow = dataTable.NewRow();
-
-            // populate data row            
-            dataRow["TypeId"] = _typeFactory.GetHash(snapshot.SnapshotType.Type);
-            dataRow["TypeFullName"] = snapshot.SnapshotType.Type.FullName;
-            dataRow["Data"] = _serializer.SerializeObject(snapshot.Data);
-
-            // add new row to table
-            dataTable.Rows.Add(dataRow);
-        }
+        }                
 
         private DataTable CreateEventDataTable()
         {
             var dataTable = new DataTable();
-
-            dataTable.Columns.Add("EventProviderGuid", typeof(Guid));
+            
             dataTable.Columns.Add("EventId", typeof(Guid));
             dataTable.Columns.Add("Sequence", typeof(int));
             dataTable.Columns.Add("TypeId", typeof(byte[]));
@@ -165,17 +139,6 @@ namespace DotNetRevolution.EventSourcing.Sql
             dataTable.Columns.Add("Data", typeof(byte[]));
 
             return dataTable;
-        }
-        
-        private DataTable CreateSnapshotDataTable()
-        {
-            var dataTable = new DataTable();
-            
-            dataTable.Columns.Add("TypeId", typeof(byte[]));
-            dataTable.Columns.Add("TypeFullName", typeof(string));
-            dataTable.Columns.Add("Data", typeof(byte[]));
-
-            return dataTable;
-        }
+        }        
     }
 }
