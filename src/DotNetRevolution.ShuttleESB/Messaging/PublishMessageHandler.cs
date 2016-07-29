@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Messaging;
-using Shuttle.ESB.Core;
+using Shuttle.Esb;
 
 namespace DotNetRevolution.ShuttleESB.Messaging
 {

@@ -91,7 +91,7 @@
     <Compile Include="Messaging\ShuttleMessageCatalog.cs" />
     <Compile Include="Messaging\ShuttleMessageEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialzation\MessageSerializer.cs" />
+    <Compile Include="Serialization\MessageSerializer.cs" />
     <Compile Include="SubscriptionManager\EmptySubscriptionManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -105,12 +105,12 @@
       <HintPath>..\..\packages\shuttle-core-data.3.2.12\lib\net461-full\Shuttle.Core.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Shuttle.Core.Infrastructure, Version=4.1.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\shuttle-core-infrastructure.4.1.9\lib\net461-full\Shuttle.Core.Infrastructure.dll</HintPath>
+    <Reference Include="Shuttle.Core.Infrastructure, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shuttle.Core.Infrastructure.4.2.2\lib\net461-full\Shuttle.Core.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Shuttle.ESB.Core, Version=5.1.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\shuttle-esb-core.5.1.4\lib\net461-full\Shuttle.ESB.Core.dll</HintPath>
+    <Reference Include="Shuttle.Esb, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Shuttle.Esb.6.2.1\lib\net461-full\Shuttle.Esb.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

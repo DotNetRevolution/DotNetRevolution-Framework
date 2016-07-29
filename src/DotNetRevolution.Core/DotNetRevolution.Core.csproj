@@ -155,6 +155,9 @@
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
     <Compile Include="Extension\GuidExtension.AsString.cs" />
+    <Compile Include="Hashing\CodeContract\HashProviderContract.cs" />
+    <Compile Include="Hashing\IHashProvider.cs" />
+    <Compile Include="Hashing\MD5HashProvider.cs" />
     <Compile Include="Messaging\CodeContract\MessageHandlerContract`1.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\IMessageHandler`1.cs" />

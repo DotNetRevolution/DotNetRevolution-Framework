@@ -12,17 +12,19 @@ namespace DotNetRevolution.EventSourcing.Sql
 {
     internal class SqlSerializer
     {
-        private static readonly Encoding _encoding = Encoding.UTF8;
-
         private readonly ISerializer _serializer;
         private readonly ITypeFactory _typeFactory;
+        private readonly Encoding _encoding;
 
-        public SqlSerializer(ISerializer serializer,
+        public SqlSerializer(Encoding encoding,
+                             ISerializer serializer,
                              ITypeFactory typeFactory)
         {
+            Contract.Requires(encoding != null);
             Contract.Requires(serializer != null);
             Contract.Requires(typeFactory != null);
 
+            _encoding = encoding;
             _serializer = serializer;
             _typeFactory = typeFactory;
         }

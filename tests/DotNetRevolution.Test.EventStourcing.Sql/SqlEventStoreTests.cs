@@ -10,8 +10,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
 using System.Threading.Tasks;
-using DotNetRevolution.EventSourcing.Hashing;
 using System;
+using DotNetRevolution.Core.Hashing;
+using System.Text;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -25,18 +26,18 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestInitialize]
         public void Init()
         {
-            var typeFactory = new DefaultTypeFactory(new MD5HashProvider());
+            var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
             var snapshotProviderFactory = new SnapshotProviderFactory();
             snapshotProviderFactory.AddProvider(new EventProviderType(typeof(AccountAggregateRoot)), _snapshotProvider = new AccountSnapshotProvider());
             
             _eventStore = new SqlEventStore(
-                new AggregateRootProcessorFactory(
-                    _processor = new SingleMethodAggregateRootProcessor("Apply")),
-                    new SnapshotPolicyFactory(new ExplicitVersionSnapshotPolicy(1)),
-                    snapshotProviderFactory,
-                    new JsonSerializer(),
-                    typeFactory,
-                    ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
+                new AggregateRootProcessorFactory(_processor = new SingleMethodAggregateRootProcessor("Apply")),
+                new SnapshotPolicyFactory(new ExplicitVersionSnapshotPolicy(1)),
+                snapshotProviderFactory,
+                new JsonSerializer(),
+                typeFactory,
+                Encoding.UTF8,
+                ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
         }
 
         [TestMethod]
@@ -83,15 +84,21 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 100000, i =>
-                {
-                    try
-                    {
-                        CanCommitTransactionAndGetEventProvider();
-                    }
-                    catch (Exception e)
-                    { Assert.Fail(e.ToString()); }
-                });
+            Parallel.For(0, 10000, i =>
+             {
+                 try
+                 {
+                     var command = new Create(100);
+                     var domainEvents = AccountAggregateRoot.Create(100);
+
+                     _eventStore.Commit(new Transaction("UnitTester",
+                         command,
+                         new EventProvider(domainEvents)));
+
+                 }
+                 catch (Exception e)
+                 { Assert.Fail(e.ToString()); }
+             });
         }
 
         [TestMethod]

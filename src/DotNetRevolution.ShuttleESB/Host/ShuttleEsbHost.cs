@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Base;
 using Shuttle.Core.Infrastructure;
-using Shuttle.ESB.Core;
+using Shuttle.Esb;
 
 namespace DotNetRevolution.ShuttleESB.Host
 {
@@ -71,17 +71,23 @@ namespace DotNetRevolution.ShuttleESB.Host
 
         protected abstract List<Type> MessagesRequiringSubscriptions { get; }
 
-        protected abstract IEncryptionAlgorithm InitializeEncryptionAlgorithm();
-
-        protected abstract ICompressionAlgorithm InitializeCompressionAlgorithm();
-
         protected abstract ISerializer InitializeMessageSerializer();
 
         protected abstract void InitializeContainer();
 
         protected abstract ISubscriptionManager InitializeSubscriptionManager();
-        
+
         protected abstract IMessageHandlerFactory InitializeMessageHandlerFactory();
+
+        protected virtual IEncryptionAlgorithm InitializeEncryptionAlgorithm()
+        {
+            return new TripleDesEncryptionAlgorithm();
+        }
+
+        protected virtual ICompressionAlgorithm InitializeCompressionAlgorithm()
+        {
+            return new GZipCompressionAlgorithm();
+        }
 
         protected override void Dispose(bool disposing)
         {

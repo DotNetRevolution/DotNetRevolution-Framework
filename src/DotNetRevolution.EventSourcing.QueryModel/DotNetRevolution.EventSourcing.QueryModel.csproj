@@ -46,7 +46,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\DotNetRevolution.EventSourcing.Query\DotNetRevolution.EventSourcing.Query.csproj">
+    <ProjectReference Include="..\DotNetRevolution.EventSourcing.Query\DotNetRevolution.EventSourcing.Query.csproj">
       <Project>{f661f588-fdf5-49ed-87f8-b20433d8cf31}</Project>
       <Name>DotNetRevolution.EventSourcing.Query</Name>
     </ProjectReference>

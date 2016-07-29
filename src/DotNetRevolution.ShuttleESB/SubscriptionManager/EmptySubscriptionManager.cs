@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shuttle.ESB.Core;
+using Shuttle.Esb;
 
 namespace DotNetRevolution.ShuttleESB.SubscriptionManager
 {

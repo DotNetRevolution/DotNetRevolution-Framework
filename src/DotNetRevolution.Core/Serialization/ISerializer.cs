@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.IO;
-using System.Text;
 using DotNetRevolution.Core.Serialization.CodeContract;
 
 namespace DotNetRevolution.Core.Serialization
@@ -10,9 +9,9 @@ namespace DotNetRevolution.Core.Serialization
     public interface ISerializer
     {
         string Serialize(object item);
-        Stream Serialize(object item, Encoding encoding);
+        Stream Serialize(object item, System.Text.Encoding encoding);
         object Deserialize(Type type, string data);
-        object Deserialize(Type type, Stream data, Encoding encoding);
-        object Deserialize(Type type, byte[] data, Encoding encoding);
+        object Deserialize(Type type, Stream data, System.Text.Encoding encoding);
+        object Deserialize(Type type, byte[] data, System.Text.Encoding encoding);
     }
 }

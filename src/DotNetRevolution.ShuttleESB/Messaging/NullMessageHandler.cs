@@ -1,4 +1,4 @@
-﻿using Shuttle.ESB.Core;
+﻿using Shuttle.Esb;
 
 namespace DotNetRevolution.ShuttleESB.Messaging
 {

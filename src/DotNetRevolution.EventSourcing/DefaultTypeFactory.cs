@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Hashing;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -45,20 +46,32 @@ namespace DotNetRevolution.EventSourcing
         
         public byte[] GetHash(Type type)
         {
-            return _hashProvider.GetHash(type.FullName);
+            var hash = _hashProvider.GetHash(type.FullName);
+            Contract.Assume(hash != null);
+
+            return hash;
         }
 
         public Type GetType(byte[] hash)
         {
-            if (_types.Count(x => x.Key.SequenceEqual(hash)) == 1)
-            {
-                var value = _types.First(x => x.Key.SequenceEqual(hash)).Value;
-                Contract.Assume(value != null);
+            Contract.Assume(Enumerable.Any(_types));
 
-                return value;
+            // find the type where the hash sequence matches
+            KeyValuePair<byte[], Type> kvp;
+
+            try
+            {
+                kvp = _types.First(x => x.Key.SequenceEqual(hash));
+            }
+            catch (InvalidOperationException exception)
+            {
+                throw new TypeNotFoundForHashException(hash, exception);
             }
             
-            throw new TypeNotFoundForHashException(hash);
+            var value = kvp.Value;
+            Contract.Assume(value != null);
+
+            return value;
         }
         
         [ContractInvariantMethod]

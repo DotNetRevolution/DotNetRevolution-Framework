@@ -4,6 +4,7 @@ using DotNetRevolution.Core.Domain;
 using System.Data.SqlClient;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using DotNetRevolution.EventSourcing.AggregateRoot;
+using System.Text;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -20,17 +21,19 @@ namespace DotNetRevolution.EventSourcing.Sql
                              ISnapshotProviderFactory snapshotProviderFactory,
                              ISerializer serializer,
                              ITypeFactory typeFactory,
+                             Encoding encoding,
                              string connectionString)
             : base(eventStreamProcessorProvider, snapshotPolicyProvider, snapshotProviderFactory, serializer)
         {
             Contract.Requires(eventStreamProcessorProvider != null);
+            Contract.Requires(encoding != null);
             Contract.Requires(snapshotPolicyProvider != null);
             Contract.Requires(serializer != null);
             Contract.Requires(typeFactory != null);
             Contract.Requires(string.IsNullOrEmpty(connectionString) == false);
             
             _connectionString = connectionString;
-            _serializer = new SqlSerializer(serializer, typeFactory);
+            _serializer = new SqlSerializer(encoding, serializer, typeFactory);
             _typeFactory = typeFactory;
 
             _getSnapshotIfPolicySatisfiedDelegate = new GetSnapshotIfPolicySatisfiedDelegate(GetSnapshotIfPolicySatisfied);

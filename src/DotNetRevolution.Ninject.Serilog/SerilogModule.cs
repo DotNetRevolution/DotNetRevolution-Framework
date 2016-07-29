@@ -79,7 +79,7 @@ namespace DotNetRevolution.Ninject.Serilog
             Contract.Assume(string.IsNullOrWhiteSpace(path) == false);
 
             // send Serilog errors to console
-            SelfLog.Out = new StreamWriter(path, true);
+            SelfLog.Enable(new StreamWriter(path, true));
         }
     }
 }

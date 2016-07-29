@@ -15,6 +15,13 @@ namespace DotNetRevolution.EventSourcing
             Hash = hash;   
         }
 
+        public TypeNotFoundForHashException(byte[] hash, Exception innerException)
+        {
+            Contract.Requires(hash != null);
+
+            Hash = hash;
+        }
+
         private TypeNotFoundForHashException()
         {
         }

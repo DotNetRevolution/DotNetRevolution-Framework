@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Messaging;
-using Shuttle.ESB.Core;
+using Shuttle.Esb;
 
 namespace DotNetRevolution.ShuttleESB.Messaging
 {
-    public class IncomingMessageHandler<TMessage> : Shuttle.ESB.Core.IMessageHandler<TMessage> 
+    public class IncomingMessageHandler<TMessage> : Shuttle.Esb.IMessageHandler<TMessage> 
         where TMessage : class
     {
         private readonly IMessageDispatcher _dispatcher;

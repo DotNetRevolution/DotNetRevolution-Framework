@@ -51,8 +51,6 @@ namespace DotNetRevolution.EventSourcing.Commanding
             _eventStore.Commit(transaction);
             
             _domainEventDispatcher.PublishAll(domainEvents);
-
-            _messageDispatcher.Dispatch(new ProcessCommandMessage(new AnnounceTransactionCommand(identity)));
         }
 
         [ContractInvariantMethod]

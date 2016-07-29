@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.EventSourcing.Hashing.CodeContract
+namespace DotNetRevolution.Core.Hashing.CodeContract
 {
     [ContractClassFor(typeof(IHashProvider))]
     internal abstract class HashProviderContract : IHashProvider

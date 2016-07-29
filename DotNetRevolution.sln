@@ -59,9 +59,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Command", "src\DotNetRevolution.EventSourcing.Command\DotNetRevolution.EventSourcing.Command.csproj", "{D886288B-9170-4AD8-9BA4-4642B28A73A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Query", "src\DotNetRevolution.EventSourcing.Query\DotNetRevolution.EventSourcing.Query.csproj", "{F661F588-FDF5-49ED-87F8-B20433D8CF31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Announcer", "src\DotNetRevolution.EventSourcing.Announcer\DotNetRevolution.EventSourcing.Announcer.csproj", "{9DE0292C-9E45-45E0-9176-6B2556858AAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.QueryModel", "DotNetRevolution.EventSourcing.QueryModel\DotNetRevolution.EventSourcing.QueryModel.csproj", "{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.QueryModel", "src\DotNetRevolution.EventSourcing.QueryModel\DotNetRevolution.EventSourcing.QueryModel.csproj", "{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Query", "src\DotNetRevolution.EventSourcing.Query\DotNetRevolution.EventSourcing.Query.csproj", "{F661F588-FDF5-49ED-87F8-B20433D8CF31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -155,14 +157,18 @@ Global
 		{D886288B-9170-4AD8-9BA4-4642B28A73A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D886288B-9170-4AD8-9BA4-4642B28A73A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D886288B-9170-4AD8-9BA4-4642B28A73A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DE0292C-9E45-45E0-9176-6B2556858AAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DE0292C-9E45-45E0-9176-6B2556858AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DE0292C-9E45-45E0-9176-6B2556858AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DE0292C-9E45-45E0-9176-6B2556858AAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,7 +194,8 @@ Global
 		{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D} = {E4A1D295-C96B-42F1-BEE6-EBF21E75D591}
 		{6FE2C1E1-5388-4E45-80F4-08ED8A446091} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{D886288B-9170-4AD8-9BA4-4642B28A73A3} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
-		{F661F588-FDF5-49ED-87F8-B20433D8CF31} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{9DE0292C-9E45-45E0-9176-6B2556858AAA} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{F661F588-FDF5-49ED-87F8-B20433D8CF31} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
 	EndGlobalSection
 EndGlobal

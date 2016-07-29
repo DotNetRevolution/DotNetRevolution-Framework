@@ -80,9 +80,6 @@
     </Compile>
     <Compile Include="CodeContract\TypeFactoryContract.cs" />
     <Compile Include="DefaultTypeFactory.cs" />
-    <Compile Include="Hashing\CodeContract\HashProviderContract.cs" />
-    <Compile Include="Hashing\IHashProvider.cs" />
-    <Compile Include="Hashing\MD5HashProvider.cs" />
     <Compile Include="ITypeFactory.cs" />
     <Compile Include="CodeContract\EventProviderContract.cs" />
     <Compile Include="CodeContract\EventProviderContract`1.cs" />

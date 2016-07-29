@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DotNetRevolution.EventSourcing.Query;
+﻿using DotNetRevolution.EventSourcing.Query;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.EventSourcing.QueryModel

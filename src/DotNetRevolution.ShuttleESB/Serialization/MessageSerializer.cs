@@ -4,17 +4,21 @@ using System.IO;
 using System.Text;
 using Shuttle.Core.Infrastructure;
 
-namespace DotNetRevolution.ShuttleESB.Serialzation
+namespace DotNetRevolution.ShuttleESB.Serialization
 {
     public class MessageSerializer : ISerializer
     {
         private readonly Core.Serialization.ISerializer _serializer;
-
-        public MessageSerializer(Core.Serialization.ISerializer serializer)
+        private readonly Encoding _encoding;
+        
+        public MessageSerializer(Encoding encoding, 
+                                 Core.Serialization.ISerializer serializer)
         {
+            Contract.Requires(encoding != null);
             Contract.Requires(serializer != null);
 
             _serializer = serializer;
+            _encoding = encoding;
         }
 
         public Stream Serialize(object message)
@@ -23,7 +27,7 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
             Contract.Assume(message != null);
 
             // serialize
-            return _serializer.Serialize(message, Encoding.UTF8);
+            return _serializer.Serialize(message, _encoding);
         }
 
         public object Deserialize(Type type, Stream stream)
@@ -39,7 +43,7 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
             stream.Read(bytes, 0, bytes.Length);
 
             // convert bytes to string
-            var data = Encoding.UTF8.GetString(bytes);
+            var data = _encoding.GetString(bytes);
             Contract.Assume(string.IsNullOrWhiteSpace(data) == false);
 
             // use serializer to deserialize the object
@@ -50,6 +54,7 @@ namespace DotNetRevolution.ShuttleESB.Serialzation
         private void ObjectInvariants()
         {
             Contract.Invariant(_serializer != null);
+            Contract.Invariant(_encoding != null);
         }
     }
 }
