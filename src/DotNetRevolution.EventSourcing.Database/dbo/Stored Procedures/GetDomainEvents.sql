@@ -57,11 +57,10 @@ AS
 	-- select events
 	SELECT t.EventProviderVersion
 		 , te.[Sequence]
-		 , tet.TransactionEventTypeId
+		 , te.TransactionEventTypeId
 		 , te.[Data]
 	  FROM @transactionTable t
 	  JOIN dbo.TransactionEvent te ON te.TransactionId = t.TransactionId
-	  JOIN dbo.TransactionEventType tet ON te.TransactionEventTypeId = tet.TransactionEventTypeId 
      WHERE @snapshotId IS NULL 
 	    OR t.EventProviderVersion > @snapshotVersion
 	   

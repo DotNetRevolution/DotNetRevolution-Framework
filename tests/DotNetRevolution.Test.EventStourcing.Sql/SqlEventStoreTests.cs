@@ -84,17 +84,11 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 10000, i =>
+            Parallel.For(0, 1000, i =>
              {
                  try
                  {
-                     var command = new Create(100);
-                     var domainEvents = AccountAggregateRoot.Create(100);
-
-                     _eventStore.Commit(new Transaction("UnitTester",
-                         command,
-                         new EventProvider(domainEvents)));
-
+                     CanCommitTransactionAndGetEventProviderWithSnapshot();
                  }
                  catch (Exception e)
                  { Assert.Fail(e.ToString()); }
