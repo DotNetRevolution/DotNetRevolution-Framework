@@ -79,6 +79,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeContract\TypeFactoryContract.cs" />
+    <Compile Include="DefaultUsernameProvider.cs" />
     <Compile Include="DefaultTypeFactory.cs" />
     <Compile Include="ITypeFactory.cs" />
     <Compile Include="CodeContract\EventProviderContract.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorContract.cs" />
     <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorFactoryContract.cs" />
     <Compile Include="IEventStream.cs" />
+    <Compile Include="IUsernameProvider.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotPolicyContract.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotPolicyFactoryContract.cs" />
     <Compile Include="DomainEventSerializationException.cs" />

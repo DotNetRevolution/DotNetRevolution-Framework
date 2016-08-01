@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System;
 using DotNetRevolution.Core.Hashing;
 using System.Text;
+using DotNetRevolution.Core.GuidGeneration;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -26,14 +27,16 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestInitialize]
         public void Init()
         {
+            GuidGenerator.Default = new SequentialGuidGenerator(SequentialGuidType.SequentialAtEnd);
             var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
             var snapshotProviderFactory = new SnapshotProviderFactory();
             snapshotProviderFactory.AddProvider(new EventProviderType(typeof(AccountAggregateRoot)), _snapshotProvider = new AccountSnapshotProvider());
-            
+
             _eventStore = new SqlEventStore(
                 new AggregateRootProcessorFactory(_processor = new SingleMethodAggregateRootProcessor("Apply")),
                 new SnapshotPolicyFactory(new ExplicitVersionSnapshotPolicy(1)),
                 snapshotProviderFactory,
+                new DefaultUsernameProvider("UnitTester"),
                 new JsonSerializer(),
                 typeFactory,
                 Encoding.UTF8,
@@ -46,9 +49,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction("UnitTester",
-                command,
-                new EventProvider(domainEvents)));
+            _eventStore.Commit(new Transaction(command, new EventProvider(domainEvents)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -61,9 +62,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction("UnitTester",
-                command,
-                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
         }
 
         [TestMethod]
@@ -72,9 +71,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction("UnitTester",
-                command,
-                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -101,9 +98,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction("UnitTester",
-                command,
-                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -119,7 +114,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var newVersion = eventProvider.Version;
 
-            _eventStore.Commit(new Transaction("UnitTester", command2, eventProvider));            
+            _eventStore.Commit(new Transaction(command2, eventProvider));            
         }
 
         [TestMethod]
@@ -128,9 +123,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction("UnitTester",
-                command,
-                new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -147,7 +140,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var newBalance = aggregateRoot.Balance;
             var newVersion = eventProvider.Version;
 
-            _eventStore.Commit(new Transaction("UnitTester", command2, eventProvider));
+            _eventStore.Commit(new Transaction(command2, eventProvider));
 
             eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 

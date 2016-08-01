@@ -1,6 +1,6 @@
-﻿using DotNetRevolution.Core.Base;
-using DotNetRevolution.Core.Commanding;
+﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.GuidGeneration;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -14,22 +14,28 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly SqlCommand _command;
         private readonly GetSnapshotIfPolicySatisfiedDelegate _getSnapshotIfPolicySatisfiedDelegate;
         private readonly ITypeFactory _typeFactory;
+        private readonly IGuidGenerator _guidGenerator;
 
         public CommitTransactionCommand(SqlSerializer serializer,
             GetSnapshotIfPolicySatisfiedDelegate getSnapshotIfPolicySatisfiedDelegate, 
-            ITypeFactory typeFactory,           
-            Transaction transaction)
+            ITypeFactory typeFactory, 
+            string username,          
+            Transaction transaction,
+            IGuidGenerator guidGenerator)
         {
             Contract.Requires(serializer != null);
             Contract.Requires(getSnapshotIfPolicySatisfiedDelegate != null);
             Contract.Requires(typeFactory != null);
             Contract.Requires(transaction != null);
+            Contract.Requires(guidGenerator != null);
+            Contract.Requires(string.IsNullOrWhiteSpace(username) == false);
 
             _serializer = serializer;
             _typeFactory = typeFactory;
+            _guidGenerator = guidGenerator;
             _getSnapshotIfPolicySatisfiedDelegate = getSnapshotIfPolicySatisfiedDelegate;
 
-            _command = CreateSqlCommand(transaction.Identity, transaction.Command, transaction.EventProvider, transaction.User);            
+            _command = CreateSqlCommand(transaction.Identity, transaction.Command, transaction.EventProvider, username);            
         }
 
         public void Execute(SqlConnection conn)
@@ -59,7 +65,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
             sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _serializer.SerializeObject(command);
             
-            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = SequentialGuid.Create();
+            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = _guidGenerator.Create();
             sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.Identity.Value;
             sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.EventProviderType.Type);
             sqlCommand.Parameters.Add("@eventProviderTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.EventProviderType.Type.FullName;

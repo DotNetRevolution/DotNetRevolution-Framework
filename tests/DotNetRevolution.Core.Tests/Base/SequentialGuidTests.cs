@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.GuidGeneration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -95,7 +96,7 @@ namespace DotNetRevolution.Core.Tests.Base
         {
             for (var i = 0; i < count; i++)
             {
-                Assert.IsTrue(set.Add(SequentialGuid.Create()));
+                Assert.IsTrue(set.Add(GuidGenerator.Default.Create()));
             }
         }
     }

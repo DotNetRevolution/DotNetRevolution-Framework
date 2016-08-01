@@ -12,20 +12,24 @@ namespace DotNetRevolution.EventSourcing
         private readonly IAggregateRootProcessorFactory _aggregateRootProcessorFactory;
         private readonly ISnapshotPolicyFactory _snapshotPolicyFactory;
         private readonly ISnapshotProviderFactory _snapshotProviderFactory;
+        private readonly IUsernameProvider _usernameProvider;
 
         public EventStore(IAggregateRootProcessorFactory aggregateRootProcessorFactory,
                           ISnapshotPolicyFactory snapshotPolicyFactory,
                           ISnapshotProviderFactory snapshotProviderFactory,
+                          IUsernameProvider usernameProvider,
                           ISerializer serializer)
         {
             Contract.Requires(aggregateRootProcessorFactory != null);
             Contract.Requires(snapshotPolicyFactory != null);
             Contract.Requires(snapshotProviderFactory != null);
             Contract.Requires(serializer != null);
+            Contract.Requires(usernameProvider != null);
 
             _aggregateRootProcessorFactory = aggregateRootProcessorFactory;
             _snapshotPolicyFactory = snapshotPolicyFactory;
             _snapshotProviderFactory = snapshotProviderFactory;
+            _usernameProvider = usernameProvider;
         }
 
         public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
@@ -70,7 +74,7 @@ namespace DotNetRevolution.EventSourcing
         {
             try
             {                
-                CommitTransaction(transaction);
+                CommitTransaction(_usernameProvider.GetUsername(), transaction);
             }
             catch (Exception ex)
             {
@@ -98,7 +102,7 @@ namespace DotNetRevolution.EventSourcing
         
         protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot);
 
-        protected abstract void CommitTransaction(Transaction transaction);
+        protected abstract void CommitTransaction(string username, Transaction transaction);
         
         [ContractInvariantMethod]
         private void ObjectInvariants()
@@ -106,6 +110,7 @@ namespace DotNetRevolution.EventSourcing
             Contract.Invariant(_aggregateRootProcessorFactory != null);
             Contract.Invariant(_snapshotPolicyFactory != null);
             Contract.Invariant(_snapshotProviderFactory != null);
+            Contract.Invariant(_usernameProvider != null);
         }
     }
 }

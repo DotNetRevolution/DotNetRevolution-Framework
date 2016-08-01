@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Base;
 using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.GuidGeneration;
 using System;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents
@@ -14,7 +15,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents
 
         public Created(Guid accountId, decimal balance)
         {
-            DomainEventId = SequentialGuid.Create();
+            DomainEventId = GuidGenerator.Default.Create();
             AccountId = accountId;
             Balance = balance;
         }

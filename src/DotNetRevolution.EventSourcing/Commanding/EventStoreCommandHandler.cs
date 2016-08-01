@@ -1,6 +1,5 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Core.Messaging;
 using DotNetRevolution.EventSourcing.Commanding.CodeContract;
 using System.Diagnostics.Contracts;
 
@@ -13,19 +12,15 @@ namespace DotNetRevolution.EventSourcing.Commanding
     {
         private readonly IEventStore _eventStore;
         private readonly IDomainEventDispatcher _domainEventDispatcher;
-        private readonly IMessageDispatcher _messageDispatcher;
 
         public EventStoreCommandHandler(IEventStore eventStore,
-                                        IDomainEventDispatcher domainEventDispatcher,
-                                        IMessageDispatcher messageDispatcher)
+                                        IDomainEventDispatcher domainEventDispatcher)
         {
             Contract.Requires(eventStore != null);
             Contract.Requires(domainEventDispatcher != null);
-            Contract.Requires(messageDispatcher != null);
 
             _eventStore = eventStore;
             _domainEventDispatcher = domainEventDispatcher;
-            _messageDispatcher = messageDispatcher;
         }
 
         protected abstract Identity GetEventProviderIdentity(TCommand command);
@@ -46,7 +41,7 @@ namespace DotNetRevolution.EventSourcing.Commanding
             Contract.Assume(string.IsNullOrWhiteSpace(domainEvents.AggregateRoot.ToString()) == false);
             Contract.Assume(Contract.ForAll(domainEvents, o => o != null));
 
-            var transaction = new Transaction("d", command, eventProvider.CreateNewVersion(domainEvents));
+            var transaction = new Transaction(command, eventProvider.CreateNewVersion(domainEvents));
 
             _eventStore.Commit(transaction);
             
@@ -58,7 +53,6 @@ namespace DotNetRevolution.EventSourcing.Commanding
         {
             Contract.Invariant(_eventStore != null);
             Contract.Invariant(_domainEventDispatcher != null);
-            Contract.Invariant(_messageDispatcher != null);
         }
     }
 }

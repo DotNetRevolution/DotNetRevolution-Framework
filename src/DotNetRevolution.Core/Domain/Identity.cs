@@ -1,4 +1,4 @@
-﻿using DotNetRevolution.Core.Base;
+﻿using DotNetRevolution.Core.GuidGeneration;
 using System;
 using System.Diagnostics.Contracts;
 
@@ -19,7 +19,7 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Ensures(Contract.Result<Identity>() != null);
 
-            return new Identity(SequentialGuid.Create());
+            return new Identity(GuidGenerator.Default.Create());
         }
 
         public static implicit operator Guid(Identity identity)

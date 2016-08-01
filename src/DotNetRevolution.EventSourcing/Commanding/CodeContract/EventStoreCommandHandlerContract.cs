@@ -2,7 +2,6 @@
 using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 using System;
-using DotNetRevolution.Core.Messaging;
 
 namespace DotNetRevolution.EventSourcing.Commanding.CodeContract
 {
@@ -12,13 +11,11 @@ namespace DotNetRevolution.EventSourcing.Commanding.CodeContract
         where TCommand : ICommand
     {
         public EventStoreCommandHandlerContract(IEventStore eventStore,
-                                                IDomainEventDispatcher domainEventDispatcher,
-                                                IMessageDispatcher messageDispatcher)
-            : base(eventStore, domainEventDispatcher, messageDispatcher)
+                                                IDomainEventDispatcher domainEventDispatcher)
+            : base(eventStore, domainEventDispatcher)
         {
             Contract.Requires(eventStore != null);
             Contract.Requires(domainEventDispatcher != null);
-            Contract.Requires(messageDispatcher != null);
         }
 
         protected override Identity GetEventProviderIdentity(TCommand command)

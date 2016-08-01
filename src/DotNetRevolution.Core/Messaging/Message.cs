@@ -1,11 +1,11 @@
-﻿using DotNetRevolution.Core.Base;
+﻿using DotNetRevolution.Core.GuidGeneration;
 using System;
 
 namespace DotNetRevolution.Core.Messaging
 {
     public abstract class Message : IMessage
     {
-        private readonly Guid _id = SequentialGuid.Create();
+        private readonly Guid _id = GuidGenerator.Default.Create();
 
         public Guid MessageId
         {

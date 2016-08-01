@@ -92,6 +92,9 @@
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />
+    <Compile Include="GuidGeneration\CodeContract\GuidGeneratorContract.cs" />
+    <Compile Include="GuidGeneration\GuidGenerator.cs" />
+    <Compile Include="GuidGeneration\SequentialGuidType.cs" />
     <Compile Include="Base\UsedImplicitlyAttribute.cs" />
     <Compile Include="Commanding\CodeContract\CommandCatalogContract.cs" />
     <Compile Include="Commanding\CodeContract\CommandDispatcherContract.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="Domain\DomainEventHandlingException.cs" />
     <Compile Include="Domain\DomainException.cs" />
     <Compile Include="Domain\EntityCollection.cs" />
+    <Compile Include="GuidGeneration\DefaultGenerator.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
     <Compile Include="Domain\Identity.cs" />
     <Compile Include="Domain\IDomainEvent.cs" />
@@ -148,8 +152,10 @@
     <Compile Include="Domain\IDomainEventHandler.cs" />
     <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
     <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
-    <Compile Include="Base\SequentialGuid.cs" />
+    <Compile Include="GuidGeneration\SequentialGuid.cs" />
     <Compile Include="Domain\IDomainEventHandler`1.cs" />
+    <Compile Include="GuidGeneration\IGuidGenerator.cs" />
+    <Compile Include="GuidGeneration\SequentialGenerator.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.AsReadOnly.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
