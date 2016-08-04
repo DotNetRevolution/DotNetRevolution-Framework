@@ -38,6 +38,16 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             }
         }
 
+        public Identity GlobalIdentity
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<Identity>() != null);
+
+                throw new NotImplementedException();
+            }
+        }
+
         public Identity Identity
         {
             get

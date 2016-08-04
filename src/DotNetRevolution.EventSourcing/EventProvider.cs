@@ -1,13 +1,12 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.Snapshotting;
-using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
     public class EventProvider : IEventProvider
     {
-        public Guid GlobalId { get; }
+        public Identity GlobalIdentity { get; }
 
         public EventProviderType EventProviderType { get; }
 
@@ -19,18 +18,21 @@ namespace DotNetRevolution.EventSourcing
 
         public EventProviderDescriptor Descriptor { get; }
         
-        public EventProvider(EventProviderType type,
+        public EventProvider(Identity globalIdentity,
+            EventProviderType type,
             Identity identity,
             EventProviderVersion version,
             EventProviderDescriptor descriptor,
             EventStream domainEvents)
         {
+            Contract.Requires(globalIdentity != null);
             Contract.Requires(type != null);
             Contract.Requires(identity != null);
             Contract.Requires(version != null);
             Contract.Requires(descriptor != null);
             Contract.Requires(domainEvents != null);
-            
+
+            GlobalIdentity = globalIdentity;
             EventProviderType = type;
             Identity = identity;
             Version = version;
@@ -39,7 +41,8 @@ namespace DotNetRevolution.EventSourcing
         }
 
         public EventProvider(IDomainEventCollection domainEventCollection)
-            : this(new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
+            : this(Identity.New(),
+                   new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity,
                    EventProviderVersion.Initial,
                    new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),

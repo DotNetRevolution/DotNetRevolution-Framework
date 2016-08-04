@@ -20,6 +20,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         private SqlSnapshot _sqlSnapshot;
         private EventProviderDescriptor _eventProviderDescriptor;
         private EventProviderVersion _eventProviderVersion;
+        private Identity _globalIdentity;
 
         public GetDomainEventsCommand(SqlSerializer serializer, 
             ITypeFactory typeFactory,
@@ -44,17 +45,18 @@ namespace DotNetRevolution.EventSourcing.Sql
             _command.Connection = conn;
             
             // execute command
-            _sqlDomainEvents = ExecuteSqlCommand(_command, out _eventProviderDescriptor, out _sqlSnapshot, out _eventProviderVersion);
+            _sqlDomainEvents = ExecuteSqlCommand(_command, out _globalIdentity, out _eventProviderDescriptor, out _sqlSnapshot, out _eventProviderVersion);
 
             // set executed so GetResults will return something
             _executed = true;
         }
 
-        public EventStream GetResults(out EventProviderDescriptor eventProviderDescriptor, out EventProviderVersion version, out Snapshot snapshot)
+        public EventStream GetResults(out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out EventProviderVersion version, out Snapshot snapshot)
         {
             Contract.Requires(_executed);
 
             // set output parameters
+            globalIdentity = _globalIdentity;
             eventProviderDescriptor = _eventProviderDescriptor;
             version = _eventProviderVersion;
 
@@ -86,7 +88,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             return sqlCommand;
         }
 
-        private static Collection<SqlDomainEvent> ExecuteSqlCommand(SqlCommand command, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
+        private static Collection<SqlDomainEvent> ExecuteSqlCommand(SqlCommand command, out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
         {
             var sqlDomainEvents = new Collection<SqlDomainEvent>();
 
@@ -105,7 +107,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                 }
 
                 // get event provider information
-                GetEventProviderInformation(dataReader, out eventProviderDescriptor, out snapshot, out version);
+                GetEventProviderInformation(dataReader, out globalIdentity, out eventProviderDescriptor, out snapshot, out version);
 
                 // move reader to next result set
                 if (dataReader.NextResult())
@@ -139,12 +141,16 @@ namespace DotNetRevolution.EventSourcing.Sql
             return sqlDomainEvents;
         }
 
-        private static void GetEventProviderInformation(SqlDataReader dataReader, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
+        private static void GetEventProviderInformation(SqlDataReader dataReader, out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
         {
-            // get descriptor
-            eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(0));
+            // event provider global identity
+            globalIdentity = new Identity(dataReader.GetGuid(0));
 
-            version = new EventProviderVersion(dataReader.GetInt32(1));
+            // get descriptor
+            eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(1));
+
+            // event provider version
+            version = new EventProviderVersion(dataReader.GetInt32(2));
 
             // read snapshot
             snapshot = GetSnapshot(dataReader);
@@ -155,17 +161,17 @@ namespace DotNetRevolution.EventSourcing.Sql
             SqlSnapshot snapshot = null;
 
             // check if snapshot result is null
-            if (dataReader.IsDBNull(2) == false && dataReader.IsDBNull(3) == false)
+            if (dataReader.IsDBNull(3) == false && dataReader.IsDBNull(4) == false)
             {
                 // get snapshot
-                snapshot = new SqlSnapshot((byte[])dataReader[2], (byte[])dataReader[3]);
+                snapshot = new SqlSnapshot((byte[])dataReader[3], (byte[])dataReader[4]);
             }
-            else if (dataReader.IsDBNull(2) == true && dataReader.IsDBNull(3) == false)
+            else if (dataReader.IsDBNull(3) == true && dataReader.IsDBNull(4) == false)
             {
                 // throw error
                 throw new InvalidOperationException("Snapshot type is null but data is not");
             }
-            else if (dataReader.IsDBNull(2) == false && dataReader.IsDBNull(3) == true)
+            else if (dataReader.IsDBNull(3) == false && dataReader.IsDBNull(4) == true)
             {
                 // throw error
                 throw new InvalidOperationException("Snapshot data is null but type is not");

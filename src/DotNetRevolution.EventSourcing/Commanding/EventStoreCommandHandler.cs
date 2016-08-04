@@ -41,7 +41,7 @@ namespace DotNetRevolution.EventSourcing.Commanding
             Contract.Assume(string.IsNullOrWhiteSpace(domainEvents.AggregateRoot.ToString()) == false);
             Contract.Assume(Contract.ForAll(domainEvents, o => o != null));
 
-            var transaction = new Transaction(command, eventProvider.CreateNewVersion(domainEvents));
+            var transaction = new EventProviderTransaction(command, eventProvider.CreateNewVersion(domainEvents));
 
             _eventStore.Commit(transaction);
             

@@ -14,6 +14,7 @@ using System;
 using DotNetRevolution.Core.Hashing;
 using System.Text;
 using DotNetRevolution.Core.GuidGeneration;
+using DotNetRevolution.Core.Domain;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -49,7 +50,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction(command, new EventProvider(domainEvents)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventProvider(domainEvents)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -62,7 +63,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventProvider<AccountAggregateRoot>(Identity.New(), domainEvents, _processor, _snapshotProvider)));
         }
 
         [TestMethod]
@@ -71,7 +72,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventProvider<AccountAggregateRoot>(Identity.New(), domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -81,7 +82,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 1000, i =>
+            Parallel.For(0, 100000, i =>
              {
                  try
                  {
@@ -98,7 +99,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventProvider<AccountAggregateRoot>(Identity.New(), domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -114,7 +115,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var newVersion = eventProvider.Version;
 
-            _eventStore.Commit(new Transaction(command2, eventProvider));            
+            _eventStore.Commit(new EventProviderTransaction(command2, eventProvider));            
         }
 
         [TestMethod]
@@ -123,7 +124,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            _eventStore.Commit(new Transaction(command, new EventProvider<AccountAggregateRoot>(domainEvents, _processor, _snapshotProvider)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventProvider<AccountAggregateRoot>(Identity.New(), domainEvents, _processor, _snapshotProvider)));
 
             var eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -140,7 +141,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var newBalance = aggregateRoot.Balance;
             var newVersion = eventProvider.Version;
 
-            _eventStore.Commit(new Transaction(command2, eventProvider));
+            _eventStore.Commit(new EventProviderTransaction(command2, eventProvider));
 
             eventProvider = _eventStore.GetEventProvider<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 

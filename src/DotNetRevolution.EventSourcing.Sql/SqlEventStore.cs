@@ -45,7 +45,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             _getSnapshotIfPolicySatisfiedDelegate = new GetSnapshotIfPolicySatisfiedDelegate(GetSnapshotIfPolicySatisfied);
         }
 
-        protected override EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot)
+        protected override EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out Identity globalIdentity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot)
         {
             // establish command
             var command = new GetDomainEventsCommand(_serializer, _typeFactory, eventProviderType, identity);
@@ -60,10 +60,10 @@ namespace DotNetRevolution.EventSourcing.Sql
                 command.Execute(conn);
             }
 
-            return command.GetResults(out eventProviderDescriptor, out version, out snapshot);
+            return command.GetResults(out globalIdentity, out eventProviderDescriptor, out version, out snapshot);
         }
 
-        protected override void CommitTransaction(string username, Transaction transaction)
+        protected override void CommitTransaction(string username, EventProviderTransaction transaction)
         {
             // establish command
             var command = new CommitTransactionCommand(_serializer, 

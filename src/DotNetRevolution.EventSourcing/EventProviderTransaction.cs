@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class Transaction
+    public class EventProviderTransaction
     {
         public Identity Identity { [Pure] get; }
 
@@ -12,7 +12,7 @@ namespace DotNetRevolution.EventSourcing
         
         public EventProvider EventProvider { [Pure] get; }
         
-        public Transaction(ICommand command, EventProvider eventProvider)
+        public EventProviderTransaction(ICommand command, EventProvider eventProvider)
         {
             Contract.Requires(command != null);
             Contract.Requires(eventProvider != null);

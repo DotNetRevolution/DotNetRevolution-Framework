@@ -135,7 +135,7 @@
     <Compile Include="Snapshotting\SnapshotSerializationException.cs" />
     <Compile Include="Snapshotting\SnapshotType.cs" />
     <Compile Include="Snapshotting\VersionSnapshotPolicy.cs" />
-    <Compile Include="Transaction.cs" />
+    <Compile Include="EventProviderTransaction.cs" />
     <Compile Include="EventProviderVersion.cs" />
     <Compile Include="TransactionEventSequence.cs" />
     <Compile Include="TransactionEventType.cs" />

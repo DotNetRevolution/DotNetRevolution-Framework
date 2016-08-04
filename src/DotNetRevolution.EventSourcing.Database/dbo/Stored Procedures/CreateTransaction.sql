@@ -20,8 +20,8 @@ BEGIN
 	SET NOCOUNT ON;
 
 	DECLARE @errText VARCHAR(MAX)
-		  , @tempEventProviderGuid UNIQUEIDENTIFIER
-		  , @newEventProvider BIT
+		  
+	DECLARE @insertedEventProviderGuid AS TABLE (id UNIQUEIDENTIFIER)
 				
 	BEGIN TRAN
 	
@@ -49,46 +49,36 @@ BEGIN
 		 WHERE tet.TransactionEventTypeId IS NULL
 		
 		-- event provider
-		SET @tempEventProviderGuid = (SELECT EventProviderGuid
-										FROM dbo.EventProvider
-									   WHERE EventProviderId = @eventProviderId
-										 AND EventProviderTypeId = @eventProviderTypeId)
-		IF @tempEventProviderGuid IS NULL						
-		BEGIN
-			SET @newEventProvider = 1
-
-			INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)		
-			VALUES (@eventProviderGuid, @eventProviderId, @eventProviderTypeId)	
-		END
-		ELSE
-		BEGIN
-			SET @newEventProvider = 0
-			SET @eventProviderGuid = @tempEventProviderGuid
-		END
-		
+		INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)		
+		OUTPUT inserted.EventProviderGuid INTO @insertedEventProviderGuid
+		SELECT @eventProviderGuid, @eventProviderId, @eventProviderTypeId
+		 WHERE NOT EXISTS (SELECT EventProviderGuid
+							 FROM dbo.EventProvider
+							WHERE EventProviderGuid = @eventProviderGuid)
+									
 		-- create transaction
-		INSERT INTO dbo.[Transaction] (TransactionId, EventProviderGuid, EventProviderVersion, [User])
+		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion, [User])
 		VALUES (@transactionId, @eventProviderGuid, @eventProviderVersion, @user)
 
 		-- insert command
-		INSERT INTO dbo.TransactionCommand (TransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
+		INSERT INTO dbo.TransactionCommand (EventProviderTransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
 		VALUES (@transactionId, @commandTypeId, @commandId, @commandData)
 		
 		-- event provider descriptor
-		IF @newEventProvider = 1
+		IF EXISTS (SELECT * FROM @insertedEventProviderGuid)
 		BEGIN
 			-- new event provider descriptor
-			INSERT INTO dbo.EventProviderDescriptor (TransactionId, Descriptor)		
+			INSERT INTO dbo.EventProviderDescriptor (EventProviderTransactionId, Descriptor)		
 			SELECT @transactionId, @eventProviderDescriptor
 		END
 		ELSE
 		BEGIN
 			-- insert event provider descriptor if changed
-			INSERT INTO dbo.EventProviderDescriptor (TransactionId, Descriptor)		
+			INSERT INTO dbo.EventProviderDescriptor (EventProviderTransactionId, Descriptor)		
 			SELECT @transactionId, @eventProviderDescriptor
-			  FROM (SELECT TOP 1 epd.TransactionId, epd.Descriptor
+			  FROM (SELECT TOP 1 epd.EventProviderTransactionId, epd.Descriptor
 					  FROM dbo.EventProviderDescriptor epd
-					  JOIN dbo.[Transaction] t ON epd.TransactionId = t.TransactionId
+					  JOIN dbo.[EventProviderTransaction] t ON epd.EventProviderTransactionId = t.EventProviderTransactionId
 					 WHERE t.EventProviderGuid = @eventProviderGuid
 				  ORDER BY t.EventProviderVersion DESC) as a
 			 WHERE a.Descriptor <> @eventProviderDescriptor		
@@ -109,12 +99,12 @@ BEGIN
 			END
 		   	
 			-- insert snapshot
-			INSERT INTO dbo.EventProviderSnapshot (TransactionId, EventProviderSnapshotTypeId, [Data])					
+			INSERT INTO dbo.EventProviderSnapshot (EventProviderTransactionId, EventProviderSnapshotTypeId, [Data])					
 			VALUES (@transactionId, @snapshotTypeId, @snapshotData)
 		END
 
 		-- insert transaction events
-		INSERT INTO dbo.TransactionEvent (TransactionId, TransactionEventTypeId, TransactionEventId, [Sequence], [Data])
+		INSERT INTO dbo.TransactionEvent (EventProviderTransactionId, TransactionEventTypeId, TransactionEventId, [Sequence], [Data])
 		SELECT @transactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
 		  FROM @events e
 		  

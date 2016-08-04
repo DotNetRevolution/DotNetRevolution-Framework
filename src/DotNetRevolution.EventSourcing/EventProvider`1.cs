@@ -14,14 +14,16 @@ namespace DotNetRevolution.EventSourcing
 
         private Snapshot _snapshot;
 
-        public EventProvider(EventProviderType type,
+        public EventProvider(Identity globalIdentity,
+            EventProviderType type,
             Identity identity,
             EventProviderVersion version,
             EventProviderDescriptor descriptor,
             EventStream domainEvents,
             IAggregateRootProcessor aggregateRootProcessor)
-            : base(type, identity, version, descriptor, domainEvents)
+            : base(globalIdentity, type, identity, version, descriptor, domainEvents)
         {
+            Contract.Requires(globalIdentity != null);
             Contract.Requires(type != null);
             Contract.Requires(identity != null);
             Contract.Requires(version != null);
@@ -32,15 +34,17 @@ namespace DotNetRevolution.EventSourcing
             _aggregateRootProcessor = aggregateRootProcessor;
         }
         
-        public EventProvider(EventProviderType type,
+        public EventProvider(Identity globalIdentity, 
+            EventProviderType type,
             Identity identity,
             EventProviderVersion version,
             EventProviderDescriptor descriptor,
             EventStream domainEvents,
             IAggregateRootProcessor aggregateRootProcessor,
             ISnapshotProvider snapshotProvider)
-            : base(type, identity, version, descriptor, domainEvents)
+            : base(globalIdentity, type, identity, version, descriptor, domainEvents)
         {
+            Contract.Requires(globalIdentity != null);
             Contract.Requires(type != null);
             Contract.Requires(identity != null);
             Contract.Requires(version != null);
@@ -52,8 +56,9 @@ namespace DotNetRevolution.EventSourcing
             _snapshotProvider = snapshotProvider;
         }
 
-        public EventProvider(IDomainEventCollection domainEventCollection, IAggregateRootProcessor aggregateRootProcessor, ISnapshotProvider snapshotProvider)
-            : this(new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
+        public EventProvider(Identity globalIdentity, IDomainEventCollection domainEventCollection, IAggregateRootProcessor aggregateRootProcessor, ISnapshotProvider snapshotProvider)
+            : this(globalIdentity, 
+                   new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity,
                    EventProviderVersion.Initial,
                    new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),
@@ -61,20 +66,23 @@ namespace DotNetRevolution.EventSourcing
                    aggregateRootProcessor,
                    snapshotProvider)
         {
+            Contract.Requires(globalIdentity != null);
             Contract.Requires(domainEventCollection?.AggregateRoot != null);
             Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
             Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
             Contract.Requires(aggregateRootProcessor != null);            
         }
 
-        public EventProvider(IDomainEventCollection domainEventCollection, IAggregateRootProcessor aggregateRootProcessor)
-            : this(new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
+        public EventProvider(Identity globalIdentity, IDomainEventCollection domainEventCollection, IAggregateRootProcessor aggregateRootProcessor)
+            : this(globalIdentity,
+                   new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity,
                    EventProviderVersion.Initial,
                    new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),
                    new EventStream(domainEventCollection),
                    aggregateRootProcessor)
         {
+            Contract.Requires(globalIdentity != null);
             Contract.Requires(domainEventCollection?.AggregateRoot != null);
             Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
             Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
@@ -150,7 +158,8 @@ namespace DotNetRevolution.EventSourcing
             }
             
             // return new event provider with incremented version
-            return new EventProvider<TAggregateRoot>(EventProviderType,
+            return new EventProvider<TAggregateRoot>(GlobalIdentity,
+                EventProviderType,
                 Identity,
                 Version.Increment(),
                 new EventProviderDescriptor(aggregateRoot.ToString()),
@@ -175,7 +184,7 @@ namespace DotNetRevolution.EventSourcing
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_aggregateRootProcessor != null);            
+            Contract.Invariant(_aggregateRootProcessor != null);
         }
     }
 }

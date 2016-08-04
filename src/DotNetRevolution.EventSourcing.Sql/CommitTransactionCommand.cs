@@ -20,7 +20,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             GetSnapshotIfPolicySatisfiedDelegate getSnapshotIfPolicySatisfiedDelegate, 
             ITypeFactory typeFactory, 
             string username,          
-            Transaction transaction,
+            EventProviderTransaction transaction,
             IGuidGenerator guidGenerator)
         {
             Contract.Requires(serializer != null);
@@ -65,7 +65,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
             sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _serializer.SerializeObject(command);
             
-            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = _guidGenerator.Create();
+            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = eventProvider.GlobalIdentity.Value;
             sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.Identity.Value;
             sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.EventProviderType.Type);
             sqlCommand.Parameters.Add("@eventProviderTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.EventProviderType.Type.FullName;

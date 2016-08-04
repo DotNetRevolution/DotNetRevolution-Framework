@@ -70,7 +70,7 @@
     <Build Include="dbo\Tables\EventProvider.sql" />
     <Build Include="dbo\Tables\EventProviderDescriptor.sql" />
     <Build Include="dbo\Tables\EventProviderType.sql" />
-    <Build Include="dbo\Tables\Transaction.sql" />
+    <Build Include="dbo\Tables\EventProviderTransaction.sql" />
     <Build Include="dbo\Tables\TransactionAnnouncement.sql" />
     <Build Include="dbo\Tables\TransactionAnnouncementError.sql" />
     <Build Include="dbo\Tables\TransactionCommand.sql" />

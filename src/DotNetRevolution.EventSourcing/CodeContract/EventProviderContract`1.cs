@@ -11,7 +11,9 @@ namespace DotNetRevolution.EventSourcing.CodeContract
     {
         public abstract EventProviderDescriptor Descriptor { get; }
         public abstract EventStream DomainEvents { get; }
-        public abstract EventProviderType EventProviderType { get; }
+        public abstract EventProviderType EventProviderType { get; }        
+        public abstract Identity GlobalIdentity { get; }
+
         public abstract Identity Identity { get; }
         public abstract EventProviderVersion Version { get; }
         

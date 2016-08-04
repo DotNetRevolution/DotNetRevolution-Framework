@@ -7,7 +7,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
     [ContractClassFor(typeof(IEventStore))]
     internal abstract class EventStoreContract : IEventStore
     {
-        public void Commit(Transaction transaction)
+        public void Commit(EventProviderTransaction transaction)
         {
             Contract.Requires(transaction != null);
         }

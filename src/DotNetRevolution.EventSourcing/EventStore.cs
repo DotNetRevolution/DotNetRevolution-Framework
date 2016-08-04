@@ -39,12 +39,14 @@ namespace DotNetRevolution.EventSourcing
                 // create new event provider type
                 var eventProviderType = new EventProviderType(typeof(TAggregateRoot));
 
+                Identity globalIdentity;
                 EventProviderVersion version;
                 EventProviderDescriptor descriptor;
                 Snapshot snapshot;
 
                 // get domain events
-                var eventStream = GetDomainEvents(eventProviderType, identity, out version, out descriptor, out snapshot);
+                var eventStream = GetDomainEvents(eventProviderType, identity, out globalIdentity, out version, out descriptor, out snapshot);
+                Contract.Assume(globalIdentity != null);
                 Contract.Assume(eventStream != null);
                 Contract.Assume(version != null);
                 Contract.Assume(descriptor != null);
@@ -56,7 +58,8 @@ namespace DotNetRevolution.EventSourcing
                 var snapshotProvider = _snapshotProviderFactory.GetProvider(eventProviderType);
 
                 // return new event provider with gathered information
-                return new EventProvider<TAggregateRoot>(eventProviderType, 
+                return new EventProvider<TAggregateRoot>(globalIdentity,
+                                         eventProviderType, 
                                          identity, 
                                          version,
                                          descriptor,
@@ -70,7 +73,7 @@ namespace DotNetRevolution.EventSourcing
             }
         }
 
-        public void Commit(Transaction transaction)
+        public void Commit(EventProviderTransaction transaction)
         {
             try
             {                
@@ -100,9 +103,9 @@ namespace DotNetRevolution.EventSourcing
             return null;
         }
         
-        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot);
+        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out Identity globalIdentity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot);
 
-        protected abstract void CommitTransaction(string username, Transaction transaction);
+        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction);
         
         [ContractInvariantMethod]
         private void ObjectInvariants()

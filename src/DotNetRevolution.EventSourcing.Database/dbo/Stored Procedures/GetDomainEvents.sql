@@ -25,30 +25,31 @@ AS
 
 	-- get transactions for event provider
 	INSERT INTO @transactionTable (TransactionId, EventProviderVersion)
-	SELECT t.TransactionId
+	SELECT t.EventProviderTransactionId
 		 , t.EventProviderVersion
-	  FROM dbo.[Transaction] t
+	  FROM dbo.[EventProviderTransaction] t
 	 WHERE t.EventProviderGuid = @eventProviderGuid
 	 
 	-- get snapshot
 	SELECT TOP 1 
-			   @snapshotId = s.TransactionId
+			   @snapshotId = s.EventProviderTransactionId
 			 , @snapshotTypeId = s.EventProviderSnapshotTypeId
 			 , @snapshotData = s.[Data]
 			 , @snapshotVersion = t.EventProviderVersion
 		  FROM dbo.EventProviderSnapshot s
-		  JOIN @transactionTable t ON s.TransactionId = t.TransactionId
+		  JOIN @transactionTable t ON s.EventProviderTransactionId = t.TransactionId
 		ORDER BY t.EventProviderVersion DESC
 
 	-- get descriptor
 	SELECT TOP 1 
 			   @eventProviderDescriptor = d.Descriptor
 		  FROM dbo.EventProviderDescriptor d
-		  JOIN @transactionTable t ON d.TransactionId = t.TransactionId
+		  JOIN @transactionTable t ON d.EventProviderTransactionId = t.TransactionId
 		ORDER BY t.EventProviderVersion DESC
 
 	-- select event provider data
-	SELECT @eventProviderDescriptor 'descriptor'
+	SELECT @eventProviderGuid 'guid'
+		 , @eventProviderDescriptor 'descriptor'
 		 , MAX(t.EventProviderVersion) 'currentVersion'
 		 , @snapshotTypeId 'snapshotTypeId'
 	     , @snapshotData 'snapshotData'	  
@@ -60,7 +61,7 @@ AS
 		 , te.TransactionEventTypeId
 		 , te.[Data]
 	  FROM @transactionTable t
-	  JOIN dbo.TransactionEvent te ON te.TransactionId = t.TransactionId
+	  JOIN dbo.TransactionEvent te ON te.EventProviderTransactionId = t.TransactionId
      WHERE @snapshotId IS NULL 
 	    OR t.EventProviderVersion > @snapshotVersion
 	   
