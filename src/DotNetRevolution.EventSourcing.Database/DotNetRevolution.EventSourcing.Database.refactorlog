@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="39fbce42-cc62-42b8-8541-6125e7779a0f" ChangeDateTime="08/10/2016 14:07:36">
+    <Property Name="ElementName" Value="[dbo].[AK_TransactionEvent_Column]" />
+    <Property Name="ElementType" Value="SqlUniqueConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[TransactionEvent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[AK_TransactionEvent_EventProviderTransactionId_Sequence]" />
+  </Operation>
+</Operations>

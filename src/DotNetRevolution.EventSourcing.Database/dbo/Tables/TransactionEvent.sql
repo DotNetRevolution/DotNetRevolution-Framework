@@ -6,7 +6,8 @@
     [Sequence] INT NOT NULL, 
     [Data] VARBINARY(MAX) NOT NULL, 
     CONSTRAINT [FK_TransactionEvent_EventProviderTransactionId] FOREIGN KEY ([EventProviderTransactionId]) REFERENCES [dbo].[EventProviderTransaction]([EventProviderTransactionId]), 
-    CONSTRAINT [FK_TransactionEvent_TransactionEventType] FOREIGN KEY ([TransactionEventTypeId]) REFERENCES [dbo].[TransactionEventType]([TransactionEventTypeId]),     
+    CONSTRAINT [FK_TransactionEvent_TransactionEventType] FOREIGN KEY ([TransactionEventTypeId]) REFERENCES [dbo].[TransactionEventType]([TransactionEventTypeId]), 
+    CONSTRAINT [AK_TransactionEvent_EventProviderTransactionId_Sequence] UNIQUE ([EventProviderTransactionId],[Sequence]),     
 )
 
 GO
