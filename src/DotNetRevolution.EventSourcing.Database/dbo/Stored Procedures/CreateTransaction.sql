@@ -57,8 +57,12 @@ BEGIN
 							WHERE EventProviderGuid = @eventProviderGuid)
 									
 		-- create transaction
-		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion, [User])
-		VALUES (@transactionId, @eventProviderGuid, @eventProviderVersion, @user)
+		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion)
+		VALUES (@transactionId, @eventProviderGuid, @eventProviderVersion)
+
+		-- insert transaction information
+		INSERT INTO dbo.[TransactionInformation] (EventProviderTransactionId, [User])
+		VALUES (@transactionId, @user)
 
 		-- insert command
 		INSERT INTO dbo.TransactionCommand (EventProviderTransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
