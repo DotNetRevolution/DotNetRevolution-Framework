@@ -44,7 +44,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100, out account);
 
-            _eventStore.Commit(new EventProviderTransaction(command, new EventStream(domainEvents), new EventProviderDescriptor(account)));
+            _eventStore.Commit(new EventProviderTransaction(command, new EventStream(domainEvents), account));
 
             var eventProvider = _eventStore.GetEventStream<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
@@ -54,7 +54,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 1000, i =>
+            Parallel.For(0, 10000, i =>
              {
                  try
                  {

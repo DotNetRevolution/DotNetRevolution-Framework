@@ -19,6 +19,8 @@ namespace DotNetRevolution.Core.Querying
 
             foreach (var entry in entries)
             {
+                Contract.Assume(entry != null);
+
                 Add(entry);
             }
         }

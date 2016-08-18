@@ -25,6 +25,8 @@ namespace DotNetRevolution.Core.Commanding
 
             foreach(var entry in entries)
             {
+                Contract.Assume(entry != null);
+
                 Add(entry);
             }
         }

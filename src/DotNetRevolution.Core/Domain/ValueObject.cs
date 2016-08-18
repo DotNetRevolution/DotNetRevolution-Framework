@@ -47,6 +47,8 @@ namespace DotNetRevolution.Core.Domain
 
             foreach (var field in fields)
             {
+                Contract.Assume(field != null);
+
                 var value1 = field.GetValue(other);
                 var value2 = field.GetValue(this);
                 

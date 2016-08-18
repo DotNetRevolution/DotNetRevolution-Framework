@@ -18,7 +18,7 @@ namespace DotNetRevolution.Core.Domain
         public static Identity New()
         {
             Contract.Ensures(Contract.Result<Identity>() != null);
-
+            
             return new Identity(GuidGenerator.Default.Create());
         }
 

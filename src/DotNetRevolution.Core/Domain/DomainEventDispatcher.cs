@@ -25,7 +25,9 @@ namespace DotNetRevolution.Core.Domain
         {
             // publish events
             foreach (var domainEvent in domainEvents)
-            {                
+            {
+                Contract.Assume(domainEvent != null);
+
                 Publish(domainEvent);
             }
         }

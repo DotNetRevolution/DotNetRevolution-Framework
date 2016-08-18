@@ -44,7 +44,8 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Id;
-            
+            Contract.Assume(sessionId != null);
+
             RollingFileSink sink;
 
             if (_sinks.TryGetValue(sessionId, out sink))
@@ -63,7 +64,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
 
         private void SessionRemoved(object sender, SessionEventArgs e)
         {
-            Contract.Requires(e?.Session != null);
+            Contract.Requires(e?.Session?.Id != null);
             
             var session = e.Session;
 

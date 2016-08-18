@@ -14,11 +14,12 @@ namespace DotNetRevolution.EventSourcing
         public EventProvider(Identity globalIdentity,
             EventProviderType type,
             Identity identity)
-        {
-            Contract.Requires(globalIdentity != null);
+        {            
             Contract.Requires(type != null);
-            Contract.Requires(identity != null);
-            
+
+            Contract.Assume(identity != null);
+            Contract.Assume(globalIdentity != null);
+
             GlobalIdentity = globalIdentity;
             EventProviderType = type;
             Identity = identity;
@@ -29,7 +30,7 @@ namespace DotNetRevolution.EventSourcing
                    new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity)
         {
-            Contract.Requires(domainEventCollection?.AggregateRoot != null);            
+            Contract.Requires(domainEventCollection?.AggregateRoot != null);
         }
     }
 }

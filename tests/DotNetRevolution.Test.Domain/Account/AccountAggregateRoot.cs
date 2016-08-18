@@ -7,8 +7,16 @@ using System.Diagnostics.Contracts;
 namespace DotNetRevolution.Test.Domain.Account
 {
     public class AccountAggregateRoot : IAggregateRoot
-    {        
-        public Identity Identity { get; }
+    {
+        private readonly Identity _identity;
+
+        public Identity Identity
+        {
+            get
+            {
+                return _identity;
+            }
+        }
 
         public decimal Balance { get; private set; }
 
@@ -22,7 +30,8 @@ namespace DotNetRevolution.Test.Domain.Account
 
         public AccountAggregateRoot()
         {
-            Identity = Identity.New();
+            _identity = Identity.New();
+            Contract.Assume(_identity != null);
         }
            
         public IDomainEventCollection Credit(decimal amount, CanCreditAccount canCreditAccount)
@@ -84,7 +93,7 @@ namespace DotNetRevolution.Test.Domain.Account
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(Identity != null);
+            Contract.Invariant(_identity != null);
         }
     }
 }

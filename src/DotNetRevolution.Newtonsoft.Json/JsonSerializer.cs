@@ -47,6 +47,8 @@ namespace DotNetRevolution.Json
 
         public Stream Serialize(object item, Encoding encoding)
         {
+            Contract.Assume(encoding != null);
+
             // get item as a string
             if (item is string)
             {

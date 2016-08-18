@@ -43,7 +43,6 @@ namespace DotNetRevolution.EventSourcing.CodeContract
         public IEventStream Append(IDomainEventCollection domainEvents)
         {
             Contract.Requires(domainEvents != null);
-            Contract.Requires(Contract.ForAll(domainEvents, o => o != null));
             Contract.Ensures(Contract.Result<IEventStream>() != null);
 
             throw new NotImplementedException();

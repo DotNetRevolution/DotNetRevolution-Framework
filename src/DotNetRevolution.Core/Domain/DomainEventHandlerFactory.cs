@@ -29,7 +29,6 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Requires(domainEventType != null);
             Contract.Requires(entries != null);
-            Contract.Requires(Contract.ForAll(entries, o => o != null));
             Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventHandler>>() != null);
 
             var results = new List<IDomainEventHandler>();
@@ -39,6 +38,8 @@ namespace DotNetRevolution.Core.Domain
             {
                 foreach (var entry in entries)
                 {
+                    Contract.Assume(entry != null);
+
                     IDictionary<Type, IDomainEventHandler> cachedHandlers = GetCachedHandlers(domainEventType);
 
                     // add handlers to results
@@ -128,8 +129,7 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Requires(domainEventType != null);
             Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>() != null);
-            Contract.Ensures(Contract.ForAll(Contract.Result<IReadOnlyCollection<IDomainEventEntry>>(), o => o != null));
-
+            
             // get type of domain event
             var results = new List<IDomainEventEntry>();
 

@@ -23,7 +23,6 @@ namespace DotNetRevolution.EventSourcing
         {
             Contract.Requires(eventProvider != null);
             Contract.Requires(revisions != null);
-            Contract.Requires(Contract.ForAll(revisions, o => o != null));
         }
 
         public EventStream(IEventProvider eventProvider, params EventStreamRevision[] revisions)
@@ -31,7 +30,6 @@ namespace DotNetRevolution.EventSourcing
         {
             Contract.Requires(eventProvider != null);
             Contract.Requires(revisions != null);
-            Contract.Requires(Contract.ForAll(revisions, o => o != null));
         }
 
         private EventStream(IEventProvider eventProvider, IEnumerable<EventStreamRevision> revisions)

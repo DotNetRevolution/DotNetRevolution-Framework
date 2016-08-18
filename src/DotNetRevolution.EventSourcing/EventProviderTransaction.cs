@@ -55,29 +55,30 @@ namespace DotNetRevolution.EventSourcing
             }
         }
 
-        public EventProviderTransaction(ICommand command, IEventStream eventStream, EventProviderDescriptor descriptor)
-            : this(command, eventStream, descriptor, Identity.New())
+        public EventProviderTransaction(ICommand command, IEventStream eventStream, IAggregateRoot aggregateRoot)
+            : this(command, eventStream, aggregateRoot, Identity.New())
         {
             Contract.Requires(command != null);
-            Contract.Requires(descriptor != null);
+            Contract.Requires(aggregateRoot != null);
             Contract.Requires(eventStream != null);
             Contract.Requires(eventStream.GetUncommittedRevisions() != null);
             Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);
         }
 
-        public EventProviderTransaction(ICommand command, IEventStream eventStream, EventProviderDescriptor descriptor, Identity identity)
+        public EventProviderTransaction(ICommand command, IEventStream eventStream, IAggregateRoot aggregateRoot, Identity identity)
         {
             Contract.Requires(command != null);
-            Contract.Requires(descriptor != null);
+            Contract.Requires(aggregateRoot != null);
             Contract.Requires(eventStream != null);
             Contract.Requires(eventStream.GetUncommittedRevisions() != null);
             Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);
-            Contract.Requires(identity != null);
+
+            Contract.Assume(identity != null);
 
             _identity = identity;
             _command = command;
             _eventStream = eventStream;
-            _descriptor = descriptor;
+            _descriptor = new EventProviderDescriptor(aggregateRoot);
         }
 
         [ContractInvariantMethod]

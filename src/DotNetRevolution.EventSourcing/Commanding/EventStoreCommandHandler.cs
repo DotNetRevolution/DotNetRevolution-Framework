@@ -39,15 +39,25 @@ namespace DotNetRevolution.EventSourcing.Commanding
 
             // get event stream and aggregate root
             var eventStream = _repository.GetByIdentity(GetEventProviderIdentity(command), out aggregateRoot);
-                
+
             // handle command returning domain events
-            var domainEvents = Handle(aggregateRoot, command);
-            Contract.Assume(domainEvents.AggregateRoot != null);
-            Contract.Assume(string.IsNullOrWhiteSpace(domainEvents.AggregateRoot.ToString()) == false);
+            IDomainEventCollection domainEvents = Handle(command, aggregateRoot);
             Contract.Assume(Contract.ForAll(domainEvents, o => o != null));
 
             // append domain events
             eventStream.Append(domainEvents);
+
+            Commit(command, aggregateRoot, eventStream);
+
+            // publish all domain events on dispatcher
+            _domainEventDispatcher.PublishAll(domainEvents);
+        }
+
+        private void Commit(TCommand command, TAggregateRoot aggregateRoot, IEventStream eventStream)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(aggregateRoot != null);
+            Contract.Requires(eventStream != null);
 
             // make sure uncommitted revisions meets criteria for committing
             var uncommittedRevisions = eventStream.GetUncommittedRevisions();
@@ -56,9 +66,19 @@ namespace DotNetRevolution.EventSourcing.Commanding
 
             // commit stream
             _repository.Commit(command, eventStream, aggregateRoot);
-            
-            // publish all domain events on dispatcher
-            _domainEventDispatcher.PublishAll(domainEvents);
+        }
+
+        private IDomainEventCollection Handle(TCommand command, TAggregateRoot aggregateRoot)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(aggregateRoot != null);
+
+            var domainEvents = Handle(aggregateRoot, command);
+            Contract.Assume(domainEvents.AggregateRoot != null);
+            Contract.Assume(string.IsNullOrWhiteSpace(domainEvents.AggregateRoot.ToString()) == false);
+            Contract.Assume(Contract.ForAll(domainEvents, o => o != null));
+
+            return domainEvents;
         }
 
         [ContractInvariantMethod]

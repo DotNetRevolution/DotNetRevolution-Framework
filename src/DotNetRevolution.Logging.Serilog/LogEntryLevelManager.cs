@@ -128,10 +128,11 @@ namespace DotNetRevolution.Logging.Serilog
 
         private bool FindUserLoggingLevelSwitch(out LoggingLevelSwitch logSwitch)
         {
+            Contract.Assume(_identityManager.Current == null);
+
             var identity = _identityManager.Current;
 
             var identityName = identity == null ? string.Empty : identity.Name;
-            Contract.Assume(identityName != null);
 
             return _userLogSwitches.TryGetValue(identityName, out logSwitch);
         }
@@ -141,13 +142,14 @@ namespace DotNetRevolution.Logging.Serilog
             var session = _sessionManager.Current;
 
             var sessionId = session == null ? string.Empty : session.Id;
-            
+            Contract.Assume(sessionId != null);
+
             return _sessionLogSwitches.TryGetValue(sessionId, out logSwitch);            
         }
 
         private void SessionRemoved(object sender, SessionEventArgs e)
         {
-            Contract.Requires(e?.Session != null);
+            Contract.Requires(e?.Session?.Id != null);
             
             _sessionLogSwitches.Remove(e.Session.Id);
         }
