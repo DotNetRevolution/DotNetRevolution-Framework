@@ -2,7 +2,7 @@
 {
     public class NoSnapshotPolicy : ISnapshotPolicy
     {
-        public bool Check(IEventProvider eventProvider)
+        public bool Check(IEventStream eventStream)
         {
             return false;
         }

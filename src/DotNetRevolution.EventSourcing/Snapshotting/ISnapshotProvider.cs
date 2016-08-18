@@ -8,6 +8,6 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
     public interface ISnapshotProvider
     {
         [Pure]
-        Snapshot GetSnapshot(IAggregateRoot aggregateRoot);
+        Snapshot CreateSnapshot(IAggregateRoot aggregateRoot);
     }
 }

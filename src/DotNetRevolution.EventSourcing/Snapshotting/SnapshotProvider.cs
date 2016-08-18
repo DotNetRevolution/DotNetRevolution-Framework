@@ -7,7 +7,7 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
     {
         public abstract Snapshot GetSnapshot(TAggregateRoot aggregateRoot);
 
-        public Snapshot GetSnapshot(IAggregateRoot aggregateRoot)
+        public Snapshot CreateSnapshot(IAggregateRoot aggregateRoot)
         {
             return GetSnapshot((TAggregateRoot) aggregateRoot);
         }        

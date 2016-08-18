@@ -2,9 +2,7 @@
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.EventSourcing;
-using DotNetRevolution.EventSourcing.Snapshotting;
 using DotNetRevolution.EventSourcing.AggregateRoot;
-using DotNetRevolution.Core.Domain;
 
 namespace DotNetRevolution.Test.EventSourcing
 {
@@ -17,10 +15,8 @@ namespace DotNetRevolution.Test.EventSourcing
             var command = new Create(100);
             var domainEvents = AccountAggregateRoot.Create(100);
 
-            var eventProvider = new EventProvider<AccountAggregateRoot>(Identity.New(), domainEvents, new SingleMethodAggregateRootProcessor("Apply"));
-
-            var aggregateRoot = eventProvider.CreateAggregateRoot();
-
+            var aggregateRoot = new SingleMethodAggregateRootProcessor("Apply").Process<AccountAggregateRoot>(new EventStream(domainEvents));
+            
             Assert.IsNotNull(aggregateRoot);
             Assert.AreEqual(domainEvents.AggregateRoot.Identity, aggregateRoot.Identity);
             Assert.AreEqual(command.BeginningBalance, aggregateRoot.Balance);

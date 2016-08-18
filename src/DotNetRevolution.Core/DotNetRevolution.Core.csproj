@@ -92,6 +92,7 @@
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />
+    <Compile Include="Domain\IRepository.cs" />
     <Compile Include="GuidGeneration\CodeContract\GuidGeneratorContract.cs" />
     <Compile Include="GuidGeneration\GuidGenerator.cs" />
     <Compile Include="GuidGeneration\SequentialGuidType.cs" />

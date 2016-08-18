@@ -6,21 +6,71 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventProviderTransaction
     {
-        public Identity Identity { [Pure] get; }
+        private readonly Identity _identity;
+        private readonly ICommand _command;
+        private readonly IEventStream _eventStream;
 
-        public ICommand Command { [Pure] get; }
+        public Identity Identity
+        {
+            [Pure]
+            get
+            {
+                Contract.Ensures(Contract.Result<Identity>() != null);
+
+                return _identity;
+            }
+        }
+
+        public ICommand Command
+        {
+            [Pure]
+            get
+            {
+                Contract.Ensures(Contract.Result<ICommand>() != null);
+
+                return _command;
+            }
+        }
         
-        public EventProvider EventProvider { [Pure] get; }
-        
-        public EventProviderTransaction(ICommand command, EventProvider eventProvider)
+        public IEventStream EventStream
+        {
+            [Pure]
+            get
+            {
+                Contract.Ensures(Contract.Result<IEventStream>() != null);
+
+                return _eventStream;
+            }
+        }
+
+        public EventProviderTransaction(ICommand command, IEventStream eventStream)
+            : this(command, eventStream, Identity.New())
         {
             Contract.Requires(command != null);
-            Contract.Requires(eventProvider != null);
+            Contract.Requires(eventStream != null);
+            Contract.Requires(eventStream.GetUncommittedRevisions() != null);
+            Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);
+        }
 
-            Identity = Identity.New();
+        public EventProviderTransaction(ICommand command, IEventStream eventStream, Identity identity)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(eventStream != null);
+            Contract.Requires(eventStream.GetUncommittedRevisions() != null);
+            Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);
+            Contract.Requires(identity != null);
 
-            Command = command;
-            EventProvider = eventProvider;
+            _identity = identity;
+            _command = command;
+            _eventStream = eventStream;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_identity != null);
+            Contract.Invariant(_command != null);
+            Contract.Invariant(_eventStream != null);
         }
     }
 }

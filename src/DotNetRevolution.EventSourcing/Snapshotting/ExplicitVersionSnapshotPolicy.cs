@@ -9,9 +9,9 @@
             _version = version;
         }
 
-        public bool Check(IEventProvider eventProvider)
+        public bool Check(IEventStream eventStream)
         {
-            return eventProvider.Version == _version;
+            return false;// return eventStream. == _version;
         }
     }
 }

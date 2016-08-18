@@ -9,9 +9,14 @@ namespace DotNetRevolution.EventSourcing
 
         public EventProviderDescriptor(string value)
         {
-            Contract.Requires(string.IsNullOrWhiteSpace(value) == false);
-
             Value = value;
+        }
+
+        public EventProviderDescriptor(IAggregateRoot aggregateRoot)
+        {
+            Contract.Requires(aggregateRoot != null);
+
+            Value = aggregateRoot.ToString();
         }
     }
 }

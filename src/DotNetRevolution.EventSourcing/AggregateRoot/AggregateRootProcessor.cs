@@ -3,6 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Reflection;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using DotNetRevolution.Core.Domain;
+using System.Linq;
 
 namespace DotNetRevolution.EventSourcing.AggregateRoot
 {
@@ -22,35 +23,54 @@ namespace DotNetRevolution.EventSourcing.AggregateRoot
             return CreateAggregateRoot<TAggregateRoot>(typeof(TAggregateRoot), snapshot);
         }
 
-        public TAggregateRoot Process<TAggregateRoot>(EventStream eventStream) where TAggregateRoot : class, IAggregateRoot
+        public TAggregateRoot Process<TAggregateRoot>(IEventStream eventStream) where TAggregateRoot : class, IAggregateRoot
         {
             var aggregateRootType = typeof(TAggregateRoot);
 
             // create aggregate root
-            TAggregateRoot aggregateRoot = CreateAggregateRoot<TAggregateRoot>(aggregateRootType, eventStream.Snapshot);
+            TAggregateRoot aggregateRoot = CreateAggregateRoot<TAggregateRoot>(aggregateRootType, GetSnapshot(eventStream));
 
             // apply domain events to bring to current state
-            foreach (var domainEvent in eventStream)
+            foreach (var revision in eventStream)
             {
-                Contract.Assume(domainEvent != null);
+                Contract.Assume(revision != null);
 
-                // get apply method name for domain event
-                var methodName = GetMethodName(domainEvent.GetType().Name);
-
-                // get apply method info
-                var methodInfo = aggregateRootType.GetMethod(methodName, DefaultBindingFlags, null, new[] { domainEvent.GetType() }, null);
-
-                // check if method info found
-                if (methodInfo == null)
+                foreach (var domainEvent in revision.DomainEvents)
                 {
-                    throw new InvalidOperationException(string.Format("Could not find method {0}({1})", methodName, domainEvent.GetType().FullName));
-                }
+                    Contract.Assume(domainEvent != null);
 
-                // invoke method supplying domain event
-                methodInfo.Invoke(aggregateRoot, new[] { domainEvent });
+                    // get apply method name for domain event
+                    var methodName = GetMethodName(domainEvent.GetType().Name);
+
+                    // get apply method info
+                    var methodInfo = aggregateRootType.GetMethod(methodName, DefaultBindingFlags, null, new[] { domainEvent.GetType() }, null);
+
+                    // check if method info found
+                    if (methodInfo == null)
+                    {
+                        throw new InvalidOperationException(string.Format("Could not find method {0}({1})", methodName, domainEvent.GetType().FullName));
+                    }
+
+                    // invoke method supplying domain event
+                    methodInfo.Invoke(aggregateRoot, new[] { domainEvent });
+                }
             }
 
             return aggregateRoot;
+        }
+
+        private Snapshot GetSnapshot(IEventStream eventStream)
+        {
+            Contract.Requires(eventStream != null);
+
+            var firstElement = eventStream.FirstOrDefault();
+            
+            if (firstElement == null)
+            {
+                return null;
+            }
+
+            return firstElement.Snapshot;
         }
 
         private TAggregateRoot CreateAggregateRoot<TAggregateRoot>(Type aggregateRootType, Snapshot snapshot) where TAggregateRoot : class, IAggregateRoot

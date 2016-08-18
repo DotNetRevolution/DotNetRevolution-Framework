@@ -10,6 +10,6 @@ namespace DotNetRevolution.EventSourcing
         void Commit(EventProviderTransaction transaction);
 
         [Pure]
-        EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot;
+        IEventStream GetEventStream<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot;
     }
 }

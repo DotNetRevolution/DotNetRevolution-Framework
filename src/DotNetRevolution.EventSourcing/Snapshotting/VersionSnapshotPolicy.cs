@@ -13,9 +13,9 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
             _modulus = modulus;
         }
         
-        public bool Check(IEventProvider eventProvider)
+        public bool Check(IEventStream eventStream)
         {
-            return (eventProvider.Version % _modulus) == 0;
+            return true;//(eventStream.Version % _modulus) == 0;
         }
 
         [ContractInvariantMethod]

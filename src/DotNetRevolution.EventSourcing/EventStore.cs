@@ -1,6 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Extension;
 using DotNetRevolution.Core.Serialization;
-using DotNetRevolution.EventSourcing.AggregateRoot;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Diagnostics.Contracts;
@@ -9,63 +9,30 @@ namespace DotNetRevolution.EventSourcing
 {
     public abstract class EventStore : IEventStore
     {
-        private readonly IAggregateRootProcessorFactory _aggregateRootProcessorFactory;
-        private readonly ISnapshotPolicyFactory _snapshotPolicyFactory;
-        private readonly ISnapshotProviderFactory _snapshotProviderFactory;
         private readonly IUsernameProvider _usernameProvider;
 
-        public EventStore(IAggregateRootProcessorFactory aggregateRootProcessorFactory,
-                          ISnapshotPolicyFactory snapshotPolicyFactory,
-                          ISnapshotProviderFactory snapshotProviderFactory,
-                          IUsernameProvider usernameProvider,
+        public EventStore(IUsernameProvider usernameProvider,
                           ISerializer serializer)
-        {
-            Contract.Requires(aggregateRootProcessorFactory != null);
-            Contract.Requires(snapshotPolicyFactory != null);
-            Contract.Requires(snapshotProviderFactory != null);
+        {     
             Contract.Requires(serializer != null);
             Contract.Requires(usernameProvider != null);
-
-            _aggregateRootProcessorFactory = aggregateRootProcessorFactory;
-            _snapshotPolicyFactory = snapshotPolicyFactory;
-            _snapshotProviderFactory = snapshotProviderFactory;
+                     
             _usernameProvider = usernameProvider;
         }
 
-        public EventProvider<TAggregateRoot> GetEventProvider<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
+        public IEventStream GetEventStream<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
         {            
             try
             {
                 // create new event provider type
                 var eventProviderType = new EventProviderType(typeof(TAggregateRoot));
-
-                Identity globalIdentity;
-                EventProviderVersion version;
-                EventProviderDescriptor descriptor;
-                Snapshot snapshot;
-
-                // get domain events
-                var eventStream = GetDomainEvents(eventProviderType, identity, out globalIdentity, out version, out descriptor, out snapshot);
-                Contract.Assume(globalIdentity != null);
+                                
+                // get event stream
+                var eventStream = GetEventStream(eventProviderType, identity);
                 Contract.Assume(eventStream != null);
-                Contract.Assume(version != null);
-                Contract.Assume(descriptor != null);
 
-                // get processor
-                var aggregateRootProcessor = _aggregateRootProcessorFactory.GetProcessor(eventProviderType);
-
-                // get snapshot provider
-                var snapshotProvider = _snapshotProviderFactory.GetProvider(eventProviderType);
-
-                // return new event provider with gathered information
-                return new EventProvider<TAggregateRoot>(globalIdentity,
-                                         eventProviderType, 
-                                         identity, 
-                                         version,
-                                         descriptor,
-                                         eventStream,
-                                         aggregateRootProcessor,
-                                         snapshotProvider);
+                // return event stream
+                return eventStream;
             }
             catch (Exception ex)
             {
@@ -77,42 +44,26 @@ namespace DotNetRevolution.EventSourcing
         {
             try
             {                
-                CommitTransaction(_usernameProvider.GetUsername(), transaction);
+                var committed = CommitTransaction(_usernameProvider.GetUsername(), transaction);
+
+                var uncommittedRevisions = transaction.EventStream.GetUncommittedRevisions();
+                Contract.Assume(uncommittedRevisions != null);
+
+                uncommittedRevisions.ForEach(x => x.Commit(committed));
             }
             catch (Exception ex)
             {
                 throw new EventStoreException("Error processing request to commit transaction.", ex);
             }
         }
-        
-        public Snapshot GetSnapshotIfPolicySatisfied(IEventProvider eventProvider)
-        {
-            Contract.Requires(eventProvider != null);
 
-            // get snapshot policy
-            var snapshotPolicy = _snapshotPolicyFactory.GetPolicy(eventProvider.EventProviderType);
+        protected abstract EventStream GetEventStream(EventProviderType eventProviderType, Identity identity);
 
-            // check event provider against policy
-            if (snapshotPolicy.Check(eventProvider))
-            {
-                // ask event provider for a snapshot
-                return eventProvider.GetSnapshot();
-            }
-
-            // policy determined no snapshot needed
-            return null;
-        }
-        
-        protected abstract EventStream GetDomainEvents(EventProviderType eventProviderType, Identity identity, out Identity globalIdentity, out EventProviderVersion version, out EventProviderDescriptor eventProviderDescriptor, out Snapshot snapshot);
-
-        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction);
+        protected abstract DateTime CommitTransaction(string username, EventProviderTransaction transaction);
         
         [ContractInvariantMethod]
         private void ObjectInvariants()
-        {
-            Contract.Invariant(_aggregateRootProcessorFactory != null);
-            Contract.Invariant(_snapshotPolicyFactory != null);
-            Contract.Invariant(_snapshotProviderFactory != null);
+        {            
             Contract.Invariant(_usernameProvider != null);
         }
     }

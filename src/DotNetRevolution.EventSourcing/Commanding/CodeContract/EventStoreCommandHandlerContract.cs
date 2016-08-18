@@ -10,11 +10,11 @@ namespace DotNetRevolution.EventSourcing.Commanding.CodeContract
         where TAggregateRoot : class, IAggregateRoot
         where TCommand : ICommand
     {
-        public EventStoreCommandHandlerContract(IEventStore eventStore,
+        public EventStoreCommandHandlerContract(IEventProviderRepository<TAggregateRoot> repository,
                                                 IDomainEventDispatcher domainEventDispatcher)
-            : base(eventStore, domainEventDispatcher)
+            : base(repository, domainEventDispatcher)
         {
-            Contract.Requires(eventStore != null);
+            Contract.Requires(repository != null);
             Contract.Requires(domainEventDispatcher != null);
         }
 

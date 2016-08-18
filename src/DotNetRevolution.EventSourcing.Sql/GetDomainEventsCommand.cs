@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
@@ -14,13 +15,17 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly SqlSerializer _serializer;
         private readonly ITypeFactory _typeFactory;
         private readonly SqlCommand _command;
+        private readonly EventProviderType _eventProviderType;
+        private readonly Identity _eventProviderIdentity;
 
         private bool _executed;
-        private Collection<SqlDomainEvent> _sqlDomainEvents;
+
         private SqlSnapshot _sqlSnapshot;
-        private EventProviderDescriptor _eventProviderDescriptor;
-        private EventProviderVersion _eventProviderVersion;
+
         private Identity _globalIdentity;
+        private EventProviderDescriptor _eventProviderDescriptor;
+
+        private Collection<SqlDomainEvent> _sqlDomainEvents;
 
         public GetDomainEventsCommand(SqlSerializer serializer, 
             ITypeFactory typeFactory,
@@ -34,6 +39,9 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             _serializer = serializer;
             _typeFactory = typeFactory;
+            _eventProviderType = eventProviderType;
+            _eventProviderIdentity = identity;
+
             _command = CreateSqlCommand(eventProviderType, identity);
         }
         
@@ -45,35 +53,70 @@ namespace DotNetRevolution.EventSourcing.Sql
             _command.Connection = conn;
             
             // execute command
-            _sqlDomainEvents = ExecuteSqlCommand(_command, out _globalIdentity, out _eventProviderDescriptor, out _sqlSnapshot, out _eventProviderVersion);
+            _sqlDomainEvents = ExecuteSqlCommand(_command);
 
             // set executed so GetResults will return something
             _executed = true;
         }
 
-        public EventStream GetResults(out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out EventProviderVersion version, out Snapshot snapshot)
+        public EventStream GetResults()
         {
             Contract.Requires(_executed);
 
-            // set output parameters
-            globalIdentity = _globalIdentity;
-            eventProviderDescriptor = _eventProviderDescriptor;
-            version = _eventProviderVersion;
+            var eventProvider = new EventProvider(_globalIdentity, _eventProviderType, _eventProviderIdentity, _eventProviderDescriptor);
+            
+            // check for snapshot
+            if (_sqlSnapshot == null)
+            {
+                // no snapshot, return event stream with events only
+                return new EventStream(eventProvider, GetRevisions());
+            }
+            else
+            {
+                // check for events
+                if (_sqlDomainEvents.Any() == false)
+                {
+                    // return event stream with no events, snapshot only
+                    return new EventStream(eventProvider, GetSnapshotRevision());
+                }
 
-            // set snapshot       
-            snapshot = _sqlSnapshot == null
+                // get revisions and preprend snapshot revision
+                var revisions = GetRevisions();
+                revisions.Insert(0, GetSnapshotRevision());
+
+                // return event stream with snapshot and events
+                return new EventStream(eventProvider, revisions);
+            }            
+        }
+
+        private Snapshot GetSnapshot()
+        {
+            return _sqlSnapshot == null
                 ? null
                 : _serializer.DeserializeSnapshot(_sqlSnapshot);
+        }
 
-            // return deserialized events
-            if (_sqlDomainEvents.Any() == false)
+        private EventStreamRevision GetSnapshotRevision()
+        {
+            return new EventStreamRevision(_sqlSnapshot.Version, GetSnapshot(), _sqlSnapshot.Committed);
+        }
+
+        private List<EventStreamRevision> GetRevisions()
+        {
+            var versions = _sqlDomainEvents.GroupBy(x => x.EventProviderVersion);
+                                    
+            var revisions = new List<EventStreamRevision>(versions.Count());
+
+            foreach(var group in versions)
             {
-                // return event stream with no events, snapshot only
-                return new EventStream(new Collection<IDomainEvent>(), snapshot);
-            }
+                var firstDomainEvent = group.First();
 
-            // return event stream with events and snapshot
-            return new EventStream(_serializer.DeserializeDomainEvents(_sqlDomainEvents), snapshot);
+                revisions.Add(new EventStreamRevision(firstDomainEvent.EventProviderVersion,
+                                                      _serializer.DeserializeDomainEvents(new Collection<SqlDomainEvent>(group.ToList())),
+                                                      firstDomainEvent.Committed));
+            }
+            
+            return revisions;
         }
 
         private SqlCommand CreateSqlCommand(EventProviderType eventProviderType, Identity identity)
@@ -88,7 +131,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             return sqlCommand;
         }
 
-        private static Collection<SqlDomainEvent> ExecuteSqlCommand(SqlCommand command, out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
+        private Collection<SqlDomainEvent> ExecuteSqlCommand(SqlCommand command)
         {
             var sqlDomainEvents = new Collection<SqlDomainEvent>();
 
@@ -107,7 +150,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                 }
 
                 // get event provider information
-                GetEventProviderInformation(dataReader, out globalIdentity, out eventProviderDescriptor, out snapshot, out version);
+                GetEventProviderInformation(dataReader);
 
                 // move reader to next result set
                 if (dataReader.NextResult())
@@ -117,9 +160,10 @@ namespace DotNetRevolution.EventSourcing.Sql
                     {
                         // create new sql domain event
                         var sqlDomainEvent = new SqlDomainEvent(dataReader.GetInt32(0),
-                            dataReader.GetInt32(1),
-                            (byte[])dataReader[2],
-                            (byte[])dataReader[3]);
+                            dataReader.GetInt32(2),
+                            dataReader.GetDateTime(1),
+                            (byte[])dataReader[3],
+                            (byte[])dataReader[4]);
 
                         // add sql domain event to collection
                         sqlDomainEvents.Add(sqlDomainEvent);
@@ -133,7 +177,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
 
             // check if snapshot or events were returned
-            if (snapshot == null && sqlDomainEvents.Any() == false)
+            if (_sqlSnapshot == null && sqlDomainEvents.Any() == false)
             {
                 throw new InvalidOperationException("No snapshot or events returned.");
             }
@@ -141,43 +185,40 @@ namespace DotNetRevolution.EventSourcing.Sql
             return sqlDomainEvents;
         }
 
-        private static void GetEventProviderInformation(SqlDataReader dataReader, out Identity globalIdentity, out EventProviderDescriptor eventProviderDescriptor, out SqlSnapshot snapshot, out EventProviderVersion version)
+        private void GetEventProviderInformation(SqlDataReader dataReader)
         {
             // event provider global identity
-            globalIdentity = new Identity(dataReader.GetGuid(0));
+            _globalIdentity = new Identity(dataReader.GetGuid(0));
 
             // get descriptor
-            eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(1));
-
-            // event provider version
-            version = new EventProviderVersion(dataReader.GetInt32(2));
-
+            _eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(1));
+            
             // read snapshot
-            snapshot = GetSnapshot(dataReader);
+            _sqlSnapshot = GetSnapshot(dataReader);
         }
 
         private static SqlSnapshot GetSnapshot(SqlDataReader dataReader)
         {
-            SqlSnapshot snapshot = null;
+            // load columns in list for easy evaluation
+            var snapshotValuesReturnedNull = new List<bool>(4);
+            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(2));
+            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(3));
+            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(4));
+            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(5));
 
             // check if snapshot result is null
-            if (dataReader.IsDBNull(3) == false && dataReader.IsDBNull(4) == false)
+            if (snapshotValuesReturnedNull.All(x => x == false))
             {
                 // get snapshot
-                snapshot = new SqlSnapshot((byte[])dataReader[3], (byte[])dataReader[4]);
+                return new SqlSnapshot(new EventProviderVersion(dataReader.GetInt32(2)), dataReader.GetDateTime(5), (byte[])dataReader[3], (byte[])dataReader[4]);
             }
-            else if (dataReader.IsDBNull(3) == true && dataReader.IsDBNull(4) == false)
+            else if (snapshotValuesReturnedNull.All(x => x == true))
             {
-                // throw error
-                throw new InvalidOperationException("Snapshot type is null but data is not");
-            }
-            else if (dataReader.IsDBNull(3) == false && dataReader.IsDBNull(4) == true)
-            {
-                // throw error
-                throw new InvalidOperationException("Snapshot data is null but type is not");
+                // return if all values are null
+                return null;
             }
 
-            return snapshot;
+            throw new ApplicationException("One or more snapshot values are null.");
         }
     }
 }

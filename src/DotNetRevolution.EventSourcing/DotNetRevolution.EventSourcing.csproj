@@ -78,9 +78,14 @@
     <Compile Include="..\.SolutionItems\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CodeContract\EventProviderRepositoryContract.cs" />
+    <Compile Include="CodeContract\EventStreamContract.cs" />
     <Compile Include="CodeContract\TypeFactoryContract.cs" />
     <Compile Include="DefaultUsernameProvider.cs" />
     <Compile Include="DefaultTypeFactory.cs" />
+    <Compile Include="EventProviderRepository.cs" />
+    <Compile Include="EventStreamRevision.cs" />
+    <Compile Include="IEventProviderRepository.cs" />
     <Compile Include="ITypeFactory.cs" />
     <Compile Include="CodeContract\EventProviderContract.cs" />
     <Compile Include="CodeContract\EventProviderContract`1.cs" />
@@ -89,8 +94,6 @@
     <Compile Include="Commanding\CodeContract\EventStoreCommandHandlerContract.cs" />
     <Compile Include="Commanding\EventStoreCommandHandler.cs" />
     <Compile Include="EventProviderNotFoundException.cs" />
-    <Compile Include="EventStreamDomainEventCollection.cs" />
-    <Compile Include="IEventStreamDomainEventCollection.cs" />
     <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorContract.cs" />
     <Compile Include="AggregateRoot\CodeContract\AggregateRootProcessorFactoryContract.cs" />
     <Compile Include="IEventStream.cs" />

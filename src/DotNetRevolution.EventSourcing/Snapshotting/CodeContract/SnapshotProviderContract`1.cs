@@ -8,7 +8,7 @@ namespace DotNetRevolution.EventSourcing.Snapshotting.CodeContract
     internal abstract class SnapshotProviderContract<TAggregateRoot> : ISnapshotProvider<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
-        public abstract Snapshot GetSnapshot(IAggregateRoot aggregateRoot);
+        public abstract Snapshot CreateSnapshot(IAggregateRoot aggregateRoot);
 
         public Snapshot GetSnapshot(TAggregateRoot aggregateRoot)
         {

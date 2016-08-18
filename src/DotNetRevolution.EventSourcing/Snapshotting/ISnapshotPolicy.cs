@@ -7,6 +7,6 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
     public interface ISnapshotPolicy
     {
         [Pure]
-        bool Check(IEventProvider eventProvider);
+        bool Check(IEventStream eventStream);
     }
 }

@@ -7,7 +7,7 @@ namespace DotNetRevolution.EventSourcing.Snapshotting.CodeContract
     [ContractClassFor(typeof(ISnapshotProvider))]
     internal abstract class SnapshotProviderContract : ISnapshotProvider
     {
-        public Snapshot GetSnapshot(IAggregateRoot aggregateRoot)
+        public Snapshot CreateSnapshot(IAggregateRoot aggregateRoot)
         {
             Contract.Requires(aggregateRoot != null);
             Contract.Ensures(Contract.Result<object>() != null);

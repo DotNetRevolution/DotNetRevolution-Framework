@@ -10,19 +10,18 @@
     , @eventProviderTypeId			BINARY(16)		
 	, @eventProviderTypeFullName	VARCHAR (512)   
 	, @eventProviderDescriptor		VARCHAR (MAX)   
-    , @eventProviderVersion			INT             
-	, @snapshotTypeId				BINARY(16) = NULL
-	, @snapshotTypeFullName			VARCHAR (512) = NULL
-	, @snapshotData					VARBINARY (MAX) = NULL
 	, @events						dbo.udttEvent READONLY	    
+	, @committed					DATETIME2 OUTPUT
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	DECLARE @errText VARCHAR(MAX)
-		  
 	DECLARE @insertedEventProviderGuid AS TABLE (id UNIQUEIDENTIFIER)
+	DECLARE @insertedTransactions AS TABLE (id UNIQUEIDENTIFIER, EventProviderVersion INT)
 				
+	SET @committed = SYSUTCDATETIME()
+
 	BEGIN TRAN
 	
 	BEGIN TRY
@@ -57,8 +56,10 @@ BEGIN
 							WHERE EventProviderGuid = @eventProviderGuid)
 									
 		-- create transaction
-		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion)
-		VALUES (@transactionId, @eventProviderGuid, @eventProviderVersion)
+		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion, [Committed])
+		OUTPUT inserted.EventProviderTransactionId, inserted.EventProviderVersion INTO @insertedTransactions
+		SELECT @transactionId, @eventProviderGuid, e.EventProviderVersion, @committed
+		  FROM @events e
 
 		-- insert transaction information
 		INSERT INTO dbo.[TransactionInformation] (EventProviderTransactionId, [User])
@@ -87,30 +88,12 @@ BEGIN
 				  ORDER BY t.EventProviderVersion DESC) as a
 			 WHERE a.Descriptor <> @eventProviderDescriptor		
 		END
-		 
-		-- snapshot provided?
-		IF (@snapshotTypeId IS NOT NULL AND
-		    @snapshotTypeFullName IS NOT NULL AND
-			@snapshotData IS NOT NULL)
-		BEGIN				
-			-- snapshot type
-			IF NOT EXISTS (SELECT EventProviderSnapshotTypeId 
-							 FROM dbo.EventProviderSnapshotType 
-							WHERE EventProviderSnapshotTypeId = @snapshotTypeId)
-			BEGIN
-				INSERT INTO dbo.EventProviderSnapshotType (EventProviderSnapshotTypeId, FullName)
-				VALUES (@snapshotTypeId, @snapshotTypeFullName)
-			END
-		   	
-			-- insert snapshot
-			INSERT INTO dbo.EventProviderSnapshot (EventProviderTransactionId, EventProviderSnapshotTypeId, [Data])					
-			VALUES (@transactionId, @snapshotTypeId, @snapshotData)
-		END
-
+		
 		-- insert transaction events
 		INSERT INTO dbo.TransactionEvent (EventProviderTransactionId, TransactionEventTypeId, TransactionEventId, [Sequence], [Data])
-		SELECT @transactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
+		SELECT t.id, e.TypeId, e.EventId, e.[Sequence], e.[Data]
 		  FROM @events e
+		  JOIN @insertedTransactions t ON e.EventProviderVersion = t.EventProviderVersion
 		  
 		IF @@ROWCOUNT = 0		
 		BEGIN
@@ -119,7 +102,7 @@ BEGIN
 
 		-- nothing failed
 		COMMIT TRAN
-
+		
 		-- return success to caller
 		RETURN 0
 	END TRY

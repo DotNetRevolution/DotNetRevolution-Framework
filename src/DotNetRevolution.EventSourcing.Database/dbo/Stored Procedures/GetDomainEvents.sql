@@ -9,12 +9,14 @@ AS
 		  , @snapshotData VARBINARY(MAX)
 		  , @eventProviderGuid UNIQUEIDENTIFIER
 		  , @snapshotVersion INT
+		  , @snapshotCommitted DATETIME2
 		  , @eventProviderDescriptor VARCHAR(MAX)
 		  
     DECLARE @transactionTable TABLE 
 		  (			
 			  TransactionId UNIQUEIDENTIFIER
 			, EventProviderVersion INT
+			, [Committed] DATETIME2
 		  )
 	
 	-- get event provider table id
@@ -24,9 +26,10 @@ AS
 								 AND ep.EventProviderTypeId = @eventProviderTypeId)
 
 	-- get transactions for event provider
-	INSERT INTO @transactionTable (TransactionId, EventProviderVersion)
+	INSERT INTO @transactionTable (TransactionId, EventProviderVersion, [Committed])
 	SELECT t.EventProviderTransactionId
 		 , t.EventProviderVersion
+		 , t.[Committed]
 	  FROM dbo.[EventProviderTransaction] t
 	 WHERE t.EventProviderGuid = @eventProviderGuid
 	 
@@ -36,6 +39,7 @@ AS
 			 , @snapshotTypeId = s.EventProviderSnapshotTypeId
 			 , @snapshotData = s.[Data]
 			 , @snapshotVersion = t.EventProviderVersion
+			 , @snapshotCommitted = t.[Committed]
 		  FROM dbo.EventProviderSnapshot s
 		  JOIN @transactionTable t ON s.EventProviderTransactionId = t.TransactionId
 		ORDER BY t.EventProviderVersion DESC
@@ -50,16 +54,17 @@ AS
 	-- select event provider data
 	SELECT @eventProviderGuid 'guid'
 		 , @eventProviderDescriptor 'descriptor'
-		 , MAX(t.EventProviderVersion) 'currentVersion'
+		 , @snapshotVersion 'snapshotVersion'
 		 , @snapshotTypeId 'snapshotTypeId'
 	     , @snapshotData 'snapshotData'	  
-	  FROM @transactionTable t
+		 , @snapshotCommitted 'snapshotCommitted'	  
 
 	-- select events
 	SELECT t.EventProviderVersion
+		 , t.[Committed]
 		 , te.[Sequence]
 		 , te.TransactionEventTypeId
-		 , te.[Data]
+		 , te.[Data]		 
 	  FROM @transactionTable t
 	  JOIN dbo.TransactionEvent te ON te.EventProviderTransactionId = t.TransactionId
      WHERE @snapshotId IS NULL 

@@ -1,7 +1,6 @@
 ﻿using System;
 using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.EventSourcing.Snapshotting;
 
 namespace DotNetRevolution.EventSourcing.CodeContract
 {
@@ -18,11 +17,11 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             }
         }
 
-        public EventStream DomainEvents
+        public IEventStream EventStream
         {
             get
             {
-                Contract.Ensures(Contract.Result<EventStream>() != null);
+                Contract.Ensures(Contract.Result<IEventStream>() != null);
 
                 throw new NotImplementedException();
             }
@@ -66,11 +65,6 @@ namespace DotNetRevolution.EventSourcing.CodeContract
 
                 throw new NotImplementedException();
             }
-        }
-
-        public Snapshot GetSnapshot()
-        {
-            throw new NotImplementedException();
         }
     }
 }

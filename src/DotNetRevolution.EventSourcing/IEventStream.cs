@@ -1,16 +1,20 @@
-﻿using System.Collections.Generic;
-using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.EventSourcing.Snapshotting;
+using DotNetRevolution.EventSourcing.CodeContract;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public interface IEventStream : IEnumerable<IDomainEvent>
+    [ContractClass(typeof(EventStreamContract))]
+    public interface IEventStream : IEnumerable<EventStreamRevision>
     {
         [Pure]
-        IEventStreamDomainEventCollection DomainEvents { get; }
+        IEventProvider EventProvider { get; }
+        
+        [Pure]
+        IEventStream Append(IDomainEventCollection domainEvents);
 
         [Pure]
-        Snapshot Snapshot { get; }
+        IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions();
     }
 }

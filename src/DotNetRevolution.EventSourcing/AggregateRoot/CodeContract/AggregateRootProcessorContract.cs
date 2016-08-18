@@ -16,7 +16,7 @@ namespace DotNetRevolution.EventSourcing.AggregateRoot.CodeContract
             throw new NotImplementedException();
         }
 
-        public TAggregateRoot Process<TAggregateRoot>(EventStream eventStream) where TAggregateRoot : class, IAggregateRoot
+        public TAggregateRoot Process<TAggregateRoot>(IEventStream eventStream) where TAggregateRoot : class, IAggregateRoot
         {
             Contract.Requires(eventStream != null);
             Contract.Ensures(Contract.Result<TAggregateRoot>() != null);

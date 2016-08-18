@@ -1,5 +1,4 @@
 ﻿using DotNetRevolution.Core.Domain;
-using DotNetRevolution.EventSourcing.Snapshotting;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
@@ -12,50 +11,31 @@ namespace DotNetRevolution.EventSourcing
 
         public Identity Identity { get; }
 
-        public EventProviderVersion Version { get; }
-
-        public EventStream DomainEvents { get; }
-
         public EventProviderDescriptor Descriptor { get; }
         
         public EventProvider(Identity globalIdentity,
             EventProviderType type,
             Identity identity,
-            EventProviderVersion version,
-            EventProviderDescriptor descriptor,
-            EventStream domainEvents)
+            EventProviderDescriptor descriptor)
         {
             Contract.Requires(globalIdentity != null);
             Contract.Requires(type != null);
             Contract.Requires(identity != null);
-            Contract.Requires(version != null);
             Contract.Requires(descriptor != null);
-            Contract.Requires(domainEvents != null);
 
             GlobalIdentity = globalIdentity;
             EventProviderType = type;
             Identity = identity;
-            Version = version;
             Descriptor = descriptor;
-            DomainEvents = domainEvents;
         }
 
         public EventProvider(IDomainEventCollection domainEventCollection)
             : this(Identity.New(),
                    new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity,
-                   EventProviderVersion.Initial,
-                   new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()),
-                   new EventStream(domainEventCollection))
+                   new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()))
         {
-            Contract.Requires(domainEventCollection?.AggregateRoot != null);
-            Contract.Requires(string.IsNullOrWhiteSpace(domainEventCollection.AggregateRoot.ToString()) == false);
-            Contract.Requires(Contract.ForAll(domainEventCollection, o => o != null));
-        }
-
-        public virtual Snapshot GetSnapshot()
-        {
-            return null;
+            Contract.Requires(domainEventCollection?.AggregateRoot != null);            
         }
     }
 }

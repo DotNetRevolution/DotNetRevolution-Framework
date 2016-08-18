@@ -9,7 +9,7 @@ namespace DotNetRevolution.EventSourcing.AggregateRoot
     public interface IAggregateRootProcessor
     {
         [Pure]
-        TAggregateRoot Process<TAggregateRoot>(EventStream eventStream) where TAggregateRoot : class, IAggregateRoot;
+        TAggregateRoot Process<TAggregateRoot>(IEventStream eventStream) where TAggregateRoot : class, IAggregateRoot;
 
         [Pure]
         TAggregateRoot Process<TAggregateRoot>(Snapshot snapshot) where TAggregateRoot : class, IAggregateRoot;
