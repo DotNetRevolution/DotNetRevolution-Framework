@@ -12,8 +12,10 @@ namespace DotNetRevolution.Test.EventSourcing
         [TestMethod]
         public void CanGetAggregateRoot()
         {
+            AccountAggregateRoot account;
+
             var command = new Create(100);
-            var domainEvents = AccountAggregateRoot.Create(100);
+            var domainEvents = AccountAggregateRoot.Create(100, out account);
 
             var aggregateRoot = new OnConventionAggregateRootProcessor().Process<AccountAggregateRoot>(new EventStream(domainEvents));
             

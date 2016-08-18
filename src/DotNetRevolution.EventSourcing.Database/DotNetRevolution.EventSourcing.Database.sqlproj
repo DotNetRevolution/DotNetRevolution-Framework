@@ -87,11 +87,6 @@
     <Build Include="dbo\Tables\TransactionInformation.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="scripts\test commit proc.sql" />
-    <None Include="scripts\generated sql.sql" />
-    <None Include="scripts\get_events.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <RefactorLog Include="DotNetRevolution.EventSourcing.Database.refactorlog" />
   </ItemGroup>
 </Project>

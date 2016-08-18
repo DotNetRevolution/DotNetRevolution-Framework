@@ -9,9 +9,10 @@ namespace DotNetRevolution.EventSourcing.CodeContract
     internal abstract class EventProviderRepositoryContract<TAggregateRoot> : IEventProviderRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
-        public void Commit(ICommand command, IEventStream eventStream)
+        public void Commit(ICommand command, IEventStream eventStream, TAggregateRoot aggregateRoot)
         {
             Contract.Requires(command != null);
+            Contract.Requires(aggregateRoot != null);
             Contract.Requires(eventStream != null);
             Contract.Requires(eventStream.GetUncommittedRevisions() != null);
             Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);

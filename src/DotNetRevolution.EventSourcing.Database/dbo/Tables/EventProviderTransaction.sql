@@ -3,7 +3,6 @@
 	[EventProviderTransactionId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED, 	
 	[EventProviderGuid] UNIQUEIDENTIFIER NOT NULL,
 	[EventProviderVersion] INT NOT NULL,
-	[Committed] DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(), 
  
     CONSTRAINT [AK_EventProviderTransaction_EventProviderId_EventProviderVersion] UNIQUE ([EventProviderGuid],[EventProviderVersion])
 )

@@ -30,9 +30,9 @@ namespace DotNetRevolution.EventSourcing
             return eventStream;
         }
 
-        public void Commit(ICommand command, IEventStream eventStream)
+        public void Commit(ICommand command, IEventStream eventStream, TAggregateRoot aggregateRoot)
         {   
-            var transaction = new EventProviderTransaction(command, eventStream);            
+            var transaction = new EventProviderTransaction(command, eventStream, new EventProviderDescriptor(aggregateRoot));            
 
             _eventStore.Commit(transaction);
         }

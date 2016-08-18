@@ -11,6 +11,6 @@ namespace DotNetRevolution.EventSourcing
     {
         IEventStream GetByIdentity(Identity identity, out TAggregateRoot aggregateRoot);
 
-        void Commit(ICommand command, IEventStream eventStream);
+        void Commit(ICommand command, IEventStream eventStream, TAggregateRoot aggregateRoot);
     }
 }

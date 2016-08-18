@@ -77,9 +77,9 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
             throw new DebitDeclinedException(declinationReason);
         }
 
-        public static IDomainEventCollection Create(decimal beginningBalance)
+        public static IDomainEventCollection Create(decimal beginningBalance, out AccountAggregateRoot account)
         {
-            var account = new AccountAggregateRoot();
+            account = new AccountAggregateRoot();
 
             var result = new Created(Identity.New(), beginningBalance);
 

@@ -4,6 +4,7 @@ using DotNetRevolution.Core.Serialization;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Diagnostics.Contracts;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -43,23 +44,23 @@ namespace DotNetRevolution.EventSourcing
         public void Commit(EventProviderTransaction transaction)
         {
             try
-            {                
-                var committed = CommitTransaction(_usernameProvider.GetUsername(), transaction);
-
+            {
                 var uncommittedRevisions = transaction.EventStream.GetUncommittedRevisions();
                 Contract.Assume(uncommittedRevisions != null);
 
-                uncommittedRevisions.ForEach(x => x.Commit(committed));
+                CommitTransaction(_usernameProvider.GetUsername(), transaction, uncommittedRevisions);
+                
+                uncommittedRevisions.ForEach(x => x.Commit());
             }
             catch (Exception ex)
             {
                 throw new EventStoreException("Error processing request to commit transaction.", ex);
             }
         }
-
+        
         protected abstract EventStream GetEventStream(EventProviderType eventProviderType, Identity identity);
 
-        protected abstract DateTime CommitTransaction(string username, EventProviderTransaction transaction);
+        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
         
         [ContractInvariantMethod]
         private void ObjectInvariants()

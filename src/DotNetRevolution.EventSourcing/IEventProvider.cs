@@ -10,6 +10,5 @@ namespace DotNetRevolution.EventSourcing
         Identity GlobalIdentity { [Pure] get; }
         Identity Identity { [Pure] get; }
         EventProviderType EventProviderType { [Pure] get; }
-        EventProviderDescriptor Descriptor { [Pure] get; }
     }
 }

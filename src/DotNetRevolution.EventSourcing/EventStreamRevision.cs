@@ -1,6 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.Snapshotting;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -11,8 +10,7 @@ namespace DotNetRevolution.EventSourcing
     {
         private readonly EventProviderVersion _version;
         private readonly IReadOnlyCollection<IDomainEvent> _domainEvents;
-        private DateTime? _committed;
-        
+                
         [Pure]
         public IReadOnlyCollection<IDomainEvent> DomainEvents
         {
@@ -39,10 +37,7 @@ namespace DotNetRevolution.EventSourcing
         public Snapshot Snapshot { get; }
 
         [Pure]
-        public DateTime? Committed
-        {
-            get { return _committed; }            
-        }
+        public bool Committed { get; private set; }
 
         public EventStreamRevision(IDomainEventCollection domainEvents)
             : this(EventProviderVersion.Initial, domainEvents)
@@ -59,14 +54,15 @@ namespace DotNetRevolution.EventSourcing
             _version = version;
         }
 
-        public EventStreamRevision(EventProviderVersion version, IReadOnlyCollection<IDomainEvent> domainEvents, DateTime committed)
+        public EventStreamRevision(EventProviderVersion version, IReadOnlyCollection<IDomainEvent> domainEvents, bool committed)
         {
             Contract.Requires(version != null);
             Contract.Requires(domainEvents != null);
 
+            Committed = committed;
+
             _domainEvents = domainEvents;
             _version = version;
-            _committed = committed;
         }
 
         public EventStreamRevision(EventProviderVersion version, Snapshot snapshot)
@@ -80,21 +76,21 @@ namespace DotNetRevolution.EventSourcing
             _version = version;
         }
 
-        public EventStreamRevision(EventProviderVersion version, Snapshot snapshot, DateTime committed)
+        public EventStreamRevision(EventProviderVersion version, Snapshot snapshot, bool committed)
         {
             Contract.Requires(version != null);
             Contract.Requires(snapshot != null);
             
             Snapshot = snapshot;
+            Committed = committed;
 
             _domainEvents = new Collection<IDomainEvent>();
             _version = version;
-            _committed = committed;
         }
 
-        internal void Commit(DateTime dateTime)
+        internal void Commit()
         {
-            _committed = dateTime;
+            Committed = true;
         }
 
         [ContractInvariantMethod]

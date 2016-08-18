@@ -4,6 +4,7 @@ using DotNetRevolution.Core.Domain;
 using System.Data.SqlClient;
 using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -49,13 +50,14 @@ namespace DotNetRevolution.EventSourcing.Sql
             return command.GetResults();
         }
 
-        protected override DateTime CommitTransaction(string username, EventProviderTransaction transaction)
+        protected override void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
             // establish command
             var command = new CommitTransactionCommand(_serializer,
                 _typeFactory,
                 username,
-                transaction);
+                transaction,
+                uncommittedRevisions);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -65,9 +67,6 @@ namespace DotNetRevolution.EventSourcing.Sql
 
                 // execute
                 command.Execute(conn);
-
-                // return result
-                return command.GetResult();
             }            
         }
     }

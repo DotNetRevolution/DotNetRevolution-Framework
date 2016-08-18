@@ -23,7 +23,6 @@ namespace DotNetRevolution.EventSourcing.Sql
         private SqlSnapshot _sqlSnapshot;
 
         private Identity _globalIdentity;
-        private EventProviderDescriptor _eventProviderDescriptor;
 
         private Collection<SqlDomainEvent> _sqlDomainEvents;
 
@@ -63,7 +62,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         {
             Contract.Requires(_executed);
 
-            var eventProvider = new EventProvider(_globalIdentity, _eventProviderType, _eventProviderIdentity, _eventProviderDescriptor);
+            var eventProvider = new EventProvider(_globalIdentity, _eventProviderType, _eventProviderIdentity);
             
             // check for snapshot
             if (_sqlSnapshot == null)
@@ -98,7 +97,7 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         private EventStreamRevision GetSnapshotRevision()
         {
-            return new EventStreamRevision(_sqlSnapshot.Version, GetSnapshot(), _sqlSnapshot.Committed);
+            return new EventStreamRevision(_sqlSnapshot.Version, GetSnapshot(), true);
         }
 
         private List<EventStreamRevision> GetRevisions()
@@ -113,7 +112,7 @@ namespace DotNetRevolution.EventSourcing.Sql
 
                 revisions.Add(new EventStreamRevision(firstDomainEvent.EventProviderVersion,
                                                       _serializer.DeserializeDomainEvents(new Collection<SqlDomainEvent>(group.ToList())),
-                                                      firstDomainEvent.Committed));
+                                                      true));
             }
             
             return revisions;
@@ -160,10 +159,9 @@ namespace DotNetRevolution.EventSourcing.Sql
                     {
                         // create new sql domain event
                         var sqlDomainEvent = new SqlDomainEvent(dataReader.GetInt32(0),
-                            dataReader.GetInt32(2),
-                            dataReader.GetDateTime(1),
-                            (byte[])dataReader[3],
-                            (byte[])dataReader[4]);
+                            dataReader.GetInt32(1),
+                            (byte[])dataReader[2],
+                            (byte[])dataReader[3]);
 
                         // add sql domain event to collection
                         sqlDomainEvents.Add(sqlDomainEvent);
@@ -189,10 +187,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         {
             // event provider global identity
             _globalIdentity = new Identity(dataReader.GetGuid(0));
-
-            // get descriptor
-            _eventProviderDescriptor = new EventProviderDescriptor(dataReader.GetString(1));
-            
+                        
             // read snapshot
             _sqlSnapshot = GetSnapshot(dataReader);
         }
@@ -200,17 +195,16 @@ namespace DotNetRevolution.EventSourcing.Sql
         private static SqlSnapshot GetSnapshot(SqlDataReader dataReader)
         {
             // load columns in list for easy evaluation
-            var snapshotValuesReturnedNull = new List<bool>(4);
+            var snapshotValuesReturnedNull = new List<bool>(3);
+            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(1));
             snapshotValuesReturnedNull.Add(dataReader.IsDBNull(2));
             snapshotValuesReturnedNull.Add(dataReader.IsDBNull(3));
-            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(4));
-            snapshotValuesReturnedNull.Add(dataReader.IsDBNull(5));
 
             // check if snapshot result is null
             if (snapshotValuesReturnedNull.All(x => x == false))
             {
                 // get snapshot
-                return new SqlSnapshot(new EventProviderVersion(dataReader.GetInt32(2)), dataReader.GetDateTime(5), (byte[])dataReader[3], (byte[])dataReader[4]);
+                return new SqlSnapshot(new EventProviderVersion(dataReader.GetInt32(1)), (byte[])dataReader[2], (byte[])dataReader[3]);
             }
             else if (snapshotValuesReturnedNull.All(x => x == true))
             {

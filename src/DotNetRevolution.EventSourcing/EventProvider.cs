@@ -9,31 +9,25 @@ namespace DotNetRevolution.EventSourcing
 
         public EventProviderType EventProviderType { get; }
 
-        public Identity Identity { get; }
-
-        public EventProviderDescriptor Descriptor { get; }
+        public Identity Identity { get; }        
         
         public EventProvider(Identity globalIdentity,
             EventProviderType type,
-            Identity identity,
-            EventProviderDescriptor descriptor)
+            Identity identity)
         {
             Contract.Requires(globalIdentity != null);
             Contract.Requires(type != null);
             Contract.Requires(identity != null);
-            Contract.Requires(descriptor != null);
-
+            
             GlobalIdentity = globalIdentity;
             EventProviderType = type;
             Identity = identity;
-            Descriptor = descriptor;
         }
 
         public EventProvider(IDomainEventCollection domainEventCollection)
             : this(Identity.New(),
                    new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
-                   domainEventCollection.AggregateRoot.Identity,
-                   new EventProviderDescriptor(domainEventCollection.AggregateRoot.ToString()))
+                   domainEventCollection.AggregateRoot.Identity)
         {
             Contract.Requires(domainEventCollection?.AggregateRoot != null);            
         }

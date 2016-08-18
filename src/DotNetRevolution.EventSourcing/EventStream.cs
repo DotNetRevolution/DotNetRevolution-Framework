@@ -73,7 +73,7 @@ namespace DotNetRevolution.EventSourcing
 
         public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()
         {
-            return _revisions.Where(x => x.Committed.HasValue == false)
+            return _revisions.Where(x => x.Committed == false)
                              .ToList();
         }
 

@@ -55,7 +55,7 @@ namespace DotNetRevolution.EventSourcing.Commanding
             Contract.Assume(uncommittedRevisions.Count > 0);
 
             // commit stream
-            _repository.Commit(command, eventStream);
+            _repository.Commit(command, eventStream, aggregateRoot);
             
             // publish all domain events on dispatcher
             _domainEventDispatcher.PublishAll(domainEvents);

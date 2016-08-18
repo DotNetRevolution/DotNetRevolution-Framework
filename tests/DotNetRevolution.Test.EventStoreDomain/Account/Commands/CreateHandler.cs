@@ -6,7 +6,8 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
     {
         public override void Handle(Create command)
         {
-            var domainEvents = AccountAggregateRoot.Create(command.BeginningBalance);
+            AccountAggregateRoot account;
+            var domainEvents = AccountAggregateRoot.Create(command.BeginningBalance, out account);
         }
     }
 }

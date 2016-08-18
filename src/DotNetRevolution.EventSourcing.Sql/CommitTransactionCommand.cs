@@ -13,18 +13,19 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly SqlSerializer _serializer;
         private readonly SqlCommand _command;
         private readonly ITypeFactory _typeFactory;
-
-        private readonly SqlParameter _committed;
+        
         private readonly SqlParameter _result;
 
         public CommitTransactionCommand(SqlSerializer serializer,
             ITypeFactory typeFactory, 
             string username,          
-            EventProviderTransaction transaction)
+            EventProviderTransaction transaction,
+            IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
             Contract.Requires(serializer != null);
             Contract.Requires(typeFactory != null);
             Contract.Requires(transaction != null);
+            Contract.Requires(uncommittedRevisions != null);
             Contract.Requires(string.IsNullOrWhiteSpace(username) == false);
 
             _serializer = serializer;
@@ -35,12 +36,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                     Direction = ParameterDirection.ReturnValue
                 };
 
-            _committed = new SqlParameter("committed", SqlDbType.DateTime2)
-                {
-                    Direction = ParameterDirection.Output
-                };
-
-            _command = CreateSqlCommand(transaction.Identity, transaction.Command, transaction.EventStream, username);            
+            _command = CreateSqlCommand(transaction, uncommittedRevisions, username);            
         }
 
         public void Execute(SqlConnection conn)
@@ -55,12 +51,7 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             ThrowIfError();
         }
-
-        public DateTime GetResult()
-        {
-            return (DateTime)_committed.Value;
-        }
-
+        
         private void ThrowIfError()
         {
             if ((int)_result.Value != 0)
@@ -69,20 +60,20 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        private SqlCommand CreateSqlCommand(Identity transactionId, ICommand command, IEventStream eventStream, string user)
+        private SqlCommand CreateSqlCommand(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions, string user)
         {
             var sqlCommand = new SqlCommand("[dbo].[CreateTransaction]");
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
-            var eventProvider = eventStream.EventProvider;
+            var command = transaction.Command;
+            var eventProvider = transaction.EventStream.EventProvider;
             var commandType = command.GetType();
 
-            // set output parameters
+            // set return parameter
             sqlCommand.Parameters.Add(_result);
-            sqlCommand.Parameters.Add(_committed);
 
             // set parameters
-            sqlCommand.Parameters.Add("@transactionId", SqlDbType.UniqueIdentifier).Value = transactionId.Value;
+            sqlCommand.Parameters.Add("@transactionId", SqlDbType.UniqueIdentifier).Value = transaction.Identity.Value;
             sqlCommand.Parameters.Add("@user", SqlDbType.NVarChar, 256).Value = user;
 
             sqlCommand.Parameters.Add("@commandId", SqlDbType.UniqueIdentifier).Value = command.CommandId;
@@ -94,13 +85,13 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.Identity.Value;
             sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.EventProviderType.Type);
             sqlCommand.Parameters.Add("@eventProviderTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.EventProviderType.Type.FullName;
-            sqlCommand.Parameters.Add("@eventProviderDescriptor", SqlDbType.VarChar).Value = eventProvider.Descriptor.Value;
+            sqlCommand.Parameters.Add("@eventProviderDescriptor", SqlDbType.VarChar).Value = transaction.Descriptor.Value;
             
             // event user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@events", SqlDbType.Structured)
             {
                 TypeName = "[dbo].[udttEvent]",
-                Value = GetEventDataTable(eventStream.GetUncommittedRevisions())
+                Value = GetEventDataTable(uncommittedRevisions)
             });            
 
             return sqlCommand;
