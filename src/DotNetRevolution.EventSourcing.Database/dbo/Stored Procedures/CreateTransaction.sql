@@ -16,11 +16,9 @@ BEGIN
 	SET NOCOUNT ON;
 
 	DECLARE @errText VARCHAR(MAX)
-	DECLARE @insertedEventProviderGuid AS TABLE (id UNIQUEIDENTIFIER)
-	DECLARE @insertedTransactions AS TABLE (id UNIQUEIDENTIFIER, EventProviderVersion INT)
 				
-	BEGIN TRAN event_provider
-	
+	BEGIN TRAN 
+		
 	BEGIN TRY
 				
 		-- event provider type
@@ -29,10 +27,23 @@ BEGIN
 		 WHERE NOT EXISTS (SELECT EventProviderTypeId
 							 FROM dbo.EventProviderType
 					 		WHERE FullName = @eventProviderTypeFullName)
+							
+		-- command type					
+		INSERT INTO dbo.TransactionCommandType (TransactionCommandTypeId, FullName) 
+		SELECT @commandTypeId, @commandTypeFullName
+		WHERE NOT EXISTS (SELECT TransactionCommandTypeId 
+							FROM dbo.TransactionCommandType
+					 		WHERE FullName = @commandTypeFullName)
 
+		-- insert transaction event types  
+		INSERT INTO dbo.TransactionEventType (TransactionEventTypeId, FullName)
+		SELECT e.TypeId, e.TypeFullName
+		  FROM @events e
+	 LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName		
+		 WHERE tet.TransactionEventTypeId IS NULL
+		
 		-- event provider
-		INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)		
-		OUTPUT inserted.EventProviderGuid INTO @insertedEventProviderGuid
+		INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)				
 		SELECT @eventProviderGuid, @eventProviderId, @eventProviderTypeId
 		 WHERE NOT EXISTS (SELECT EventProviderGuid
 							 FROM dbo.EventProvider
@@ -50,12 +61,8 @@ BEGIN
 				  EventProviderGuid = source.EventProviderGuid
 				, Descriptor = source.Descriptor;
 				
-		COMMIT TRAN event_provider
-		BEGIN TRAN event_provider_transaction
-
 		-- create transaction
-		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion)
-		OUTPUT inserted.EventProviderTransactionId, inserted.EventProviderVersion INTO @insertedTransactions
+		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 
 		SELECT @transactionId, @eventProviderGuid, e.EventProviderVersion
 		  FROM @events e
 
@@ -63,32 +70,16 @@ BEGIN
 		INSERT INTO dbo.[TransactionInformation] (EventProviderTransactionId, [User])
 		VALUES (@transactionId, @user)
 			
-		-- command type					
-		INSERT INTO dbo.TransactionCommandType (TransactionCommandTypeId, FullName) 
-		SELECT @commandTypeId, @commandTypeFullName
-		WHERE NOT EXISTS (SELECT TransactionCommandTypeId 
-							FROM dbo.TransactionCommandType
-					 		WHERE FullName = @commandTypeFullName)
-
 		-- insert command
 		INSERT INTO dbo.TransactionCommand (EventProviderTransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
 		VALUES (@transactionId, @commandTypeId, @commandId, @commandData)
 						
-		COMMIT TRAN event_provider_transaction
-		BEGIN TRAN transaction_events
-
-		-- insert transaction event types  
-		INSERT INTO dbo.TransactionEventType (TransactionEventTypeId, FullName)
-		SELECT e.TypeId, e.TypeFullName
-		  FROM @events e
-	 LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName		
-		 WHERE tet.TransactionEventTypeId IS NULL
-		
 		-- insert transaction events
 		INSERT INTO dbo.TransactionEvent (EventProviderTransactionId, TransactionEventTypeId, TransactionEventId, [Sequence], [Data])
-		SELECT t.id, e.TypeId, e.EventId, e.[Sequence], e.[Data]
+		SELECT ept.EventProviderTransactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
 		  FROM @events e
-		  JOIN @insertedTransactions t ON e.EventProviderVersion = t.EventProviderVersion
+		  JOIN dbo.EventProviderTransaction ept ON  e.EventProviderVersion = ept.EventProviderVersion
+												AND ept.EventProviderGuid = @eventProviderGuid
 		  
 		IF @@ROWCOUNT = 0		
 		BEGIN
@@ -96,7 +87,7 @@ BEGIN
 		END
 
 		-- nothing failed
-		COMMIT TRAN transaction_events
+		COMMIT TRAN 
 		
 		-- return success to caller
 		RETURN 0
