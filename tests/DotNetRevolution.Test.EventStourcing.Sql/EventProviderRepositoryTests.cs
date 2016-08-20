@@ -21,7 +21,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestInitialize]
         public void Init()
         {
-            GuidGenerator.Default = new SequentialGuidGenerator(SequentialGuidType.SequentialAtEnd);
+            GuidGenerator.Default = new SequentialAtEndGuidGenerator();
             var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
 
             var hash = typeFactory.GetHash(typeof(Created));
