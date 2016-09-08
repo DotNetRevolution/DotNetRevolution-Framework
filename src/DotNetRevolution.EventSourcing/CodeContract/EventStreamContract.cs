@@ -40,14 +40,20 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             }
         }
 
-        public IEventStream Append(IDomainEventCollection domainEvents)
+        public void Append(IReadOnlyCollection<IDomainEvent> domainEvents)
         {
             Contract.Requires(domainEvents != null);
-            Contract.Ensures(Contract.Result<IEventStream>() != null);
 
             throw new NotImplementedException();
         }
 
+        public void Append(IDomainEvent domainEvent)
+        {
+            Contract.Requires(domainEvent != null);
+
+            throw new NotImplementedException();
+        }
+        
         public abstract IEnumerator<EventStreamRevision> GetEnumerator();
 
         public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()

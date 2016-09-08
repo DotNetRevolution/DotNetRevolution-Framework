@@ -9,8 +9,6 @@ namespace DotNetRevolution.Core.Commanding.CodeContract
     {
         public override void Handle(TCommand command)
         {
-            Contract.Requires(command != null);
-
             throw new NotImplementedException();
         }
     }

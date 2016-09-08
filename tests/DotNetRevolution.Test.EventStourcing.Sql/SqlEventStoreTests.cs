@@ -39,16 +39,17 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void CanCommitTransactionAndGetEventProvider()
         {
-            AccountAggregateRoot account;
+            Assert.Fail();
+            //AccountAggregateRoot account;
 
-            var command = new Create(100);
-            var domainEvents = AccountAggregateRoot.Create(100, out account);
+            //var command = new Create(100);
+            //var domainEvents = AccountAggregateRoot.Create(100, out account);
 
-            _eventStore.Commit(new EventProviderTransaction(command, new EventStream(domainEvents), account));
+            //_eventStore.Commit(new EventProviderTransaction(command, new EventStream(domainEvents), account));
 
-            var eventProvider = _eventStore.GetEventStream<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
+            //var eventProvider = _eventStore.GetEventStream<AccountAggregateRoot>(domainEvents.AggregateRoot.Identity);
 
-            Assert.IsNotNull(eventProvider);
+            //Assert.IsNotNull(eventProvider);
         }
         
         [TestMethod]

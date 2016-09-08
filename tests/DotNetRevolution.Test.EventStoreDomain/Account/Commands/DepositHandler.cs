@@ -1,35 +1,22 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class DepositHandler : CommandHandler<Deposit>
-    {
-        private readonly IDomainEventDispatcher _domainEventDispatcher;
-
-        public DepositHandler(IDomainEventDispatcher domainEventDispatcher)
-        {
-            Contract.Requires(domainEventDispatcher != null);
-
-            _domainEventDispatcher = domainEventDispatcher;
-        }
-
+    {        
         public override void Handle(Deposit command)
         {
             Contract.Assume(command.Amount > decimal.Zero);
 
-            var accountAggregate = new AccountAggregateRoot(new Identity(command.AccountId));
-
-            var events = accountAggregate.Credit(command.Amount, new CanCreditAccount(CanCreditAccount));
-
-            Contract.Assume(Contract.ForAll(events, o => o != null));
-
-            _domainEventDispatcher.PublishAll(events);
+            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
+            
+            domainEvents.AggregateRoot.Execute(command);
         }
 
-        private bool CanCreditAccount(AccountAggregateRoot account, decimal amount, out string declinationReason)
+        private bool CanCreditAccount(AccountState account, decimal amount, out string declinationReason)
         {
             Contract.Requires(account != null);
 
@@ -47,12 +34,6 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             }
 
             return true;
-        }
-
-        [ContractInvariantMethod]
-        private void ObjectInvariants()
-        {
-            Contract.Invariant(_domainEventDispatcher != null);
         }
     }
 }

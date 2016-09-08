@@ -12,8 +12,8 @@ AS
 		  
     DECLARE @transactionTable TABLE 
 		  (			
-			  TransactionId UNIQUEIDENTIFIER
-			, EventProviderVersion INT
+			  TransactionId UNIQUEIDENTIFIER NOT NULL
+			, EventProviderVersion INT NOT NULL
 		  )
 	
 	-- get event provider table id

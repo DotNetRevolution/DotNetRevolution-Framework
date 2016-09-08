@@ -1,113 +1,49 @@
-﻿using DotNetRevolution.Core.Base;
-using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
+﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
-using DotNetRevolution.Test.EventStoreDomain.Account.Exceptions;
-using DotNetRevolution.Test.EventStoreDomain.Account.Snapshots;
 using System.Diagnostics.Contracts;
+using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
+using DotNetRevolution.Core.Reflection;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account
 {
-    public class AccountAggregateRoot : IAggregateRoot
-    {
-        public Identity Identity { get; private set; }
+    public class AccountAggregateRoot : AggregateRoot<AccountState>
+    {        
+        private static IMethodInvoker _methodInvoker = new NamedMethodInvoker<AccountAggregateRoot>("Execute");
 
-        public decimal Balance { get; private set; }
-        
-        [UsedImplicitly]
-        private AccountAggregateRoot()
-        {
-        }
-
-        public AccountAggregateRoot(AccountSnapshot snapshot)
-            : this(new Identity(snapshot.Id))
-        {
-            Contract.Requires(snapshot != null);
-            
-            Balance = snapshot.Balance;
-        }
-
-        public AccountAggregateRoot(Identity identity)
+        private AccountAggregateRoot(Identity identity, AccountState state)
+            : base(identity, state)
         {
             Contract.Requires(identity != null);
-
-            Identity = identity;
+            Contract.Requires(state != null);
+        }               
+        
+        private void Execute(Deposit command)
+        {
+            State.Apply(new CreditApplied(Identity, command.Amount, State.Balance + command.Amount));
         }
 
-        public override string ToString()
+        private void Execute(Withdraw command)
         {
-            return string.Format("AccountID: {0}", Identity.Value.ToString());
+            State.Apply(new CreditApplied(Identity, command.Amount, State.Balance - command.Amount));
         }
-
-        public IDomainEventCollection Credit(decimal amount, CanCreditAccount canCreditAccount)
+        
+        public static DomainEventCollection Create(Create command)
         {
-            Contract.Requires(canCreditAccount != null);
-            Contract.Ensures(Contract.Result<IDomainEventCollection>() != null);
+            var identity = new Identity(command.Identity);
 
-            string declinationReason;
+            var domainEvent = new Created(identity, command.BeginningBalance);
 
-            if (canCreditAccount(this, amount, out declinationReason))
-            {
-                var result = new CreditApplied(Identity, amount, Balance + amount);
+            var state = new AccountState(domainEvent);
 
-                Apply(result);
+            var aggregateRoot = new AccountAggregateRoot(identity, state);
 
-                return new DomainEventCollection(this, result);
-            }
-
-            throw new CreditDeclinedException(declinationReason);            
+            return new DomainEventCollection(aggregateRoot, domainEvent);
         }
-
-        public IDomainEventCollection Debit(decimal amount, CanDebitAccount canDebitAccount)
+        
+        public override void Execute(ICommand command)
         {
-            Contract.Requires(canDebitAccount != null);
-            Contract.Ensures(Contract.Result<IDomainEventCollection>() != null);
-
-            string declinationReason;
-
-            if (canDebitAccount(this, amount, out declinationReason))
-            {
-                var result = new DebitApplied(Identity, amount, Balance - amount);
-
-                Apply(result);
-
-                return new DomainEventCollection(this, result);
-            }
-
-            throw new DebitDeclinedException(declinationReason);
+            _methodInvoker.InvokeMethodFor(this, command);
         }
-
-        public static IDomainEventCollection Create(decimal beginningBalance, out AccountAggregateRoot account)
-        {
-            account = new AccountAggregateRoot();
-
-            var result = new Created(Identity.New(), beginningBalance);
-
-            account.Apply(result);
-
-            return new DomainEventCollection(account, result);                
-        }
-
-        private void Apply(Created domainEvent)
-        {
-            Identity = domainEvent.AccountId;
-            Balance = domainEvent.Balance;
-        }
-
-        private void OnCreated(Created domainEvent)
-        {
-            Identity = domainEvent.AccountId;
-            Balance = domainEvent.Balance;
-        }
-
-        private void Apply(DebitApplied domainEvent)
-        {
-            Balance = domainEvent.NewBalance;
-        }
-
-        private void Apply(CreditApplied domainEvent)
-        {
-            Balance = domainEvent.NewBalance;
-        }        
     }
 }

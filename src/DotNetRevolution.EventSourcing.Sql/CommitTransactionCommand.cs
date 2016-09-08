@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -106,7 +107,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             var sequence = new TransactionEventSequence();
 
             // go through each domain event in the event provider
-            foreach (var revision in eventStream)
+            foreach (var revision in eventStream.Where(x => x is DomainEventRevision).Cast<DomainEventRevision>())
             {
                 foreach(var domainEvent in revision.DomainEvents)
                 {

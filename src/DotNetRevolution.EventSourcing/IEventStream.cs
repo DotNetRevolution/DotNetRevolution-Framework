@@ -10,9 +10,12 @@ namespace DotNetRevolution.EventSourcing
     {
         [Pure]
         IEventProvider EventProvider { get; }
-        
+
         [Pure]
-        IEventStream Append(IDomainEventCollection domainEvents);
+        void Append(IDomainEvent domainEvent);
+
+        [Pure]
+        void Append(IReadOnlyCollection<IDomainEvent> domainEvents);
 
         [Pure]
         IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions();

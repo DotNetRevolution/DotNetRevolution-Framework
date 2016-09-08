@@ -44,7 +44,7 @@ namespace DotNetRevolution.Core.Domain
             }
             catch (Exception e)
             {
-                // rethrow exception has a domain event handling exception
+                // throw exception as a domain event handling exception
                 throw new DomainEventHandlingException(domainEvent, e, "Could not get a domain event handler for domain event.");
             }
         }

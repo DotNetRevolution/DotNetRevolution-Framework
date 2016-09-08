@@ -16,7 +16,7 @@ namespace DotNetRevolution.Test.EventSourcing
             AccountAggregateRoot account;
 
             var command = new Create(100);
-            var domainEvents = AccountAggregateRoot.Create(100, out account);
+            var domainEvents = AccountAggregateRoot.Create(command);
 
             var aggregateRoot = new MappedEventStreamProcessor(new AggregateRootProcessorMap(typeof(Created), "Apply"))
                 .Process<AccountAggregateRoot>(new EventStream(domainEvents));

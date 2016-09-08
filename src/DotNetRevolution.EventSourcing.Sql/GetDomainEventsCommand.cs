@@ -97,7 +97,7 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         private EventStreamRevision GetSnapshotRevision()
         {
-            return new EventStreamRevision(_sqlSnapshot.Version, GetSnapshot(), true);
+            return new SnapshotRevision(_sqlSnapshot.Version, GetSnapshot(), true);
         }
 
         private List<EventStreamRevision> GetRevisions()
@@ -110,7 +110,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             {
                 var firstDomainEvent = group.First();
 
-                revisions.Add(new EventStreamRevision(firstDomainEvent.EventProviderVersion,
+                revisions.Add(new DomainEventRevision(firstDomainEvent.EventProviderVersion,
                                                       _serializer.DeserializeDomainEvents(new Collection<SqlDomainEvent>(group.ToList())),
                                                       true));
             }

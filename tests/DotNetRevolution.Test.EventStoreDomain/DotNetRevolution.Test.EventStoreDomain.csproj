@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account\AccountAggregateRoot.cs" />
-    <Compile Include="Account\AccountRepository.cs" />
+    <Compile Include="Account\AccountState.cs" />
     <Compile Include="Account\Commands\Create.cs" />
     <Compile Include="Account\Commands\CreateHandler.cs" />
     <Compile Include="Account\Commands\Deposit.cs" />

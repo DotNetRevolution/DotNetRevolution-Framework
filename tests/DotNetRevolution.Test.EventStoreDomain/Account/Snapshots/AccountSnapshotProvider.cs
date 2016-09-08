@@ -6,7 +6,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Snapshots
     {
         public override Snapshot GetSnapshot(AccountAggregateRoot aggregateRoot)
         {
-            return new Snapshot(new AccountSnapshot(aggregateRoot.Identity, aggregateRoot.Balance));
+            return new Snapshot(new AccountSnapshot(aggregateRoot.Identity, aggregateRoot.State.Balance));
         }
     }
 }

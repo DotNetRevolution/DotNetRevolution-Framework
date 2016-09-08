@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
@@ -20,16 +21,12 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
         {
             Contract.Assume(command.Amount > decimal.Zero);
 
-            var accountAggregate = new AccountAggregateRoot(new Identity(command.AccountId));
+            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
 
-            var events = accountAggregate.Debit(command.Amount, new CanDebitAccount(CanDebitAccount));
-
-            Contract.Assume(Contract.ForAll(events, o => o != null));
-
-            _domainEventDispatcher.PublishAll(events);
+            domainEvents.AggregateRoot.Execute(command);  
         }
 
-        private bool CanDebitAccount(AccountAggregateRoot account, decimal amount, out string declinationReason)
+        private bool CanDebitAccount(AccountState account, decimal amount, out string declinationReason)
         {
             Contract.Requires(account != null);
 

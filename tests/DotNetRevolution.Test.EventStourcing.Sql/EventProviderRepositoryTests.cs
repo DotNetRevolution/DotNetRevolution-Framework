@@ -1,4 +1,5 @@
-﻿using DotNetRevolution.Core.GuidGeneration;
+﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.GuidGeneration;
 using DotNetRevolution.Core.Hashing;
 using DotNetRevolution.EventSourcing;
 using DotNetRevolution.EventSourcing.Sql;
@@ -16,7 +17,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
     public class EventProviderRepositoryTests
     {
         private IEventStore _eventStore;
-        private AccountRepository _repository;
+        private Core.Commanding.IRepository<AccountAggregateRoot> _repository;
 
         [TestInitialize]
         public void Init()
@@ -34,24 +35,27 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                 Encoding.UTF8,
                 ConfigurationManager.ConnectionStrings["SqlEventStore"].ConnectionString);
 
-            _repository = new AccountRepository(_eventStore);
+            var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
+
+            _repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(_eventStore, streamProcessor);
         }
 
         [TestMethod]
         public void CanGetEventStream()
         {
-            AccountAggregateRoot account;
-            AccountAggregateRoot result;
+            //AccountAggregateRoot account;
+            //AccountAggregateRoot result;
 
-            var command = new Create(100);
-            var domainEvents = AccountAggregateRoot.Create(100, out account);
+            //var command = new Create(100);
+            //var domainEvents = AccountAggregateRoot.Create(command);
 
-            _repository.Commit(command, new EventStream(domainEvents), account);
+            //account = new AccountAggregateRoot()
+            //_repository.Commit(command, );
 
-            var eventStream = _repository.GetByIdentity(account.Identity, out result);
-
-            Assert.IsNotNull(eventStream);
-            Assert.IsNotNull(result);
+            //account = _repository.GetByIdentity(account.Identity);
+            Assert.Fail();
+            //Assert.IsNotNull(eventStream);
+            //Assert.IsNotNull(result);
         }
     }
 }

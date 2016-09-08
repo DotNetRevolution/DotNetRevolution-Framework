@@ -1,7 +1,8 @@
-﻿using DotNetRevolution.Core.Domain.CodeContract;
+﻿using DotNetRevolution.Core.Commanding.CodeContract;
+using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Domain
+namespace DotNetRevolution.Core.Commanding
 {
     [ContractClass(typeof(RepositoryContract<>))]
     public interface IRepository<TAggregateRoot>
@@ -9,6 +10,6 @@ namespace DotNetRevolution.Core.Domain
     {
         TAggregateRoot GetByIdentity(Identity identity);
 
-        void Commit(TAggregateRoot aggregateRoot);
+        void Commit(ICommand command, TAggregateRoot aggregateRoot);
     }
 }

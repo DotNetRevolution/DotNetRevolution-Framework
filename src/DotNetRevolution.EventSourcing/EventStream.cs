@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStream : IEventStream
+    public class EventStream : IEventStream, IStateTracker
     {
         private readonly List<EventStreamRevision> _revisions = new List<EventStreamRevision>();
 
         public IEventProvider EventProvider { get; }
 
         public EventStream(IDomainEventCollection domainEvents)
-            : this(new EventProvider(domainEvents), new EventStreamRevision(domainEvents))
+            : this(new EventProvider(domainEvents), new DomainEventRevision(domainEvents))
         {
             Contract.Requires(domainEvents?.AggregateRoot != null);
         }
@@ -40,20 +41,28 @@ namespace DotNetRevolution.EventSourcing
             EventProvider = eventProvider;
             _revisions.AddRange(revisions);
         }
-        
-        public IEventStream Append(IDomainEventCollection domainEvents)
+
+        public void Append(IReadOnlyCollection<IDomainEvent> domainEvents)
         {
             // find latest version
             var latestVersion = GetLatestVersion();
 
             // create new revision using last revision's version to increment from
-            var newRevision = new EventStreamRevision(latestVersion.Increment(), domainEvents);
+            var newRevision = new DomainEventRevision(latestVersion.Increment(), domainEvents);
 
             // add new revision to stream
             _revisions.Add(newRevision);
+        }
 
-            // return this for fluent api
-            return this;
+        public void Append(IDomainEvent domainEvent)
+        {
+            Append(new Collection<IDomainEvent> { domainEvent });
+        }
+
+        public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()
+        {
+            return _revisions.Where(x => x.Committed == false)
+                             .ToList();
         }
 
         private EventProviderVersion GetLatestVersion()
@@ -67,12 +76,6 @@ namespace DotNetRevolution.EventSourcing
             Contract.Assume(lastRevision != null);
 
             return lastRevision.Version;
-        }
-
-        public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()
-        {
-            return _revisions.Where(x => x.Committed == false)
-                             .ToList();
         }
 
         IEnumerator<EventStreamRevision> IEnumerable<EventStreamRevision>.GetEnumerator()
@@ -89,6 +92,16 @@ namespace DotNetRevolution.EventSourcing
         private void ObjectInvariants()
         {
             Contract.Invariant(_revisions != null);            
+        }
+
+        public void Apply(IDomainEvent domainEvent)
+        {
+            Append(domainEvent);
+        }
+
+        public void Apply(IReadOnlyCollection<IDomainEvent> domainEvents)
+        {
+            Append(domainEvents);
         }
     }
 }

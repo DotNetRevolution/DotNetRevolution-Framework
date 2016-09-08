@@ -1,7 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Extension;
 using DotNetRevolution.Core.Serialization;
-using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Diagnostics.Contracts;
 using System.Collections.Generic;
