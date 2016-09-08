@@ -111,7 +111,11 @@
     <Compile Include="Domain\IRepository.cs" />
     <Compile Include="Domain\IStateTracker.cs" />
     <Compile Include="GuidGeneration\CodeContract\GuidGeneratorContract.cs" />
+    <Compile Include="GuidGeneration\CodeContract\SequentialGuidGeneratorContract.cs" />
     <Compile Include="GuidGeneration\GuidGenerator.cs" />
+    <Compile Include="GuidGeneration\SequentialAsBytesGuidGenerator.cs" />
+    <Compile Include="GuidGeneration\SequentialAsStringGuidGenerator.cs" />
+    <Compile Include="GuidGeneration\SequentialAtEndGuidGenerator.cs" />
     <Compile Include="GuidGeneration\SequentialGuidType.cs" />
     <Compile Include="Base\UsedImplicitlyAttribute.cs" />
     <Compile Include="Commanding\CodeContract\CommandCatalogContract.cs" />
@@ -170,10 +174,9 @@
     <Compile Include="Domain\IDomainEventHandler.cs" />
     <Compile Include="Domain\IDomainEventHandlerCollection.cs" />
     <Compile Include="Domain\IDomainEventHandlerFactory.cs" />
-    <Compile Include="GuidGeneration\SequentialGuid.cs" />
+    <Compile Include="GuidGeneration\SequentialGuidGenerator.cs" />
     <Compile Include="Domain\IDomainEventHandler`1.cs" />
     <Compile Include="GuidGeneration\IGuidGenerator.cs" />
-    <Compile Include="GuidGeneration\SequentialGenerator.cs" />
     <Compile Include="Domain\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.AsReadOnly.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
