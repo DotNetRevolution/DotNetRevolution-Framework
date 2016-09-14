@@ -104,6 +104,7 @@
     <Compile Include="Domain\CodeContract\AggregateRootBuilderContract.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootStateBuilderContract.cs" />
     <Compile Include="Domain\CodeContract\RepositoryContract.cs" />
+    <Compile Include="Domain\CodeContract\StateTrackerContract.cs" />
     <Compile Include="Domain\IAggregateRootBuilder.cs" />
     <Compile Include="Domain\IAggregateRootState.cs" />
     <Compile Include="Domain\IAggregateRootStateBuilder.cs" />

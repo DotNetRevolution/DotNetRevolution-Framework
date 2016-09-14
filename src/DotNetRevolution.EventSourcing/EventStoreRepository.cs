@@ -23,14 +23,23 @@ namespace DotNetRevolution.EventSourcing
                 
         public TAggregateRoot GetByIdentity(Identity identity)
         {
+            Contract.Assume(identity != null);
+
             var eventStream = _eventStore.GetEventStream<TAggregateRoot>(identity);
 
             return _eventStreamProcessor.Process(eventStream);
         }
 
         public void Commit(ICommand command, TAggregateRoot aggregateRoot)
-        {            
-            var transaction = new EventProviderTransaction(command, (IEventStream) aggregateRoot.State.InternalStateTracker, aggregateRoot);
+        {
+            Contract.Assume(command != null);
+            Contract.Assume(aggregateRoot?.State != null);
+
+            var stateTracker = aggregateRoot.State.InternalStateTracker as IEventStreamStateTracker;
+            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions() != null);
+            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions().Count > 0);
+
+            var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot);
 
             _eventStore.Commit(transaction);
         }

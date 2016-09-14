@@ -41,21 +41,18 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         }
 
         [TestMethod]
-        public void CanGetEventStream()
+        public void CanGetAggregateRoot()
         {
-            //AccountAggregateRoot account;
-            //AccountAggregateRoot result;
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var domainEvents = AccountAggregateRoot.Create(command);
 
-            //var command = new Create(100);
-            //var domainEvents = AccountAggregateRoot.Create(command);
+            domainEvents.AggregateRoot.State.InternalStateTracker = new EventStreamStateTracker(new EventStream(domainEvents));
 
-            //account = new AccountAggregateRoot()
-            //_repository.Commit(command, );
+            _repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
 
-            //account = _repository.GetByIdentity(account.Identity);
-            Assert.Fail();
-            //Assert.IsNotNull(eventStream);
-            //Assert.IsNotNull(result);
+            var account = _repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
+
+            Assert.IsNotNull(account);
         }
     }
 }

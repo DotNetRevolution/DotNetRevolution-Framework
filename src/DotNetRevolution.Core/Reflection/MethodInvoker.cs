@@ -9,13 +9,15 @@ namespace DotNetRevolution.Core.Reflection
     {
         protected static class Cache<TCache>
         {
-            public static IDictionary<Type, MethodInfo> Entries;
+            public static IDictionary<Type, MethodInfo> Entries { get; set; }
 
             public static object Lock = new object();
         }
         
         public void InvokeMethodFor<TInstance>(TInstance instance, object parameter)
         {
+            Contract.Assume(Cache<TInstance>.Entries != null);
+
             MethodInfo methodInfo;
 
             if (Cache<TInstance>.Entries.TryGetValue(parameter.GetType(), out methodInfo))

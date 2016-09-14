@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="CodeContract\EventStreamContract.cs" />
     <Compile Include="CodeContract\EventStreamProcessorContract.cs" />
+    <Compile Include="CodeContract\EventStreamStateTrackerContract.cs" />
     <Compile Include="CodeContract\TypeFactoryContract.cs" />
     <Compile Include="DefaultUsernameProvider.cs" />
     <Compile Include="DefaultTypeFactory.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="EventStreamStateTracker.cs" />
     <Compile Include="IEventStreamProcessor.cs" />
     <Compile Include="IEventStreamRevision.cs" />
+    <Compile Include="IEventStreamStateTracker.cs" />
     <Compile Include="ITypeFactory.cs" />
     <Compile Include="CodeContract\EventProviderContract.cs" />
     <Compile Include="CodeContract\EventProviderContract`1.cs" />

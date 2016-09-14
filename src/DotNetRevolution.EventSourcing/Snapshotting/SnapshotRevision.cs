@@ -37,5 +37,11 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
 
             _snapshot = snapshot;
         }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_snapshot != null);
+        }
     }
 }

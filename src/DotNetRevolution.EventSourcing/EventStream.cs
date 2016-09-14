@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStream : IEventStream, IStateTracker
+    public class EventStream : IEventStream
     {
         private readonly List<EventStreamRevision> _revisions = new List<EventStreamRevision>();
 
@@ -92,16 +92,6 @@ namespace DotNetRevolution.EventSourcing
         private void ObjectInvariants()
         {
             Contract.Invariant(_revisions != null);            
-        }
-
-        public void Apply(IDomainEvent domainEvent)
-        {
-            Append(domainEvent);
-        }
-
-        public void Apply(IReadOnlyCollection<IDomainEvent> domainEvents)
-        {
-            Append(domainEvents);
         }
     }
 }

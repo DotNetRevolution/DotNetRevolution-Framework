@@ -8,5 +8,10 @@ namespace DotNetRevolution.Core.GuidGeneration
         {
             return Guid.NewGuid();
         }
+
+        public static Guid NewGuid()
+        {
+            return new DefaultGenerator().Create();
+        }
     }
 }

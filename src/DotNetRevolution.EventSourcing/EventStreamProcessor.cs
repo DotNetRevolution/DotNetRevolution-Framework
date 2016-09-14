@@ -17,6 +17,9 @@ namespace DotNetRevolution.EventSourcing
         public EventStreamProcessor(IAggregateRootBuilder<TAggregateRoot, TAggregateRootState> aggregateRootBuilder,
                                     IAggregateRootStateBuilder<TAggregateRootState> aggregateRootStateBuilder)
         {
+            Contract.Requires(aggregateRootBuilder != null);
+            Contract.Requires(aggregateRootStateBuilder != null);
+
             _aggregateRootBuilder = aggregateRootBuilder;
             _aggregateRootStateBuilder = aggregateRootStateBuilder;
         }
@@ -28,7 +31,11 @@ namespace DotNetRevolution.EventSourcing
             // set stream as internal state tracker
             state.InternalStateTracker = new EventStreamStateTracker(stream);
 
-            return _aggregateRootBuilder.Build(stream.EventProvider.Identity, state);
+            // create aggregate root with state
+            var aggregateRoot = _aggregateRootBuilder.Build(stream.EventProvider.Identity, state);
+            Contract.Assume(aggregateRoot != null);
+
+            return aggregateRoot;
         }
 
         private TAggregateRootState CreateState(IEventStream stream)
@@ -37,36 +44,43 @@ namespace DotNetRevolution.EventSourcing
             Contract.Ensures(Contract.Result<TAggregateRootState>() != null);
 
             var snapshotRevision = stream.FirstOrDefault(x => x is SnapshotRevision) as SnapshotRevision;
-            var domainEventRevisions = stream.Where(x => x is DomainEventRevision)
-                                             .Cast<DomainEventRevision>()                                             
-                                             .ToList();
+
+            // order domain events and flatten list
+            IReadOnlyCollection<IDomainEvent> domainEvents = stream.Where(x => x is DomainEventRevision)
+                                                                   .OrderBy(x => x.Version)                                     
+                                                                   .Cast<DomainEventRevision>()                                                                                  
+                                                                   .SelectMany(x => x.DomainEvents)
+                                                                   .ToList();
+
+            var domainEventsExist = domainEvents.Any();
+
+            TAggregateRootState state;
 
             // check for valid stream
-            if (snapshotRevision == null || domainEventRevisions.Any() == false)
+            if (snapshotRevision == null)
             {
-                throw new InvalidOperationException("Event stream does not contain a snapshot or domain event revision.");
-            }
-
-            if (domainEventRevisions.Any())
-            {
-                // order domain events and flatten list
-                IReadOnlyCollection<IDomainEvent> domainEvents = domainEventRevisions.OrderBy(x => x.Version)
-                                                       .SelectMany(x => x.DomainEvents)
-                                                       .ToList()
-                                                       .AsReadOnly();
-
-                if (snapshotRevision == null)
+                if (domainEventsExist)
                 {
                     // domain events only
-                    return _aggregateRootStateBuilder.Build(domainEvents);
+                    state = _aggregateRootStateBuilder.Build(domainEvents);
                 }
-                
-                // snapshot and domain events
-                return _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data, domainEvents);
+
+                throw new InvalidOperationException("Event stream does not contain a snapshot or domain event revision.");
+            }
+            else
+            {
+                if (domainEventsExist)
+                {
+                    // snapshot and domain events
+                    state = _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data, domainEvents);
+                }
+
+                // snapshot only
+                state = _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data);
             }
             
-            // snapshot only
-            return _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data);
+            Contract.Assume(state != null);
+            return state;
         }
 
         [ContractInvariantMethod]

@@ -4,31 +4,35 @@ using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStreamStateTracker : IStateTracker
+    public class EventStreamStateTracker : IStateTracker, IEventStreamStateTracker
     {
-        private readonly IEventStream _eventStream;
+        public IEventStream EventStream { get; }
 
         public EventStreamStateTracker(IEventStream eventStream)
         {
             Contract.Requires(eventStream != null);
 
-            _eventStream = eventStream;
+            EventStream = eventStream;
         }
 
         public void Apply(IReadOnlyCollection<IDomainEvent> domainEvents)
         {
-            _eventStream.Append(domainEvents);
+            Contract.Assume(domainEvents != null);
+
+            EventStream.Append(domainEvents);
         }
 
         public void Apply(IDomainEvent domainEvent)
         {
-            _eventStream.Append(domainEvent);
+            Contract.Assume(domainEvent != null);
+
+            EventStream.Append(domainEvent);
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_eventStream != null);
+            Contract.Invariant(EventStream != null);
         }
     }
 }

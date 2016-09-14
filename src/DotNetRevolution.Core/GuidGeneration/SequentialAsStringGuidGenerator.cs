@@ -24,5 +24,10 @@ namespace DotNetRevolution.Core.GuidGeneration
 
             return guidBytes;
         }
+
+        public static Guid NewGuid()
+        {
+            return new SequentialAsStringGuidGenerator().Create();
+        }
     }
 }

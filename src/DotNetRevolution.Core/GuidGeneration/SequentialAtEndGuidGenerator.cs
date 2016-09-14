@@ -2,6 +2,9 @@
 
 namespace DotNetRevolution.Core.GuidGeneration
 {
+    /// <summary>
+    /// Preferred generator when using Microsoft SQL Server.
+    /// </summary>
     public class SequentialAtEndGuidGenerator : SequentialGuidGenerator
     {
         protected override byte[] OrderBytes(byte[] timestampBytes, byte[] randomBytes)
@@ -14,6 +17,11 @@ namespace DotNetRevolution.Core.GuidGeneration
             Buffer.BlockCopy(timestampBytes, 2, guidBytes, 10, 6);
 
             return guidBytes;
+        }
+
+        public static Guid NewGuid()
+        {
+            return new SequentialAtEndGuidGenerator().Create();
         }
     }
 }
