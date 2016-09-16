@@ -4,31 +4,28 @@ using System.Reflection;
 
 namespace DotNetRevolution.Core.Reflection
 {
-    public class StartsWithMethodInvoker : MethodInvoker
+    public class StartsWithMethodInvoker<T> : MethodInvoker
     {
-        private StartsWithMethodInvoker()
-        {
-        }
-
-        public static IMethodInvoker CreateFor<T>(string methodName)
+        public StartsWithMethodInvoker(string methodName)
         {
             Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);
-            Contract.Ensures(Contract.Result<IMethodInvoker>() != null);
 
             AddToCacheIfMissing<T>(methodName);
-
-            return new StartsWithMethodInvoker();
         }
 
-        private static void AddToCacheIfMissing<T>(string methodName)
+        private static void AddToCacheIfMissing<TT>(string methodName)
         {
-            if (Cache<T>.Entries == null)
+            // check cache for entries of TT   
+            if (Cache<TT>.Entries == null)
             {
-                lock (Cache<T>.Entries)
+                // no entries, lock cache for TT
+                lock (Cache<TT>.Lock)
                 {
-                    if (Cache<T>.Entries == null)
+                    // check to see if another thread beat this thread
+                    if (Cache<TT>.Entries == null)
                     {
-                        Cache<T>.Entries = typeof(T)
+                        // no thread beat this thread, create dictionary
+                        Cache<TT>.Entries = typeof(T)
                             .GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                             .Where(m => m.Name.StartsWith(methodName))
                             .Where(m => m.GetParameters().Length == 1)

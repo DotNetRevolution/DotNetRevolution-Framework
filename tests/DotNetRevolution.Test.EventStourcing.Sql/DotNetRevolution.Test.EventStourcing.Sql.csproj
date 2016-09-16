@@ -52,8 +52,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="EventProviderRepositoryTests.cs" />
-    <Compile Include="SqlEventStoreTests.cs" />
+    <Compile Include="SqlEventProviderRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +71,10 @@
     <ProjectReference Include="..\..\src\DotNetRevolution.Newtonsoft.Json\DotNetRevolution.Newtonsoft.Json.csproj">
       <Project>{5DCBB9F2-8A95-47C1-86E1-93BE0CC469D6}</Project>
       <Name>DotNetRevolution.Newtonsoft.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotNetRevolution.Test.EventSourcing\DotNetRevolution.Test.EventSourcing.csproj">
+      <Project>{07D81F68-4EF8-4DD7-A90F-CFDDD4B4DA1D}</Project>
+      <Name>DotNetRevolution.Test.EventSourcing</Name>
     </ProjectReference>
     <ProjectReference Include="..\DotNetRevolution.Test.EventStoreDomain\DotNetRevolution.Test.EventStoreDomain.csproj">
       <Project>{c3e88787-d808-48e8-9d07-fe369525b52a}</Project>

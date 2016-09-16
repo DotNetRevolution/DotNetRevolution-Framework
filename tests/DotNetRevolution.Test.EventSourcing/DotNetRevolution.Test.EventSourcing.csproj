@@ -53,9 +53,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="MappedEventStreamProcessorTests.cs" />
-    <Compile Include="OnConventionEventStreamProcessorTests.cs" />
-    <Compile Include="SingleMethodEventStreamProcessorTests.cs" />
+    <Compile Include="EventProviderRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -64,8 +64,10 @@ namespace DotNetRevolution.EventSourcing
                     // domain events only
                     state = _aggregateRootStateBuilder.Build(domainEvents);
                 }
-
-                throw new InvalidOperationException("Event stream does not contain a snapshot or domain event revision.");
+                else
+                {
+                    throw new InvalidOperationException("Event stream does not contain a snapshot or domain event revision.");
+                }
             }
             else
             {
@@ -74,9 +76,11 @@ namespace DotNetRevolution.EventSourcing
                     // snapshot and domain events
                     state = _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data, domainEvents);
                 }
-
-                // snapshot only
-                state = _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data);
+                else
+                {
+                    // snapshot only
+                    state = _aggregateRootStateBuilder.Build(snapshotRevision.Snapshot.Data);
+                }
             }
             
             Contract.Assume(state != null);

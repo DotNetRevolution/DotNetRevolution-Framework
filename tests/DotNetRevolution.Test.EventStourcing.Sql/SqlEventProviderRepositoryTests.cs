@@ -5,20 +5,18 @@ using DotNetRevolution.EventSourcing;
 using DotNetRevolution.EventSourcing.Sql;
 using DotNetRevolution.Json;
 using DotNetRevolution.Test.EventStoreDomain.Account;
-using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Configuration;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
     [TestClass]
-    public class EventProviderRepositoryTests
-    {
-        private IEventStore _eventStore;
-        private Core.Commanding.IRepository<AccountAggregateRoot> _repository;
-
+    public class SqlEventProviderRepositoryTests : EventProviderRepositoryTests
+    {        
         [TestInitialize]
         public void Init()
         {
@@ -26,9 +24,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
 
             var hash = typeFactory.GetHash(typeof(Created));
-            var e = typeFactory.GetType(hash);
 
-            _eventStore = new SqlEventStore(
+            var eventStore = new SqlEventStore(
                 new DefaultUsernameProvider("UnitTester"),
                 new JsonSerializer(),
                 typeFactory,
@@ -37,22 +34,32 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
 
-            _repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(_eventStore, streamProcessor);
+            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor);
+        }
+        
+        [TestMethod]
+        public override void CanGetAggregateRoot()
+        {
+            base.CanGetAggregateRoot();
         }
 
         [TestMethod]
-        public void CanGetAggregateRoot()
+        public void AddManyRecords()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
-            var domainEvents = AccountAggregateRoot.Create(command);
+            Parallel.For(0, 100000, i =>
+            {
+                try
+                {
+                    base.CanGetAggregateRoot();
+                }
+                catch (Exception e)
+                { Assert.Fail(e.ToString()); }
+            });
+        }
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = new EventStreamStateTracker(new EventStream(domainEvents));
-
-            _repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
-
-            var account = _repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
-
-            Assert.IsNotNull(account);
+        protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)
+        {
+            return new EventStreamStateTracker(new EventStream(domainEvents));
         }
     }
 }
