@@ -36,16 +36,14 @@ namespace DotNetRevolution.Core.Domain
             {
                 lock(Cache<TAggregateRoot>.Lock)
                 {
-                    if (Cache<TAggregateRoot>.Constructor == null)
+                    ctor = Cache<TAggregateRoot>.Constructor;
+
+                    if (ctor == null)
                     {
                         ctor = typeof(TAggregateRoot).GetConstructor(DefaultBindingFlags, Type.DefaultBinder, new[] { typeof(Identity), typeof(TAggregateRootState) }, null);
                         Contract.Assume(ctor != null);
 
                         Cache<TAggregateRoot>.Constructor = ctor;
-                    }
-                    else
-                    {
-                        ctor = Cache<TAggregateRoot>.Constructor;
                     }
                 }
             }
