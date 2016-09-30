@@ -9,27 +9,35 @@ using DotNetRevolution.Json;
 using DotNetRevolution.ShuttleESB.Serialization;
 using System.Text;
 using Shuttle.Esb.SqlServer;
+using System.Linq;
 
 namespace DotNetRevolution.EventSourcing.Announcer
 {
     public class Host : ShuttleESBHost, IHost
     {
+        private readonly ShuttleMessageCatalog _messageCatalog;
+
+        public Host()
+        {
+            _messageCatalog = new ShuttleMessageCatalog();
+        }
+
         protected override List<Type> MessagesRequiringSubscriptions
         {
             get
             {
-                throw new NotImplementedException();
+                return _messageCatalog.Entries.Select(x => x.MessageType).ToList();
             }
         }
                 
         protected override void InitializeContainer()
         {
-
+            
         }
         
         protected override IMessageHandlerFactory InitializeMessageHandlerFactory()
         {
-            return new CatalogMessageHandlerFactory(new ShuttleMessageCatalog());
+            return new CatalogMessageHandlerFactory(_messageCatalog);
         }
 
         protected override ISerializer InitializeMessageSerializer()
@@ -40,6 +48,6 @@ namespace DotNetRevolution.EventSourcing.Announcer
         protected override ISubscriptionManager InitializeSubscriptionManager()
         {
             return SubscriptionManager.Default();
-        }
+        }        
     }
 }
