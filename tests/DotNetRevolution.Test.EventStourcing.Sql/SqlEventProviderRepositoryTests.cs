@@ -55,8 +55,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                 catch (Exception e)
                 { Assert.Fail(e.ToString()); }
             });
-        }
-        
+        }        
+
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
@@ -65,6 +65,20 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                 try
                 {
                     base.CanAddMultipleDomainEventsToSingleEventProviderConcurrently();
+                }
+                catch (Exception e)
+                { Assert.Fail(e.ToString()); }
+            });
+        }
+
+        [TestMethod]
+        public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
+        {
+            Parallel.For(0, 100, i =>
+            {
+                try
+                {
+                    base.CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException();
                 }
                 catch (Exception e)
                 { Assert.Fail(e.ToString()); }

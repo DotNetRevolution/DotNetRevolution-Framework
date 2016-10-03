@@ -21,24 +21,33 @@ namespace DotNetRevolution.Core.Commanding
         {
             var entry = GetEntry(commandType);
 
-            var handlerType = entry.CommandHandlerType;
-
-            // lock cache for concurrency
-            lock (_handlers)
+            // cast as static command entry to check for pre-initialized command handler
+            var staticEntry = entry as StaticCommandEntry;
+            
+            // check if entry is static entry
+            if (staticEntry == null)
             {
-                // find handler in cache
-                var handler = GetCachedHandler(handlerType);
+                var handlerType = entry.CommandHandlerType;
 
-                // if handler is not cached, create and cache
-                if (handler == null)
+                // lock cache for concurrency
+                lock (_handlers)
                 {
-                    handler = CreateHandler(handlerType);
+                    // find handler in cache
+                    var handler = GetCachedHandler(handlerType);
 
-                    CacheHandler(handler);
+                    // if handler is not cached, create and cache
+                    if (handler == null)
+                    {
+                        handler = CreateHandler(handlerType);
+
+                        CacheHandler(handler);
+                    }
+
+                    return handler;
                 }
-
-                return handler;
             }
+
+            return staticEntry.Handler;
         }
         
         [Pure]
@@ -73,7 +82,7 @@ namespace DotNetRevolution.Core.Commanding
             Contract.Requires(handlerType != null);
 
             ICommandHandler handler;
-
+                        
             _handlers.TryGetValue(handlerType, out handler);
 
             return handler;

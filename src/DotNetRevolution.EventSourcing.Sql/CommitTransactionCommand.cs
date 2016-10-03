@@ -11,6 +11,9 @@ namespace DotNetRevolution.EventSourcing.Sql
 {
     internal class CommitTransactionCommand
     {
+        private const int UniqueKeyViolationNumber = 2627;
+        private const int UniqueIndexViolationNumber = 2601;
+
         private readonly SqlSerializer _serializer;
         private readonly SqlCommand _command;
         private readonly ITypeFactory _typeFactory;
@@ -54,8 +57,8 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
             catch (SqlException e)
             {
-                if (e.Number == 2627 /* unique key violation */ ||
-                    e.Number == 2601 /* unique index violation */)
+                if (e.Number == UniqueKeyViolationNumber ||
+                    e.Number == UniqueIndexViolationNumber)
                 {
                     throw new ConcurrencyException();
                 }

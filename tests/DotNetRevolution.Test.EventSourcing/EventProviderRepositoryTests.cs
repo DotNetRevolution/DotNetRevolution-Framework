@@ -6,6 +6,7 @@ using DotNetRevolution.EventSourcing;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStourcing
@@ -47,6 +48,27 @@ namespace DotNetRevolution.Test.EventStourcing
             {
                 ch.Handle(new Deposit(account.Identity, i));
             }
+        }
+
+        public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
+        {
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var domainEvents = AccountAggregateRoot.Create(command);
+
+            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+
+            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+
+            var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
+
+            Assert.IsNotNull(account);
+
+            var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })));
+            
+            Parallel.For(0, 100, (i) =>
+            {
+                dispatcher.Dispatch(new Deposit(account.Identity, i));
+            });
         }
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
