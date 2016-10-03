@@ -56,8 +56,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                 { Assert.Fail(e.ToString()); }
             });
         }
-
-
+        
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {

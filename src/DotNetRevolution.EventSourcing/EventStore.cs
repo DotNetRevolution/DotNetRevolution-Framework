@@ -4,6 +4,7 @@ using DotNetRevolution.Core.Serialization;
 using System;
 using System.Diagnostics.Contracts;
 using System.Collections.Generic;
+using DotNetRevolution.Core.Persistence;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -50,6 +51,10 @@ namespace DotNetRevolution.EventSourcing
                 CommitTransaction(_usernameProvider.GetUsername(), transaction, uncommittedRevisions);
                 
                 uncommittedRevisions.ForEach(x => x.Commit());
+            }
+            catch (ConcurrencyException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

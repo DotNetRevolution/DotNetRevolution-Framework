@@ -14,9 +14,7 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
-
-	DECLARE @errText VARCHAR(MAX)
-				
+					
 	BEGIN TRAN 
 		
 	BEGIN TRY
@@ -95,14 +93,13 @@ BEGIN
 
 	BEGIN CATCH
 		-- something failed
-		ROLLBACK TRAN
-
-		SET @errText = ERROR_MESSAGE()
-
-		RAISERROR(@errText, 16, 1)
+		ROLLBACK TRAN;
 		
+		-- raise error to caller
+		THROW
+
 		-- return failure to caller
 		RETURN 1
-		
+
 	END CATCH
 END

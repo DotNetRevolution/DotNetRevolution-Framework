@@ -1,5 +1,5 @@
-﻿using DotNetRevolution.Core.Commanding;
-using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -47,8 +47,19 @@ namespace DotNetRevolution.EventSourcing.Sql
             // set connection
             _command.Connection = conn;
 
-            // execute command
-            _command.ExecuteNonQuery();
+            try
+            {
+                // execute command
+                _command.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                if (e.Number == 2627 /* unique key violation */ ||
+                    e.Number == 2601 /* unique index violation */)
+                {
+                    throw new ConcurrencyException();
+                }
+            }
 
             ThrowIfError();
         }
