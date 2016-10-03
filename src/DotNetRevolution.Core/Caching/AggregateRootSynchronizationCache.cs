@@ -2,11 +2,14 @@
 
 namespace DotNetRevolution.Core.Caching
 {
-    public class AggregateRootSynchronizationCache : RegionedLazyCache
+    public class AggregateRootSynchronizationCache : LazyCache
     {
-        public AggregateRootSynchronizationCache()
-            : base("AggregateRootSynchronizationCache")
+        protected override string Region
         {
+            get
+            {
+                return "AggregateRootSynchronizationCache";
+            }
         }
         
         protected override CacheItemPolicy GetCacheItemPolicy()

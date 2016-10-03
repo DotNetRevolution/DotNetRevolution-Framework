@@ -3,11 +3,14 @@ using System.Runtime.Caching;
 
 namespace DotNetRevolution.Core.Caching
 {
-    public class AggregateRootCache : RegionedLazyCache
+    public class AggregateRootCache : LazyCache
     {
-        public AggregateRootCache()
-            : base("AggregateRootCache")
+        protected override string Region
         {
+            get
+            {
+                return "AggregateRootCache";
+            }
         }
 
         protected override CacheItemPolicy GetCacheItemPolicy()

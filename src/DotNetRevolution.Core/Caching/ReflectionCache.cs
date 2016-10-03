@@ -2,13 +2,16 @@
 
 namespace DotNetRevolution.Core.Caching
 {
-    public class ReflectionCache : RegionedLazyCache
-    {        
-        public ReflectionCache()
-            : base("Reflection")
+    public class ReflectionCache : LazyCache
+    {
+        protected override string Region
         {
+            get
+            {
+                return "Reflection";
+            }
         }
-
+        
         protected override CacheItemPolicy GetCacheItemPolicy()
         {
             return new CacheItemPolicy

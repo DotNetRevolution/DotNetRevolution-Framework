@@ -98,7 +98,6 @@
     <Compile Include="Caching\ICache.cs" />
     <Compile Include="Caching\LazyCache.cs" />
     <Compile Include="Caching\ReflectionCache.cs" />
-    <Compile Include="Caching\RegionedLazyCache.cs" />
     <Compile Include="Commanding\AggregateRootCommand.cs" />
     <Compile Include="Commanding\SynchronizedAggregateRootCommandHandler.cs" />
     <Compile Include="Commanding\CodeContract\RepositoryContract.cs" />

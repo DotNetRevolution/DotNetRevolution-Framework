@@ -1,15 +1,22 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Runtime.Caching;
 
 namespace DotNetRevolution.Core.Caching
 {
     public class LazyCache : ICache
     {
+        protected virtual string Region
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
+
         public T AddOrGetExisting<T>(string key, Lazy<T> lazy)
         {
             var newValue = lazy;            
-            var oldValue = MemoryCache.Default.AddOrGetExisting(AddRegionToKey(key), newValue, GetCacheItemPolicy()) as Lazy<T>;
+            var oldValue = MemoryCache.Default.AddOrGetExisting(CreateKey(key), newValue, GetCacheItemPolicy()) as Lazy<T>;
 
             try
             {
@@ -24,7 +31,7 @@ namespace DotNetRevolution.Core.Caching
         
         public void Remove(string key)
         {
-            MemoryCache.Default.Remove(AddRegionToKey(key));
+            MemoryCache.Default.Remove(CreateKey(key));
         }
         
         protected virtual CacheItemPolicy GetCacheItemPolicy()
@@ -32,9 +39,14 @@ namespace DotNetRevolution.Core.Caching
             return new CacheItemPolicy();
         }
 
-        protected virtual string AddRegionToKey(string key)
+        protected virtual string CreateKey(string key)
         {
-            return key;
+            if (string.IsNullOrWhiteSpace(Region))
+            {
+                return key;
+            }
+
+            return $"{Region}::{key}";
         }
     }
 }

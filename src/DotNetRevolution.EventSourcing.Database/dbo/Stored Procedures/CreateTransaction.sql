@@ -55,9 +55,7 @@ BEGIN
 			INSERT (EventProviderGuid, Descriptor) 
 			VALUES (source.EventProviderGuid, source.Descriptor)
 		WHEN MATCHED THEN
-			UPDATE SET 
-				  EventProviderGuid = source.EventProviderGuid
-				, Descriptor = source.Descriptor;
+			UPDATE SET Descriptor = source.Descriptor;
 				
 		-- create transaction
 		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 
