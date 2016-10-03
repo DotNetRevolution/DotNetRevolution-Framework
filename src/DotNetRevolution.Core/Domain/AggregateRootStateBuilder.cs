@@ -1,7 +1,10 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Caching;
+using DotNetRevolution.Core.Extension;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
+using System.Runtime.Caching;
 
 namespace DotNetRevolution.Core.Domain
 {
@@ -9,12 +12,11 @@ namespace DotNetRevolution.Core.Domain
         where TAggregateRootState : class, IAggregateRootState
     {
         private static BindingFlags DefaultBindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+        private readonly ReflectionCache _cache;
 
-        protected static class Cache<TCache>
+        public AggregateRootStateBuilder()
         {
-            public static IDictionary<Type[], ConstructorInfo> Entries = new Dictionary<Type[], ConstructorInfo>();
-
-            public static object Lock = new object();
+            _cache = new ReflectionCache();
         }
 
         public TAggregateRootState Build(object snapshot)
@@ -23,8 +25,7 @@ namespace DotNetRevolution.Core.Domain
             TAggregateRootState state;
 
             // find constructor
-            ctor = GetConstructor(new[] { snapshot.GetType() });
-            Contract.Assume(ctor != null);
+            ctor = GetConstructor(new[] { snapshot.GetType() }, "SnapshotOnly");
 
             // invoke constructor creating state object
             state = ctor.Invoke(new[] { snapshot }) as TAggregateRootState;
@@ -39,8 +40,7 @@ namespace DotNetRevolution.Core.Domain
             TAggregateRootState state;
 
             // find constructor
-            ctor = GetConstructor(new[] { typeof(IReadOnlyCollection<IDomainEvent>) });
-            Contract.Assume(ctor != null);
+            ctor = GetConstructor(new[] { typeof(IReadOnlyCollection<IDomainEvent>) }, "DomainEventsOnly");
 
             // invoke constructor creating state object
             state = ctor.Invoke(new[] { domainEvents }) as TAggregateRootState;
@@ -55,8 +55,7 @@ namespace DotNetRevolution.Core.Domain
             TAggregateRootState state;
 
             // find constructor
-            ctor = GetConstructor(new[] { snapshot.GetType(), typeof(IReadOnlyCollection<IDomainEvent>) });
-            Contract.Assume(ctor != null);
+            ctor = GetConstructor(new[] { snapshot.GetType(), typeof(IReadOnlyCollection<IDomainEvent>) }, "SnapshotAndDomainEvents");
 
             // invoke constructor creating state object
             state = ctor.Invoke(new[] { snapshot, domainEvents }) as TAggregateRootState;
@@ -65,36 +64,26 @@ namespace DotNetRevolution.Core.Domain
             return state;
         }
 
-        private static ConstructorInfo GetConstructor(Type[] parameters)
+        private ConstructorInfo GetConstructor(Type[] parameters, string ctorType)
         {
             Contract.Requires(parameters != null);
             Contract.Ensures(Contract.Result<ConstructorInfo>() != null);
 
-            ConstructorInfo ctor;
+            var aggregateRootStateType = typeof(TAggregateRootState);
 
-            if (Cache<TAggregateRootState>.Entries.TryGetValue(parameters, out ctor))
-            {
-                Contract.Assume(ctor != null);
-            }
-            else
-            {
-                lock (Cache<TAggregateRootState>.Lock)
-                {
-                    if (Cache<TAggregateRootState>.Entries.TryGetValue(parameters, out ctor))
-                    {
-                        Contract.Assume(ctor != null);
-                    }
-                    else
-                    {
-                        ctor = typeof(TAggregateRootState).GetConstructor(DefaultBindingFlags, Type.DefaultBinder, parameters, null);
-                        Contract.Assume(ctor != null);
+            var key = $"{aggregateRootStateType.FullName}::{ctorType}";
+            Contract.Assume(string.IsNullOrWhiteSpace(key) == false);
 
-                        Cache<TAggregateRootState>.Entries.Add(parameters, ctor);
-                    }
-                }
-            }
+            var ctor = _cache.AddOrGetExisting(key, new Lazy<ConstructorInfo>(() => aggregateRootStateType.GetConstructor(DefaultBindingFlags, Type.DefaultBinder, parameters, null)));
+            Contract.Assume(ctor != null);
 
             return ctor;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_cache != null);
         }
     }
 }

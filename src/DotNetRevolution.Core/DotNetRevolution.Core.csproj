@@ -92,22 +92,33 @@
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />
+    <Compile Include="Caching\AggregateRootCache.cs" />
+    <Compile Include="Caching\AggregateRootSynchronizationCache.cs" />
+    <Compile Include="Caching\CodeContract\CacheContract.cs" />
+    <Compile Include="Caching\ICache.cs" />
+    <Compile Include="Caching\LazyCache.cs" />
+    <Compile Include="Caching\ReflectionCache.cs" />
+    <Compile Include="Caching\RegionedLazyCache.cs" />
     <Compile Include="Commanding\AggregateRootCommand.cs" />
+    <Compile Include="Commanding\SynchronizedAggregateRootCommandHandler.cs" />
     <Compile Include="Commanding\CodeContract\RepositoryContract.cs" />
     <Compile Include="Commanding\IAggregateRootCommand.cs" />
     <Compile Include="Commanding\IRepository.cs" />
-    <Compile Include="Commanding\RepositoryCommandHandler.cs" />
+    <Compile Include="Commanding\AggregateRootCommandHandler.cs" />
     <Compile Include="Domain\AggregateRootBuilder.cs" />
     <Compile Include="Domain\AggregateRootState.cs" />
     <Compile Include="Domain\AggregateRootStateBuilder.cs" />
+    <Compile Include="Domain\AggregateRootSynchronizer.cs" />
     <Compile Include="Domain\AggregateRoot`1.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootBuilderContract.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootStateBuilderContract.cs" />
+    <Compile Include="Domain\CodeContract\AggregateRootSynchronizerContract.cs" />
     <Compile Include="Domain\CodeContract\RepositoryContract.cs" />
     <Compile Include="Domain\CodeContract\StateTrackerContract.cs" />
     <Compile Include="Domain\IAggregateRootBuilder.cs" />
     <Compile Include="Domain\IAggregateRootState.cs" />
     <Compile Include="Domain\IAggregateRootStateBuilder.cs" />
+    <Compile Include="Domain\IAggregateRootSynchronizer.cs" />
     <Compile Include="Domain\IAggregateRoot`1.cs" />
     <Compile Include="Domain\IRepository.cs" />
     <Compile Include="Domain\IStateTracker.cs" />
@@ -186,10 +197,12 @@
     <Compile Include="Hashing\CodeContract\HashProviderContract.cs" />
     <Compile Include="Hashing\IHashProvider.cs" />
     <Compile Include="Hashing\MD5HashProvider.cs" />
+    <Compile Include="Extension\MemoryCache.LazyAddOrGet.cs" />
     <Compile Include="Messaging\CodeContract\MessageHandlerContract`1.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\IMessageHandler`1.cs" />
     <Compile Include="Messaging\Message.cs" />
+    <Compile Include="Persistence\ConcurrencyException.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />
@@ -276,6 +289,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

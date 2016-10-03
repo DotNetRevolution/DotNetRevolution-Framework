@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Persistence;
+using System;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Commanding
@@ -17,7 +18,21 @@ namespace DotNetRevolution.Core.Commanding
         public void Dispatch(ICommand command)
         {
             ICommandHandler handler = GetHandler(command);
-            HandleCommand(command, handler);            
+
+            try
+            {
+                handler.Handle(command);
+            }
+            catch (ConcurrencyException)
+            {
+                // keep trying command until no more ConcurrencyException occur
+                Dispatch(command);            
+            }
+            catch (Exception e)
+            {
+                // re-throw exception as a command handling exception
+                throw new CommandHandlingException(command, e, "Exception occurred in command handler, check inner exception for details.");
+            }
         }
 
         private ICommandHandler GetHandler(ICommand command)
@@ -33,24 +48,7 @@ namespace DotNetRevolution.Core.Commanding
             catch (Exception e)
             {
                 // rethrow exception has a command handling exception
-                throw new CommandHandlingException(command, e, "Could not get a command handler for command.");
-            }
-        }
-
-        private static void HandleCommand(ICommand command, ICommandHandler handler)
-        {
-            Contract.Requires(handler != null);
-            Contract.Requires(command != null);
-
-            try
-            {
-                // handle command
-                handler.Handle(command);
-            }
-            catch (Exception e)
-            {
-                // re-throw exception as a command handling exception
-                throw new CommandHandlingException(command, e, "Exception occurred in command handler, check inner exception for details.");
+                throw new CommandHandlingException(command, e, "Could not get command handler.");
             }
         }
 

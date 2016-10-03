@@ -1,38 +1,40 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using System;
+using System.Collections.Generic;
+using DotNetRevolution.Core.Caching;
 
 namespace DotNetRevolution.Core.Reflection
 {
     public class NamedMethodInvoker<T> : MethodInvoker
     {
+        private readonly string _methodName;
+        private readonly ICache _cache;
+
         public NamedMethodInvoker(string methodName)
         {
             Contract.Requires(string.IsNullOrWhiteSpace(methodName) == false);
 
-            AddToCacheIfMissing<T>(methodName);
+            _methodName = methodName;
+            _cache = new ReflectionCache();
         }
         
-        private static void AddToCacheIfMissing<TT>(string methodName)
-        {         
-            // check cache for entries of TT   
-            if (Cache<TT>.Entries == null)
-            {
-                // no entries, lock cache for TT
-                lock (Cache<TT>.Lock)
-                {
-                    // check to see if another thread beat this thread
-                    if (Cache<TT>.Entries == null)
-                    {
-                        // no thread beat this thread, create dictionary
-                        Cache<TT>.Entries = typeof(T)
-                            .GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
-                            .Where(m => m.Name == methodName)
-                            .Where(m => m.GetParameters().Length == 1)
-                            .ToDictionary(m => m.GetParameters().First().ParameterType, m => m);
-                    }
-                }
-            }
+        protected override IDictionary<Type, MethodInfo> GetCachedEntries<TInstance>()
+        {
+            var type = typeof(TInstance);
+
+            return _cache.AddOrGetExisting(type.FullName, new Lazy<IDictionary<Type, MethodInfo>>(() => type
+                                                            .GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
+                                                            .Where(m => m.Name == _methodName)
+                                                            .Where(m => m.GetParameters().Length == 1)
+                                                            .ToDictionary(m => m.GetParameters().First().ParameterType, m => m)));
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_cache != null);
         }
     }
 }

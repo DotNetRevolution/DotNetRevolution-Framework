@@ -3,7 +3,7 @@ using System;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {    
-    public class Create : AggregateRootCommand
+    public class Create : AggregateRootCommand<AccountAggregateRoot>
     {
         public decimal BeginningBalance { get; }
         

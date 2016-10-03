@@ -24,9 +24,9 @@ namespace DotNetRevolution.EventSourcing
         public TAggregateRoot GetByIdentity(Identity identity)
         {
             Contract.Assume(identity != null);
-
+                        
             var eventStream = _eventStore.GetEventStream<TAggregateRoot>(identity);
-
+            
             return _eventStreamProcessor.Process(eventStream);
         }
 
@@ -40,7 +40,7 @@ namespace DotNetRevolution.EventSourcing
             Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions().Count > 0);
 
             var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot);
-
+            
             _eventStore.Commit(transaction);
         }
 

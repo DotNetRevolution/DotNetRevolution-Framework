@@ -44,9 +44,38 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         }
 
         [TestMethod]
+        public override void CanAddMultipleDomainEventsToSingleEventProvider()
+        {
+            Parallel.For(0, 100, i =>
+            {
+                try
+                {
+                    base.CanAddMultipleDomainEventsToSingleEventProvider();
+                }
+                catch (Exception e)
+                { Assert.Fail(e.ToString()); }
+            });
+        }
+
+
+        [TestMethod]
+        public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
+        {
+            Parallel.For(0, 100, i =>
+            {
+                try
+                {
+                    base.CanAddMultipleDomainEventsToSingleEventProviderConcurrently();
+                }
+                catch (Exception e)
+                { Assert.Fail(e.ToString()); }
+            });
+        }
+
+        [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 100000, i =>
+            Parallel.For(0, 10000, i =>
             {
                 try
                 {

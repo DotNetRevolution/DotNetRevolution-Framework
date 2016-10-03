@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Commanding
 {
     public class AggregateRootCommandHandler<TAggregateRoot, TCommand> : CommandHandler<TCommand>
         where TAggregateRoot : class, IAggregateRoot
-        where TCommand : IAggregateRootCommand
+        where TCommand : IAggregateRootCommand<TAggregateRoot>
     {
         private readonly IRepository<TAggregateRoot> _repository;
 
@@ -21,15 +21,27 @@ namespace DotNetRevolution.Core.Commanding
         {
             Contract.Assume(command.Identity != Guid.Empty);
 
-            // get aggregate root
-            var aggregateRoot = _repository.GetByIdentity(command.Identity);
+            // create identity from command
+            var identity = new Identity(command.Identity);
+
+            // use identity to get aggregate root
+            TAggregateRoot aggregateRoot = GetAggregateRoot(identity);
 
             // execute command
             aggregateRoot.Execute(command);
 
             // commit changes
             _repository.Commit(command, aggregateRoot);
-        }        
+        }
+
+        protected virtual TAggregateRoot GetAggregateRoot(Identity identity)
+        {
+            Contract.Requires(identity != null);
+            Contract.Ensures(Contract.Result<TAggregateRoot>() != null);
+
+            // get aggregate root
+            return _repository.GetByIdentity(identity);
+        }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()

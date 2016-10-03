@@ -3,15 +3,13 @@ using System;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
-    public class Deposit : Command
+    public class Deposit : AggregateRootCommand<AccountAggregateRoot>
     {
-        public Guid AccountId { get; }
-
         public decimal Amount { get; }
 
         public Deposit(Guid accountId, decimal amount)
+            : base(accountId)
         {
-            AccountId = accountId;
             Amount = amount;
         }
     }

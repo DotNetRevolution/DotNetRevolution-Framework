@@ -7,20 +7,16 @@ namespace DotNetRevolution.Core.Reflection
 {
     public abstract class MethodInvoker : IMethodInvoker
     {
-        protected static class Cache<TCache>
-        {
-            public static IDictionary<Type, MethodInfo> Entries { get; set; }
+        protected abstract IDictionary<Type, MethodInfo> GetCachedEntries<TInstance>();
 
-            public static object Lock = new object();
-        }
-        
         public void InvokeMethodFor<TInstance>(TInstance instance, object parameter)
         {
-            Contract.Assume(Cache<TInstance>.Entries != null);
-
             MethodInfo methodInfo;
 
-            if (Cache<TInstance>.Entries.TryGetValue(parameter.GetType(), out methodInfo))
+            var entries = GetCachedEntries<TInstance>();
+            Contract.Assume(entries != null);
+
+            if (entries.TryGetValue(parameter.GetType(), out methodInfo))
             {
                 Contract.Assume(methodInfo != null);
 
