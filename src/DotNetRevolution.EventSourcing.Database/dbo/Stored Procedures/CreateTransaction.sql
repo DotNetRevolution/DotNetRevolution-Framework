@@ -14,6 +14,8 @@
 AS
 BEGIN
 	SET NOCOUNT ON;
+
+	DECLARE @errorNum INT
 					
 	BEGIN TRAN 
 		
@@ -57,10 +59,23 @@ BEGIN
 		WHEN MATCHED THEN
 			UPDATE SET Descriptor = source.Descriptor;
 				
-		-- create transaction
-		INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 
-		SELECT @transactionId, @eventProviderGuid, e.EventProviderVersion
-		  FROM @events e
+		BEGIN TRY	
+
+			-- create transaction
+			INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 
+			SELECT @transactionId, @eventProviderGuid, e.EventProviderVersion
+				FROM @events e
+
+		END TRY
+		BEGIN CATCH		
+			SET @errorNum = ERROR_NUMBER()
+
+			IF @errorNum IN (2627,2601)
+				THROW 51000, 'Concurrency exception with event provider.', 1;	
+			ELSE
+				THROW
+			
+		END CATCH
 
 		-- insert transaction information
 		INSERT INTO dbo.[TransactionInformation] (EventProviderTransactionId, [User])
@@ -79,7 +94,7 @@ BEGIN
 		  
 		IF @@ROWCOUNT = 0		
 		BEGIN
-			; THROW 51000, 'No transaction events were written.', 1;
+			; THROW 51001, 'No transaction events were written.', 1;
 		END
 
 		-- nothing failed
