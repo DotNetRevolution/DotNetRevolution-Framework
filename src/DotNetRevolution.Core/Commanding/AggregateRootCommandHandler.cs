@@ -19,10 +19,10 @@ namespace DotNetRevolution.Core.Commanding
 
         public override void Handle(TCommand command)
         {
-            Contract.Assume(command.Identity != Guid.Empty);
+            Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // create identity from command
-            var identity = new Identity(command.Identity);
+            var identity = new Identity(command.AggregateRootId);
 
             // use identity to get aggregate root
             TAggregateRoot aggregateRoot = GetAggregateRoot(identity);

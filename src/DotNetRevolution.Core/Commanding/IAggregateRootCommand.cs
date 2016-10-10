@@ -6,6 +6,6 @@ namespace DotNetRevolution.Core.Commanding
     public interface IAggregateRootCommand<TAggregateRoot> : ICommand
         where TAggregateRoot : IAggregateRoot
     {
-        Guid Identity { get; }
+        Guid AggregateRootId { get; }
     }
 }

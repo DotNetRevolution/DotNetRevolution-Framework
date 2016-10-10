@@ -30,7 +30,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
         
         public static DomainEventCollection Create(Create command)
         {
-            var identity = new Identity(command.Identity);
+            var identity = new Identity(command.AggregateRootId);
 
             var domainEvent = new Created(identity, command.BeginningBalance);
 

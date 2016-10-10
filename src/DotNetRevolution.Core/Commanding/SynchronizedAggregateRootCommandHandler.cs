@@ -2,7 +2,6 @@
 using DotNetRevolution.Core.Domain;
 using System;
 using System.Diagnostics.Contracts;
-using System.Runtime.Caching;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -37,10 +36,10 @@ namespace DotNetRevolution.Core.Commanding
 
         public override void Handle(TCommand command)
         {
-            Contract.Assume(command.Identity != Guid.Empty);
+            Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // enter aggregate root synchronization
-            var identity = _synchronizer.Enter(typeof(TAggregateRoot), command.Identity);
+            var identity = _synchronizer.Enter(typeof(TAggregateRoot), command.AggregateRootId);
 
             try
             {
