@@ -19,8 +19,8 @@ namespace DotNetRevolution.Core.GuidGeneration
             // start with 10 bytes of cryptographically strong random data
             byte[] randomBytes = new byte[10];
             RandomGenerator.GetBytes(randomBytes);
-            
-            // get timestamp bytes
+
+            // get timestamp bytes, take only 6 of 8 bytes (guid = 16 bytes total)
             byte[] timestampBytes = BitConverter.GetBytes(DateTime.UtcNow.Ticks / 10000L);
 
             // converting from an Int64, reverse on little-endian systems
