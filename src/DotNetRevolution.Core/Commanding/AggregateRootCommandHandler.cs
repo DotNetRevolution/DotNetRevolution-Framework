@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Domain;
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -22,8 +23,14 @@ namespace DotNetRevolution.Core.Commanding
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // create identity from command
-            var identity = new Identity(command.AggregateRootId);
+            Handle(command, new Identity(command.AggregateRootId));
+        }
 
+        protected void Handle(TCommand command, Identity identity)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(identity != null);
+            
             // use identity to get aggregate root
             TAggregateRoot aggregateRoot = GetAggregateRoot(identity);
 
@@ -34,6 +41,30 @@ namespace DotNetRevolution.Core.Commanding
             _repository.Commit(command, aggregateRoot);
         }
 
+        public override Task HandleAsync(TCommand command)
+        {
+            Contract.Assume(command.AggregateRootId != Guid.Empty);
+
+            // create identity from command
+            return HandleAsync(command, new Identity(command.AggregateRootId));
+        }
+
+        protected async Task HandleAsync(TCommand command, Identity identity)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(identity != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
+            // use identity to get aggregate root
+            TAggregateRoot aggregateRoot = await GetAggregateRootAsync(identity);
+
+            // execute command
+            aggregateRoot.Execute(command);
+
+            // commit changes
+            await _repository.CommitAsync(command, aggregateRoot);
+        }
+
         protected virtual TAggregateRoot GetAggregateRoot(Identity identity)
         {
             Contract.Requires(identity != null);
@@ -41,6 +72,15 @@ namespace DotNetRevolution.Core.Commanding
 
             // get aggregate root
             return _repository.GetByIdentity(identity);
+        }
+
+        protected virtual Task<TAggregateRoot> GetAggregateRootAsync(Identity identity)
+        {
+            Contract.Requires(identity != null);
+            Contract.Ensures(Contract.Result<Task<TAggregateRoot>>() != null);
+
+            // get aggregate root
+            return _repository.GetByIdentityAsync(identity);
         }
 
         [ContractInvariantMethod]

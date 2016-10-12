@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Commanding.CodeContract;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -13,5 +14,11 @@ namespace DotNetRevolution.Core.Commanding
         /// </summary>
         /// <param name="command">The command.</param>
         void Handle(ICommand command);
+
+        /// <summary>
+        /// Handles the specified command asynchronously.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        Task HandleAsync(ICommand command);
     }
 }

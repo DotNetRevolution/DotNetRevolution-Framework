@@ -6,11 +6,12 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
     internal class CommitTransactionCommand
-    {
+    {        
         private const int EventProviderConcurrencyErrorNumber = 51000;
 
         private readonly SqlSerializer _serializer;
@@ -39,7 +40,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                     Direction = ParameterDirection.ReturnValue
                 };
 
-            _command = CreateSqlCommand(transaction, uncommittedRevisions, username);            
+            _command = CreateSqlCommand(transaction, uncommittedRevisions, username);
         }
 
         public void Execute(SqlConnection conn)
@@ -56,15 +57,40 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
             catch (SqlException e)
             {
-                if (e.Number == EventProviderConcurrencyErrorNumber)
-                {
-                    throw new ConcurrencyException();
-                }
+                ThrowIfEventProviderConcurrencyError(e);
             }
 
             ThrowIfError();
         }
-        
+
+        public async Task ExecuteAsync(SqlConnection conn)
+        {
+            Contract.Requires(conn != null);
+
+            // set connection
+            _command.Connection = conn;
+
+            try
+            {
+                // execute command
+                await _command.ExecuteNonQueryAsync();
+            }
+            catch (SqlException e)
+            {
+                ThrowIfEventProviderConcurrencyError(e);
+            }
+
+            ThrowIfError();
+        }
+
+        private static void ThrowIfEventProviderConcurrencyError(SqlException e)
+        {
+            if (e.Number == EventProviderConcurrencyErrorNumber)
+            {
+                throw new ConcurrencyException();
+            }
+        }
+
         private void ThrowIfError()
         {
             if ((int)_result.Value != 0)

@@ -36,12 +36,19 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor);
         }
-        
+
         [TestMethod]
         public override void CanGetAggregateRoot()
         {
             base.CanGetAggregateRoot();
         }
+
+        [TestMethod]
+        public async Task CanGetAggregateRootAsync()
+        {
+            await base.CanGetAggregateRootAsync(100);
+        }
+        
 
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProvider()
@@ -53,9 +60,11 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                     base.CanAddMultipleDomainEventsToSingleEventProvider();
                 }
                 catch (Exception e)
-                { Assert.Fail(e.ToString()); }
+                {
+                    Assert.Fail(e.ToString());
+                }
             });
-        }        
+        }
 
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
@@ -67,7 +76,25 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                     base.CanAddMultipleDomainEventsToSingleEventProviderConcurrently();
                 }
                 catch (Exception e)
-                { Assert.Fail(e.ToString()); }
+                {
+                    Assert.Fail(e.ToString());
+                }
+            });
+        }
+
+        [TestMethod]
+        public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync()
+        {
+            Parallel.For(0, 100, i =>
+            {
+                try
+                {
+                    base.CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync(i);
+                }
+                catch (Exception e)
+                {
+                    Assert.Fail(e.ToString());
+                }
             });
         }
 
@@ -81,10 +108,32 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                     base.CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException();
                 }
                 catch (Exception e)
-                { Assert.Fail(e.ToString()); }
+                {
+                    Assert.Fail(e.ToString());
+                }
             });
         }
 
+        [TestMethod]
+        public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyExceptionAsync()
+        {
+            var tasks = new Task[10];
+
+            for (var i = 0; i < 10; i++)
+            {
+                tasks[i] = CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyExceptionAsync(i);
+            }
+
+            try
+            {
+                Task.WaitAll(tasks);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.ToString());
+            }
+        }
+        
         [TestMethod]
         public void AddManyRecords()
         {
@@ -95,8 +144,30 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
                     base.CanGetAggregateRoot();
                 }
                 catch (Exception e)
-                { Assert.Fail(e.ToString()); }
+                {
+                    Assert.Fail(e.ToString());
+                }
             });
+        }
+
+        [TestMethod]
+        public void AddManyRecordsAsync()
+        {
+            var tasks = new Task[10000];
+
+            for (var i = 0; i < 10000; i++)
+            {
+                tasks[i] = base.CanGetAggregateRootAsync(i);
+            }
+
+            try
+            {
+                Task.WaitAll(tasks);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail(e.ToString());
+            }
         }
 
         protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)

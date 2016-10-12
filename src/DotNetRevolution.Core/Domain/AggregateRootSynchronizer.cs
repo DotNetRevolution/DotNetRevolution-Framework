@@ -1,13 +1,14 @@
 ﻿using DotNetRevolution.Core.Caching;
 using System;
 using System.Diagnostics.Contracts;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Domain
 {
     public class AggregateRootSynchronizer : IAggregateRootSynchronizer
     {
-        private readonly ICache _cache;
+        private const string ErrorMessage = "Error creating or finding synchronization context.";
+        private readonly ICache _cache;        
 
         public AggregateRootSynchronizer(ICache cache)
         {
@@ -16,37 +17,85 @@ namespace DotNetRevolution.Core.Domain
             _cache = cache;
         }
 
-        public void Exit(Identity identity)
+        public void Exit(IAggregateRootSynchronizationContext context)
         {
             // exit lock for identity
-            Monitor.Exit(identity);
+            context.Unlock();
         }
 
-        public Identity Enter(Type aggregateRootType, Guid id)
+        public IAggregateRootSynchronizationContext Enter(Type aggregateRootType, Guid aggregateRootId)
         {
-            Identity identity = null;
+            IAggregateRootSynchronizationContext context = null;
 
             try
             {
-                var key = $"{aggregateRootType.FullName}::{id}";
-                Contract.Assume(string.IsNullOrWhiteSpace(key) == false);
+                string key = GetKey(aggregateRootType, aggregateRootId);
 
-                // get and/or add identity to cache
-                return identity = _cache.AddOrGetExisting(key, new Lazy<Identity>(() => new Identity(id)));
+                // get and/or add context to cache
+                return context = AddOrGetCacheItem(aggregateRootId, key);
             }
             finally
             {
-                // check if identity was returned from cache
-                if (identity == null)
+                // check if context was returned from cache
+                if (context == null)
                 {
-                    throw new ApplicationException("Error creating or finding identity.");
+                    throw new ApplicationException(ErrorMessage);
                 }
 
                 // lock identity
-                Monitor.Enter(identity);
+                context.Lock();
             }
         }
 
+        public async Task<IAggregateRootSynchronizationContext> EnterAsync(Type aggregateRootType, Guid aggregateRootId)
+        {
+            IAggregateRootSynchronizationContext context = null;
+
+            try
+            {
+                string key = GetKey(aggregateRootType, aggregateRootId);
+
+                // get and/or add context to cache
+                return context = AddOrGetCacheItem(aggregateRootId, key);
+            }
+            finally
+            {
+                // check if context was returned from cache
+                if (context == null)
+                {
+                    throw new ApplicationException(ErrorMessage);
+                }
+
+                // lock identity
+                await context.LockAsync();
+            }
+        }
+
+        protected virtual AggregateRootSynchronizationContext CreateAggregateRootSynchronizationContext(Guid aggregateRootId)
+        {
+            Contract.Requires(aggregateRootId != Guid.Empty);
+
+            return new AggregateRootSynchronizationContext(new Identity(aggregateRootId));
+        }
+
+        private IAggregateRootSynchronizationContext AddOrGetCacheItem(Guid aggregateRootId, string key)
+        {
+            Contract.Requires(!string.IsNullOrWhiteSpace(key));
+
+            return _cache.AddOrGetExisting(key, new Lazy<IAggregateRootSynchronizationContext>(() => CreateAggregateRootSynchronizationContext(aggregateRootId)));
+        }
+
+        private static string GetKey(Type aggregateRootType, Guid aggregateRootId)
+        {
+            Contract.Requires(aggregateRootType != null);
+            Contract.Ensures(string.IsNullOrWhiteSpace(Contract.Result<string>()) == false);
+
+            var key = $"{aggregateRootType.FullName}::{aggregateRootId}";
+            Contract.Assume(string.IsNullOrWhiteSpace(key) == false);
+
+            return key;
+        }
+        
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {

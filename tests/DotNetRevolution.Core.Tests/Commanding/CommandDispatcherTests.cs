@@ -2,6 +2,7 @@
 using DotNetRevolution.Core.Tests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Tests.Commanding
 {
@@ -21,10 +22,16 @@ namespace DotNetRevolution.Core.Tests.Commanding
             _dispatcher = new CommandDispatcher(new CommandHandlerFactory(catalog));
         }
 
-        [TestMethod]        
+        [TestMethod]
         public void CanDispatchRegisteredCommand()
         {
             _dispatcher.Dispatch(new Command1());
+        }
+
+        [TestMethod]
+        public void CanDispatchRegisteredCommandAsync()
+        {
+            Task.WaitAll(_dispatcher.DispatchAsync(new Command1()));
         }
 
         [TestMethod]

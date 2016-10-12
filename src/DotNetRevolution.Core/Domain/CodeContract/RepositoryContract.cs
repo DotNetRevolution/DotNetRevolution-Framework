@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
@@ -18,6 +19,22 @@ namespace DotNetRevolution.Core.Domain.CodeContract
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<TAggregateRoot>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public Task CommitAsync(TAggregateRoot aggregateRoot)
+        {
+            Contract.Requires(aggregateRoot != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public Task<TAggregateRoot> GetByIdentityAsync(Identity identity)
+        {
+            Contract.Requires(identity != null);
+            Contract.Ensures(Contract.Result<Task<TAggregateRoot>>() != null);
 
             throw new NotImplementedException();
         }

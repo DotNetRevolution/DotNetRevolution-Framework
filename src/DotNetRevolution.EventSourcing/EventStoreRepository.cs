@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -19,8 +20,31 @@ namespace DotNetRevolution.EventSourcing
 
             _eventStore = eventStore;
             _eventStreamProcessor = eventStreamProcessor;
-        }        
-                
+        }
+
+        public async Task<TAggregateRoot> GetByIdentityAsync(Identity identity)
+        {
+            Contract.Assume(identity != null);
+
+            var eventStream = await _eventStore.GetEventStreamAsync<TAggregateRoot>(identity);
+
+            return _eventStreamProcessor.Process(eventStream);
+        }
+
+        public async Task CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
+        {
+            Contract.Assume(command != null);
+            Contract.Assume(aggregateRoot?.State != null);
+
+            var stateTracker = aggregateRoot.State.InternalStateTracker as IEventStreamStateTracker;
+            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions() != null);
+            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions().Count > 0);
+
+            var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot);
+
+            await _eventStore.CommitAsync(transaction);
+        }
+
         public TAggregateRoot GetByIdentity(Identity identity)
         {
             Contract.Assume(identity != null);

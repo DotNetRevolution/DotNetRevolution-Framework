@@ -1,7 +1,7 @@
 ﻿using DotNetRevolution.Core.Commanding;
-using DotNetRevolution.Core.Domain;
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
@@ -14,6 +14,11 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
             
             domainEvents.AggregateRoot.Execute(command);
+        }        
+
+        public override Task HandleAsync(Deposit command)
+        {
+            return Task.Run(() => Handle(command));
         }
 
         private bool CanCreditAccount(AccountState account, decimal amount, out string declinationReason)

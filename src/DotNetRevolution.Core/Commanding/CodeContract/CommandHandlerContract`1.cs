@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Commanding.CodeContract
 {
@@ -8,13 +10,21 @@ namespace DotNetRevolution.Core.Commanding.CodeContract
     {
         public abstract bool Reusable { get; }
 
-        public void Handle(ICommand command)
-        {
-        }
+        public abstract void Handle(ICommand command);
 
+        public abstract Task HandleAsync(ICommand command);
+        
         public void Handle(TCommand command)
         {
             Contract.Requires(command != null);
+        }
+
+        public Task HandleAsync(TCommand command)
+        {
+            Contract.Requires(command != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
+            throw new NotImplementedException();
         }
     }
 }

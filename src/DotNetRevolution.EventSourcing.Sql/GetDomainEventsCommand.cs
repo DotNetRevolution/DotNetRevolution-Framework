@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -43,16 +44,36 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             _command = CreateSqlCommand(eventProviderType, identity);
         }
-        
+
         public void Execute(SqlConnection conn)
         {
             Contract.Requires(conn != null);
 
             // set connection
             _command.Connection = conn;
-            
-            // execute command
-            _sqlDomainEvents = ExecuteSqlCommand(_command);
+
+            using (var dataReader = _command.ExecuteReader())
+            {
+                // execute command
+                _sqlDomainEvents = ExecuteSqlCommand(dataReader);
+            }
+
+            // set executed so GetResults will return something
+            _executed = true;
+        }
+
+        public async Task ExecuteAsync(SqlConnection conn)
+        {
+            Contract.Requires(conn != null);
+
+            // set connection
+            _command.Connection = conn;
+
+            using (var dataReader = await _command.ExecuteReaderAsync())
+            {
+                // execute command
+                _sqlDomainEvents = ExecuteSqlCommand(dataReader);
+            }
 
             // set executed so GetResults will return something
             _executed = true;
@@ -130,48 +151,47 @@ namespace DotNetRevolution.EventSourcing.Sql
             return sqlCommand;
         }
 
-        private Collection<SqlDomainEvent> ExecuteSqlCommand(SqlCommand command)
+        private Collection<SqlDomainEvent> ExecuteSqlCommand(SqlDataReader dataReader)
         {
+            Contract.Requires(dataReader != null);
+
             var sqlDomainEvents = new Collection<SqlDomainEvent>();
-
-            using (var dataReader = command.ExecuteReader())
+            
+            // throw exception if no rows
+            if (dataReader.HasRows == false)
             {
-                // throw exception if no rows
-                if (dataReader.HasRows == false)
-                {
-                    throw new EventProviderNotFoundException();
-                }
+                throw new EventProviderNotFoundException();
+            }
 
-                // check for event provider descriptor
-                if (dataReader.Read() == false)
-                {
-                    throw new InvalidOperationException("No event provider descriptor result returned.");
-                }
+            // check for event provider descriptor
+            if (dataReader.Read() == false)
+            {
+                throw new InvalidOperationException("No event provider descriptor result returned.");
+            }
 
-                // get event provider information
-                GetEventProviderInformation(dataReader);
+            // get event provider information
+            GetEventProviderInformation(dataReader);
 
-                // move reader to next result set
-                if (dataReader.NextResult())
+            // move reader to next result set
+            if (dataReader.NextResult())
+            {
+                // read until no more rows
+                while (dataReader.Read())
                 {
-                    // read until no more rows
-                    while (dataReader.Read())
-                    {
-                        // create new sql domain event
-                        var sqlDomainEvent = new SqlDomainEvent(dataReader.GetInt32(0),
-                            dataReader.GetInt32(1),
-                            (byte[])dataReader[2],
-                            (byte[])dataReader[3]);
+                    // create new sql domain event
+                    var sqlDomainEvent = new SqlDomainEvent(dataReader.GetInt32(0),
+                        dataReader.GetInt32(1),
+                        (byte[])dataReader[2],
+                        (byte[])dataReader[3]);
 
-                        // add sql domain event to collection
-                        sqlDomainEvents.Add(sqlDomainEvent);
-                    }
+                    // add sql domain event to collection
+                    sqlDomainEvents.Add(sqlDomainEvent);
                 }
-                else
-                {
-                    // no events returned
-                    throw new InvalidOperationException("No event result returned.");
-                }
+            }
+            else
+            {
+                // no events returned
+                throw new InvalidOperationException("No event result returned.");
             }
 
             // check if snapshot or events were returned

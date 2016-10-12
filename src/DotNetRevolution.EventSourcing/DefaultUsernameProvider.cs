@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DotNetRevolution.EventSourcing
+﻿namespace DotNetRevolution.EventSourcing
 {
     public class DefaultUsernameProvider : IUsernameProvider
     {

@@ -3,6 +3,7 @@ using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Test.EventStoreDomain.Account.Delegate;
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
@@ -24,6 +25,11 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
 
             domainEvents.AggregateRoot.Execute(command);  
+        }
+
+        public override Task HandleAsync(Withdraw command)
+        {
+            return Task.Run(() => Handle(command));
         }
 
         private bool CanDebitAccount(AccountState account, decimal amount, out string declinationReason)

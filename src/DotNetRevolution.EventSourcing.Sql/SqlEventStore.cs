@@ -3,8 +3,8 @@ using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Domain;
 using System.Data.SqlClient;
 using System.Text;
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -50,14 +50,28 @@ namespace DotNetRevolution.EventSourcing.Sql
             return command.GetResults();
         }
 
+        protected override async Task<EventStream> GetEventStreamAsync(EventProviderType eventProviderType, Identity identity)
+        {
+            // establish command
+            var command = new GetDomainEventsCommand(_serializer, _typeFactory, eventProviderType, identity);
+
+            // create connection
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                // connection needs to be open before executing
+                await conn.OpenAsync();
+
+                // execute
+                await command.ExecuteAsync(conn);
+            }
+
+            return command.GetResults();
+        }
+
         protected override void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
             // establish command
-            var command = new CommitTransactionCommand(_serializer,
-                _typeFactory,
-                username,
-                transaction,
-                uncommittedRevisions);
+            var command = CreateCommand(username, transaction, uncommittedRevisions);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -67,7 +81,32 @@ namespace DotNetRevolution.EventSourcing.Sql
 
                 // execute
                 command.Execute(conn);
-            }            
+            }
+        }
+
+        protected override async Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        {
+            // establish command
+            var command = CreateCommand(username, transaction, uncommittedRevisions);
+
+            // create connection
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                // connection needs to be open before executing
+                await conn.OpenAsync();
+
+                // execute
+                await command.ExecuteAsync(conn);
+            }
+        }
+
+        private CommitTransactionCommand CreateCommand(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        {
+            return new CommitTransactionCommand(_serializer,
+                _typeFactory,
+                username,
+                transaction,
+                uncommittedRevisions);
         }
     }
 }

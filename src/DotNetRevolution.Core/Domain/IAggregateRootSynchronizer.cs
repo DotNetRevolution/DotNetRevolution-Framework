@@ -1,14 +1,17 @@
 ﻿using DotNetRevolution.Core.Domain.CodeContract;
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Domain
 {
     [ContractClass(typeof(AggregateRootSynchronizerContract))]
     public interface IAggregateRootSynchronizer
     {
-        void Exit(Identity identity);
+        void Exit(IAggregateRootSynchronizationContext context);
 
-        Identity Enter(Type aggregateRootType, Guid id);
+        IAggregateRootSynchronizationContext Enter(Type aggregateRootType, Guid aggregateRootId);
+
+        Task<IAggregateRootSynchronizationContext> EnterAsync(Type aggregateRootType, Guid aggregateRootId);
     }
 }

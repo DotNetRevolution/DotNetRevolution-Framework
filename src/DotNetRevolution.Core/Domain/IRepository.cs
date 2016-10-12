@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain.CodeContract;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Domain
 {
@@ -9,6 +10,10 @@ namespace DotNetRevolution.Core.Domain
     {
         TAggregateRoot GetByIdentity(Identity identity);
 
+        Task<TAggregateRoot> GetByIdentityAsync(Identity identity);
+
         void Commit(TAggregateRoot aggregateRoot);
+
+        Task CommitAsync(TAggregateRoot aggregateRoot);
     }
 }

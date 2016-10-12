@@ -2,6 +2,7 @@
 using DotNetRevolution.Core.Domain;
 using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -34,29 +35,56 @@ namespace DotNetRevolution.Core.Commanding
             return aggregateRoot;
         }
 
+        protected override async Task<TAggregateRoot> GetAggregateRootAsync(Identity identity)
+        {
+            // retrieve from cache or get from base handler and store in cache
+            var task = _cache.AddOrGetExisting(GetCacheKey(identity), new Lazy<Task<TAggregateRoot>>(() => base.GetAggregateRootAsync(identity)));
+            Contract.Assume(task != null);
+
+            return await task;
+        }
+
         public override void Handle(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // enter aggregate root synchronization
-            var identity = _synchronizer.Enter(typeof(TAggregateRoot), command.AggregateRootId);
+            using (var context = _synchronizer.Enter(typeof(TAggregateRoot), command.AggregateRootId))
+            {
+                try
+                {                    
+                    // call base class to handle command
+                    Handle(command, context.Identity);
+                }
+                catch
+                {
+                    // remove aggregate root from cache in case of error
+                    _cache.Remove(GetCacheKey(context.Identity));
 
-            try
-            {
-                // call base class to handle command
-                base.Handle(command);
+                    throw;
+                }
             }
-            catch
-            {
-                // remove aggregate root from cache in case of error
-                _cache.Remove(GetCacheKey(identity));
+        }
 
-                throw;
-            }
-            finally
+        public override async Task HandleAsync(TCommand command)
+        {
+            Contract.Assume(command.AggregateRootId != Guid.Empty);
+
+            // enter aggregate root synchronization
+            using (var context = await _synchronizer.EnterAsync(typeof(TAggregateRoot), command.AggregateRootId))
             {
-                // leave aggregate root synchronization
-                _synchronizer.Exit(identity);
+                try
+                {
+                    // call base class to handle command
+                    await HandleAsync(command, context.Identity);
+                }
+                catch
+                {
+                    // remove aggregate root from cache in case of error
+                    _cache.Remove(GetCacheKey(context.Identity));
+
+                    throw;
+                }
             }
         }
 

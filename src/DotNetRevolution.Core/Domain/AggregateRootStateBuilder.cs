@@ -1,10 +1,8 @@
 ﻿using DotNetRevolution.Core.Caching;
-using DotNetRevolution.Core.Extension;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using System.Runtime.Caching;
 
 namespace DotNetRevolution.Core.Domain
 {
