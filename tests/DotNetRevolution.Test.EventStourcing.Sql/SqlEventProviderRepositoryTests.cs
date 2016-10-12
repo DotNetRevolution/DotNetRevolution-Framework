@@ -53,7 +53,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProvider()
         {
-            Parallel.For(0, 100, i =>
+            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -69,7 +69,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
-            Parallel.For(0, 100, i =>
+            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -85,7 +85,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync()
         {
-            Parallel.For(0, 100, i =>
+            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -101,7 +101,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
         {
-            Parallel.For(0, 100, i =>
+            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
