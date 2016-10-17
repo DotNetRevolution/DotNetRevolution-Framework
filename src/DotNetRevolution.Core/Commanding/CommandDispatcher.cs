@@ -24,7 +24,7 @@ namespace DotNetRevolution.Core.Commanding
             {
                 handler.Handle(command);
             }
-            catch (ConcurrencyException)
+            catch (AggregateRootConcurrencyException)
             {
                 // keep trying command until no more ConcurrencyException occur
                 Dispatch(command);            
@@ -44,7 +44,7 @@ namespace DotNetRevolution.Core.Commanding
             {
                 await handler.HandleAsync(command);
             }
-            catch (ConcurrencyException)
+            catch (AggregateRootConcurrencyException)
             {
                 // keep trying command until no more ConcurrencyException occur
                 await DispatchAsync(command);

@@ -22,7 +22,7 @@ namespace DotNetRevolution.EventSourcing.Announcer
             _messageCatalog = new ShuttleMessageCatalog();
         }
 
-        protected override List<Type> MessagesRequiringSubscriptions
+        protected override IList<Type> MessagesRequiringSubscriptions
         {
             get
             {

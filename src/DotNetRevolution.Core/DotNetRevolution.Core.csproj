@@ -176,7 +176,6 @@
     <Compile Include="Domain\DomainEventHandlerFactory.cs" />
     <Compile Include="Domain\DomainEventHandlingException.cs" />
     <Compile Include="Domain\DomainException.cs" />
-    <Compile Include="Domain\EntityCollection.cs" />
     <Compile Include="GuidGeneration\DefaultGenerator.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
     <Compile Include="Domain\Identity.cs" />
@@ -205,7 +204,7 @@
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\IMessageHandler`1.cs" />
     <Compile Include="Messaging\Message.cs" />
-    <Compile Include="Persistence\ConcurrencyException.cs" />
+    <Compile Include="Persistence\AggregateRootConcurrencyException.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />

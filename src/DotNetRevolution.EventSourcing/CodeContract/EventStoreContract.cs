@@ -8,9 +8,13 @@ namespace DotNetRevolution.EventSourcing.CodeContract
     [ContractClassFor(typeof(IEventStore))]
     internal abstract class EventStoreContract : IEventStore
     {
+        public event EventHandler<TransactionCommittedEventArgs> TransactionCommitted;
+
         public void Commit(EventProviderTransaction transaction)
         {
             Contract.Requires(transaction != null);
+            Contract.Ensures(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
+            Contract.EnsuresOnThrow<Exception>(transaction.EventStream.GetUncommittedRevisions()?.Count > 0);
         }
 
         public Task CommitAsync(EventProviderTransaction transaction)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain
@@ -54,7 +55,7 @@ namespace DotNetRevolution.Core.Domain
             Contract.Requires(handlers != null);
             Contract.Requires(domainEvent != null);
 
-            var exceptions = new List<Exception>();
+            var exceptions = new Collection<Exception>();
 
             foreach(var handler in handlers)
             {

@@ -71,8 +71,6 @@
     <Build Include="dbo\Tables\EventProviderDescriptor.sql" />
     <Build Include="dbo\Tables\EventProviderType.sql" />
     <Build Include="dbo\Tables\EventProviderTransaction.sql" />
-    <Build Include="dbo\Tables\TransactionAnnouncement.sql" />
-    <Build Include="dbo\Tables\TransactionAnnouncementError.sql" />
     <Build Include="dbo\Tables\TransactionCommand.sql" />
     <Build Include="dbo\Tables\TransactionCommandType.sql" />
     <Build Include="dbo\Tables\TransactionEvent.sql" />
@@ -80,11 +78,11 @@
     <Build Include="dbo\Stored Procedures\GetDomainEvents.sql" />
     <Build Include="dbo\Stored Procedures\CreateTransaction.sql" />
     <Build Include="dbo\User Defined Types\udttEvent.sql" />
-    <Build Include="dbo\Tables\Domain.sql" />
-    <Build Include="dbo\Tables\DomainLibrary.sql" />
+    <Build Include="dbo\Tables\TransactionInformation.sql" />
+    <Build Include="dbo\Tables\Projection.sql" />
+    <Build Include="dbo\Tables\ProjectionLog.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshot.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshotType.sql" />
-    <Build Include="dbo\Tables\TransactionInformation.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DotNetRevolution.EventSourcing.Database.refactorlog" />

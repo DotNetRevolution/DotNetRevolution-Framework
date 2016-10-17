@@ -87,7 +87,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         {
             if (e.Number == EventProviderConcurrencyErrorNumber)
             {
-                throw new ConcurrencyException();
+                throw new AggregateRootConcurrencyException();
             }
         }
 

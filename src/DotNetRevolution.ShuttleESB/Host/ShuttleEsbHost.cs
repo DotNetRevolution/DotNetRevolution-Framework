@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Base;
 using Shuttle.Core.Infrastructure;
 using Shuttle.Esb;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.ShuttleESB.Host
 {
@@ -69,7 +69,7 @@ namespace DotNetRevolution.ShuttleESB.Host
             Bus.Start();
         }
 
-        protected abstract List<Type> MessagesRequiringSubscriptions { get; }
+        protected abstract IList<Type> MessagesRequiringSubscriptions { get; }
 
         protected abstract ISerializer InitializeMessageSerializer();
 

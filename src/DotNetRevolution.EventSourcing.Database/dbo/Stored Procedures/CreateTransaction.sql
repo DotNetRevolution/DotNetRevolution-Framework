@@ -42,24 +42,25 @@ BEGIN
 	 LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName		
 		 WHERE tet.TransactionEventTypeId IS NULL
 		
-		-- event provider
-		INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)				
-		SELECT @eventProviderGuid, @eventProviderId, @eventProviderTypeId
-		 WHERE NOT EXISTS (SELECT EventProviderGuid
-							 FROM dbo.EventProvider
-							WHERE EventProviderGuid = @eventProviderGuid)
-								
-		-- event provider descriptor
-		MERGE dbo.EventProviderDescriptor AS target
-		USING (VALUES (@eventProviderGuid, @eventProviderDescriptor)) AS source (EventProviderGuid, Descriptor)
-		   ON target.EventProviderGuid = source.EventProviderGuid
-		WHEN NOT MATCHED THEN
-			INSERT (EventProviderGuid, Descriptor) 
-			VALUES (source.EventProviderGuid, source.Descriptor)
-		WHEN MATCHED THEN
-			UPDATE SET Descriptor = source.Descriptor;
-				
 		BEGIN TRY	
+
+			-- event provider
+			INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)				
+			SELECT @eventProviderGuid, @eventProviderId, @eventProviderTypeId
+			 WHERE NOT EXISTS (SELECT EventProviderGuid
+								 FROM dbo.EventProvider
+								WHERE EventProviderGuid = @eventProviderGuid)
+								
+			-- event provider descriptor
+			MERGE dbo.EventProviderDescriptor AS target
+			USING (VALUES (@eventProviderGuid, @eventProviderDescriptor)) AS source (EventProviderGuid, Descriptor)
+			   ON target.EventProviderGuid = source.EventProviderGuid
+			WHEN NOT MATCHED THEN
+				INSERT (EventProviderGuid, Descriptor) 
+				VALUES (source.EventProviderGuid, source.Descriptor)
+			WHEN MATCHED THEN
+				UPDATE SET Descriptor = source.Descriptor;
+				
 
 			-- create transaction
 			INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 

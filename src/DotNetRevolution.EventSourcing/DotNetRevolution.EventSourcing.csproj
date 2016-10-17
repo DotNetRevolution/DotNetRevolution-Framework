@@ -85,6 +85,7 @@
     <Compile Include="DefaultUsernameProvider.cs" />
     <Compile Include="DefaultTypeFactory.cs" />
     <Compile Include="DomainEventRevision.cs" />
+    <Compile Include="EventStoreDomainEventDispatcher.cs" />
     <Compile Include="EventStoreRepository.cs" />
     <Compile Include="EventStreamProcessor.cs" />
     <Compile Include="EventStreamRevision.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="EventProviderNotFoundException.cs" />
     <Compile Include="IEventStream.cs" />
     <Compile Include="IUsernameProvider.cs" />
+    <Compile Include="Projecting\Projection.cs" />
     <Compile Include="Snapshotting\SnapshotRevision.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotPolicyContract.cs" />
     <Compile Include="Snapshotting\CodeContract\SnapshotPolicyFactoryContract.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Snapshotting\VersionSnapshotPolicy.cs" />
     <Compile Include="EventProviderTransaction.cs" />
     <Compile Include="EventProviderVersion.cs" />
+    <Compile Include="TransactionCommittedEventArgs.cs" />
     <Compile Include="TransactionEventSequence.cs" />
     <Compile Include="TransactionEventType.cs" />
     <Compile Include="TypeNotFoundForHashException.cs" />

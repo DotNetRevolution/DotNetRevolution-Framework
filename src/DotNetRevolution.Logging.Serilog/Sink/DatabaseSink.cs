@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.Logging.Serilog.Sink
 {
     public class DatabaseSink : PeriodicBatchingSink
     {
-        private static readonly List<string> IgnoreProperties;
+        private static readonly Collection<string> IgnoreProperties;
         private const string TableName = "log.Entry";
 
         private readonly string _connectionString;
@@ -145,9 +146,9 @@ namespace DotNetRevolution.Logging.Serilog.Sink
             base.Dispose(disposing);
         }
         
-        private static List<string> CreateIgnoreProperties()
+        private static Collection<string> CreateIgnoreProperties()
         {
-            return new List<string>
+            return new Collection<string>
                 {
                     "Message",
                     "MachineName",

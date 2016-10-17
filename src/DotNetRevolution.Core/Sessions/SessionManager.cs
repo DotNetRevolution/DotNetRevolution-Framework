@@ -8,11 +8,11 @@ namespace DotNetRevolution.Core.Sessions
     public class SessionManager : ISessionManager
     {
         private readonly ICurrentSession _currentSession;
-        private readonly List<ISession> _sessions = new List<ISession>();
+        private readonly HashSet<ISession> _sessions = new HashSet<ISession>();
 
         public IReadOnlyCollection<ISession> Sessions
         {
-            get { return _sessions.AsReadOnly(); }
+            get { return _sessions; }
         }
 
         public ISession this[string id]

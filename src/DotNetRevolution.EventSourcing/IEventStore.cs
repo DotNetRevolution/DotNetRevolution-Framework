@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.CodeContract;
+using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
@@ -17,5 +18,7 @@ namespace DotNetRevolution.EventSourcing
 
         [Pure]
         Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot;
+
+        event EventHandler<TransactionCommittedEventArgs> TransactionCommitted;
     }
 }

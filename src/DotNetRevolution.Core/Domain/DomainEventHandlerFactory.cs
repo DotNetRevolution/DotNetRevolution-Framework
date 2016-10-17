@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain
@@ -31,7 +32,7 @@ namespace DotNetRevolution.Core.Domain
             Contract.Requires(entries != null);
             Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEventHandler>>() != null);
 
-            var results = new List<IDomainEventHandler>();
+            var results = new Collection<IDomainEventHandler>();
 
             // lock cache for concurrency
             lock (_handlers)
