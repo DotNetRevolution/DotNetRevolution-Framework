@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Extension;
 using System.Diagnostics.Contracts;
@@ -7,7 +6,8 @@ using System.Reflection;
 
 namespace DotNetRevolution.Core.Projecting
 {
-    public abstract class Projection
+    public abstract class Projection<TAggregateRoot>
+        where TAggregateRoot : IAggregateRoot
     {
         private static readonly MethodInfo _genericProjectMethod = typeof(IProject<>).GetMethod("Project");
 
@@ -34,55 +34,5 @@ namespace DotNetRevolution.Core.Projecting
 
             domainEvents.ForEach(Project);
         }        
-    }
-
-    public class AccountProjection : Projection,
-        Core.Domain.IDomainEventHandler<Created>
-    {
-        public AccountProjection(ProjectionIdentity identity)
-            : base(identity)
-        {
-            Contract.Requires(identity != null);
-
-        }
-
-        public bool Reusable
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void Handle(IDomainEvent domainEvent)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Handle(Created domainEvent)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class Created : Core.Domain.IDomainEvent
-    {
-        public Guid DomainEventId
-        {
-            get
-            {
-                return Guid.NewGuid();
-            }
-        }
-    }
-    public class Created2 : Core.Domain.IDomainEvent
-    {
-        public Guid DomainEventId
-        {
-            get
-            {
-                return Guid.NewGuid();
-            }
-        }
-    }
+    }    
 }

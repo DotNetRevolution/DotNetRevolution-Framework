@@ -1,6 +1,6 @@
 ﻿using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Domain;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading;
@@ -8,21 +8,12 @@ using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Projecting
 {
-    public class MemoryProjection : Projection
+    public abstract class ProjectionManager<TProjection, TAggregateRoot>
+        where TProjection : Projection<TAggregateRoot>
+        where TAggregateRoot : IAggregateRoot
     {
-        private readonly HashSet<TransactionIdentity> _processedTransactions = new HashSet<TransactionIdentity>();
+        public abstract bool Processed(TransactionIdentity transactionIdentity);
 
-        public MemoryProjection(ProjectionIdentity projectionIdentity)
-            : base(projectionIdentity)
-        {
-            Contract.Requires(projectionIdentity != null);
-        }
-
-        public bool Processed(TransactionIdentity transactionIdentity)
-        {
-            return false;
-        }
-        
         public void Wait(TransactionIdentity transactionIdentity)
         {
             Contract.Requires(transactionIdentity != null);
@@ -34,7 +25,7 @@ namespace DotNetRevolution.Core.Projecting
         {
             var stopwatch = Stopwatch.StartNew();
 
-            while (_processedTransactions.Contains(transactionIdentity) == false)
+            while (Processed(transactionIdentity) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
@@ -60,7 +51,7 @@ namespace DotNetRevolution.Core.Projecting
 
             var stopwatch = Stopwatch.StartNew();
 
-            while (_processedTransactions.Contains(transactionIdentity) == false)
+            while (Processed(transactionIdentity) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
@@ -69,12 +60,6 @@ namespace DotNetRevolution.Core.Projecting
 
                 await Task.Delay(10);
             }
-        }
-        
-        [ContractInvariantMethod]
-        private void ObjectInvariants()
-        {
-            Contract.Invariant(_processedTransactions != null);
         }
     }
 }

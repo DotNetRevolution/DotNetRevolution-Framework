@@ -211,9 +211,10 @@
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Persistence\AggregateRootConcurrencyException.cs" />
     <Compile Include="Projecting\IProject.cs" />
-    <Compile Include="Projecting\MemoryProjection.cs" />
+    <Compile Include="Projecting\MemoryProjectionManager.cs" />
     <Compile Include="Projecting\Projection.cs" />
     <Compile Include="Projecting\ProjectionIdentity.cs" />
+    <Compile Include="Projecting\ProjectionManager.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />
