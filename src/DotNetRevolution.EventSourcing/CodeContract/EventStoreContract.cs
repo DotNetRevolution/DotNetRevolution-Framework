@@ -25,7 +25,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             throw new NotImplementedException();
         }
 
-        public IEventStream GetEventStream<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
+        public IEventStream GetEventStream<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<IEventStream> () != null);
@@ -33,7 +33,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             throw new NotImplementedException();
         }
 
-        public Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
+        public Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<Task<IEventStream>>() != null);

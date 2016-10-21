@@ -28,12 +28,12 @@ namespace DotNetRevolution.EventSourcing
             _usernameProvider = usernameProvider;
         }
 
-        public IEventStream GetEventStream<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
+        public IEventStream GetEventStream<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {            
             try
             {
                 // create new event provider type
-                var eventProviderType = new EventProviderType(typeof(TAggregateRoot));
+                var eventProviderType = new AggregateRootType(typeof(TAggregateRoot));
                                 
                 // get event stream
                 var eventStream = GetEventStream(eventProviderType, identity);
@@ -48,12 +48,12 @@ namespace DotNetRevolution.EventSourcing
             }
         }
 
-        public async Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot
+        public async Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {
             try
             {
                 // create new event provider type
-                var eventProviderType = new EventProviderType(typeof(TAggregateRoot));
+                var eventProviderType = new AggregateRootType(typeof(TAggregateRoot));
 
                 // get event stream
                 var eventStream = await GetEventStreamAsync(eventProviderType, identity);
@@ -118,11 +118,12 @@ namespace DotNetRevolution.EventSourcing
             Contract.Assume(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
         }
 
-        protected abstract EventStream GetEventStream(EventProviderType eventProviderType, Identity identity);
+        protected abstract EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
 
-        protected abstract Task<EventStream> GetEventStreamAsync(EventProviderType eventProviderType, Identity identity);
+        protected abstract Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
 
         protected abstract void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
+
         protected abstract Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
 
         private void RaiseTransactionCommitted(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)

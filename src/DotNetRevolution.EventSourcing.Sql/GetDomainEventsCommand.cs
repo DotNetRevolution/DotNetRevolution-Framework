@@ -1,4 +1,5 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.Domain;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using System;
 using System.Collections.Generic;
@@ -16,33 +17,30 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly SqlSerializer _serializer;
         private readonly ITypeFactory _typeFactory;
         private readonly SqlCommand _command;
-        private readonly EventProviderType _eventProviderType;
-        private readonly Identity _eventProviderIdentity;
+        private readonly AggregateRootType _aggregateRootType;
+        private readonly AggregateRootIdentity _aggregateRootIdentity;
 
         private bool _executed;
-
         private SqlSnapshot _sqlSnapshot;
-
-        private Identity _globalIdentity;
-
+        private EventProviderIdentity _eventProviderIdentity;
         private Collection<SqlDomainEvent> _sqlDomainEvents;
 
         public GetDomainEventsCommand(SqlSerializer serializer, 
             ITypeFactory typeFactory,
-            EventProviderType eventProviderType, 
-            Identity identity)
+            AggregateRootType aggregateRootType, 
+            AggregateRootIdentity aggregateRootIdentity)
         {
             Contract.Requires(serializer != null);
-            Contract.Requires(eventProviderType != null);
+            Contract.Requires(aggregateRootType != null);
             Contract.Requires(typeFactory != null);
-            Contract.Requires(identity != null);
+            Contract.Requires(aggregateRootIdentity != null);
 
             _serializer = serializer;
             _typeFactory = typeFactory;
-            _eventProviderType = eventProviderType;
-            _eventProviderIdentity = identity;
+            _aggregateRootType = aggregateRootType;
+            _aggregateRootIdentity = aggregateRootIdentity;
 
-            _command = CreateSqlCommand(eventProviderType, identity);
+            _command = CreateSqlCommand(aggregateRootType, aggregateRootIdentity);
         }
 
         public void Execute(SqlConnection conn)
@@ -83,7 +81,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         {
             Contract.Requires(_executed);
 
-            var eventProvider = new EventProvider(_globalIdentity, _eventProviderType, _eventProviderIdentity);
+            var eventProvider = new EventProvider(_eventProviderIdentity, _aggregateRootType, _aggregateRootIdentity);
             
             // check for snapshot
             if (_sqlSnapshot == null)
@@ -139,14 +137,14 @@ namespace DotNetRevolution.EventSourcing.Sql
             return revisions;
         }
 
-        private SqlCommand CreateSqlCommand(EventProviderType eventProviderType, Identity identity)
+        private SqlCommand CreateSqlCommand(AggregateRootType aggregateRootType, AggregateRootIdentity identity)
         {
             var sqlCommand = new SqlCommand("[dbo].[GetDomainEvents]");
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
             // set parameters
-            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = identity.Value;
-            sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProviderType.Type);
+            sqlCommand.Parameters.Add("@aggregateRootId", SqlDbType.UniqueIdentifier).Value = identity.Value;
+            sqlCommand.Parameters.Add("@aggregateRootTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(aggregateRootType.Type);
 
             return sqlCommand;
         }
@@ -206,7 +204,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         private void GetEventProviderInformation(SqlDataReader dataReader)
         {
             // event provider global identity
-            _globalIdentity = new Identity(dataReader.GetGuid(0));
+            _eventProviderIdentity = new EventProviderIdentity(dataReader.GetGuid(0));
                         
             // read snapshot
             _sqlSnapshot = GetSnapshot(dataReader);

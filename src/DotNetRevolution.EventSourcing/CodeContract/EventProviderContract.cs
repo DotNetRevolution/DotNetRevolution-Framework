@@ -7,64 +7,34 @@ namespace DotNetRevolution.EventSourcing.CodeContract
     [ContractClassFor(typeof(IEventProvider))]
     internal abstract class EventProviderContract : IEventProvider
     {
-        public EventProviderDescriptor Descriptor
+        public AggregateRootType AggregateRootType
         {
             get
             {
-                Contract.Ensures(Contract.Result<EventProviderDescriptor>() != null);
+                Contract.Ensures(Contract.Result<AggregateRootType>() != null);
 
                 throw new NotImplementedException();
             }
         }
 
-        public IEventStream EventStream
+        public EventProviderIdentity EventProviderIdentity
         {
             get
             {
-                Contract.Ensures(Contract.Result<IEventStream>() != null);
+                Contract.Ensures(Contract.Result<EventProviderIdentity>() != null);
 
                 throw new NotImplementedException();
             }
         }
 
-        public EventProviderType EventProviderType
+        public AggregateRootIdentity AggregateRootIdentity
         {
             get
             {
-                Contract.Ensures(Contract.Result<EventProviderType>() != null);
+                Contract.Ensures(Contract.Result<AggregateRootIdentity>() != null);
 
                 throw new NotImplementedException();
             }
-        }
-
-        public Identity GlobalIdentity
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Identity>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
-        public Identity Identity
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<Identity>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
-        public EventProviderVersion Version
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<EventProviderVersion>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
+        }        
     }
 }

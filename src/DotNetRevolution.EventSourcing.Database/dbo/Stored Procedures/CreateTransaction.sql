@@ -5,10 +5,10 @@
 	, @commandTypeId				BINARY(16)	
     , @commandTypeFullName			VARCHAR(512)	
     , @commandData					VARBINARY(MAX)
-	, @eventProviderGuid			UNIQUEIDENTIFIER
 	, @eventProviderId				UNIQUEIDENTIFIER
-    , @eventProviderTypeId			BINARY(16)		
-	, @eventProviderTypeFullName	VARCHAR (512)   
+	, @aggregateRootId				UNIQUEIDENTIFIER
+    , @aggregateRootTypeId			BINARY(16)		
+	, @aggregateRootTypeFullName	VARCHAR (512)   
 	, @eventProviderDescriptor		VARCHAR (MAX)   
 	, @events						dbo.udttEvent READONLY	    
 AS
@@ -22,11 +22,11 @@ BEGIN
 	BEGIN TRY
 				
 		-- event provider type
-		INSERT INTO dbo.EventProviderType (EventProviderTypeId, FullName)
-		SELECT @eventProviderTypeId, @eventProviderTypeFullName
-		 WHERE NOT EXISTS (SELECT EventProviderTypeId
-							 FROM dbo.EventProviderType
-					 		WHERE FullName = @eventProviderTypeFullName)
+		INSERT INTO dbo.AggregateRootType (AggregateRootTypeId, FullName)
+		SELECT @aggregateRootTypeId, @aggregateRootTypeFullName
+		 WHERE NOT EXISTS (SELECT AggregateRootTypeId
+							 FROM dbo.AggregateRootType
+					 		WHERE FullName = @aggregateRootTypeFullName)
 							
 		-- command type					
 		INSERT INTO dbo.TransactionCommandType (TransactionCommandTypeId, FullName) 
@@ -45,26 +45,26 @@ BEGIN
 		BEGIN TRY	
 
 			-- event provider
-			INSERT INTO dbo.EventProvider (EventProviderGuid, EventProviderId, EventProviderTypeId)				
-			SELECT @eventProviderGuid, @eventProviderId, @eventProviderTypeId
-			 WHERE NOT EXISTS (SELECT EventProviderGuid
+			INSERT INTO dbo.EventProvider (EventProviderId, AggregateRootId, AggregateRootTypeId)				
+			SELECT @eventProviderId, @aggregateRootId, @aggregateRootTypeId
+			 WHERE NOT EXISTS (SELECT EventProviderId
 								 FROM dbo.EventProvider
-								WHERE EventProviderGuid = @eventProviderGuid)
+								WHERE EventProviderId = @eventProviderId)
 								
 			-- event provider descriptor
 			MERGE dbo.EventProviderDescriptor AS target
-			USING (VALUES (@eventProviderGuid, @eventProviderDescriptor)) AS source (EventProviderGuid, Descriptor)
-			   ON target.EventProviderGuid = source.EventProviderGuid
+			USING (VALUES (@eventProviderId, @eventProviderDescriptor)) AS source (EventProviderId, Descriptor)
+			   ON target.EventProviderId = source.EventProviderId
 			WHEN NOT MATCHED THEN
-				INSERT (EventProviderGuid, Descriptor) 
-				VALUES (source.EventProviderGuid, source.Descriptor)
+				INSERT (EventProviderId, Descriptor) 
+				VALUES (source.EventProviderId, source.Descriptor)
 			WHEN MATCHED THEN
 				UPDATE SET Descriptor = source.Descriptor;
 				
 
 			-- create transaction
-			INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderGuid, EventProviderVersion) 
-			SELECT @transactionId, @eventProviderGuid, e.EventProviderVersion
+			INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderId, EventProviderVersion) 
+			SELECT @transactionId, @eventProviderId, e.EventProviderVersion
 				FROM @events e
 
 		END TRY
@@ -91,7 +91,7 @@ BEGIN
 		SELECT ept.EventProviderTransactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
 		  FROM @events e
 		  JOIN dbo.EventProviderTransaction ept ON  e.EventProviderVersion = ept.EventProviderVersion
-												AND ept.EventProviderGuid = @eventProviderGuid
+												AND ept.EventProviderId = @eventProviderId
 		  
 		IF @@ROWCOUNT = 0		
 		BEGIN

@@ -32,7 +32,7 @@ namespace DotNetRevolution.EventSourcing
             state.InternalStateTracker = new EventStreamStateTracker(stream);
 
             // create aggregate root with state
-            var aggregateRoot = _aggregateRootBuilder.Build(stream.EventProvider.Identity, state);
+            var aggregateRoot = _aggregateRootBuilder.Build(stream.EventProvider.AggregateRootIdentity, state);
             Contract.Assume(aggregateRoot != null);
 
             return aggregateRoot;

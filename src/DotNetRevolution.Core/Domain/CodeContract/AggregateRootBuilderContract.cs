@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
         where TAggregateRoot : class, IAggregateRoot<TAggregateRootState>
         where TAggregateRootState : class, IAggregateRootState
     {
-        public TAggregateRoot Build(Identity identity, TAggregateRootState state)
+        public TAggregateRoot Build(AggregateRootIdentity identity, TAggregateRootState state)
         {
             Contract.Requires(identity != null);
             Contract.Requires(state != null);

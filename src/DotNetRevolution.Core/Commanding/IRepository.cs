@@ -9,12 +9,12 @@ namespace DotNetRevolution.Core.Commanding
     public interface IRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
-        TAggregateRoot GetByIdentity(Identity identity);
+        TAggregateRoot GetByIdentity(AggregateRootIdentity identity);
 
-        Task<TAggregateRoot> GetByIdentityAsync(Identity identity);
+        Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity);
 
-        void Commit(ICommand command, TAggregateRoot aggregateRoot);
+        ICommandHandlingResult Commit(ICommand command, TAggregateRoot aggregateRoot);
 
-        Task CommitAsync(ICommand command, TAggregateRoot aggregateRoot);
+        Task<ICommandHandlingResult> CommitAsync(ICommand command, TAggregateRoot aggregateRoot);
     }
 }

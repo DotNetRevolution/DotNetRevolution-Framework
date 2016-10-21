@@ -7,16 +7,18 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class DepositHandler : CommandHandler<Deposit>
     {        
-        public override void Handle(Deposit command)
+        public override ICommandHandlingResult Handle(Deposit command)
         {
             Contract.Assume(command.Amount > decimal.Zero);
 
-            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
+            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), Guid.NewGuid(), 50));
             
             domainEvents.AggregateRoot.Execute(command);
+
+            return new CommandHandlingResult(command.CommandId);
         }        
 
-        public override Task HandleAsync(Deposit command)
+        public override Task<ICommandHandlingResult> HandleAsync(Deposit command)
         {
             return Task.Run(() => Handle(command));
         }

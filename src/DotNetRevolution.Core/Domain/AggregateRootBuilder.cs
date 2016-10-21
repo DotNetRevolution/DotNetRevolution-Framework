@@ -17,7 +17,7 @@ namespace DotNetRevolution.Core.Domain
             _cache = new ReflectionCache();
         }
 
-        public TAggregateRoot Build(Identity identity, TAggregateRootState state)
+        public TAggregateRoot Build(AggregateRootIdentity identity, TAggregateRootState state)
         {
             ConstructorInfo ctor = GetConstructor();
 
@@ -36,7 +36,7 @@ namespace DotNetRevolution.Core.Domain
             var key = $"{aggregateRootType.FullName}";
             Contract.Assume(string.IsNullOrWhiteSpace(key) == false);
 
-            var ctor = _cache.AddOrGetExisting(key, new Lazy<ConstructorInfo>(() => aggregateRootType.GetConstructor(DefaultBindingFlags, Type.DefaultBinder, new[] { typeof(Identity), typeof(TAggregateRootState) }, null)));
+            var ctor = _cache.AddOrGetExisting(key, new Lazy<ConstructorInfo>(() => aggregateRootType.GetConstructor(DefaultBindingFlags, Type.DefaultBinder, new[] { typeof(AggregateRootIdentity), typeof(TAggregateRootState) }, null)));
             Contract.Assume(ctor != null);
 
             return ctor;

@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Domain
     {
         public new TAggregateRootState State { get; }
 
-        public AggregateRoot(Identity identity, TAggregateRootState state)
+        public AggregateRoot(AggregateRootIdentity identity, TAggregateRootState state)
             : base(identity, state)
         {
             Contract.Requires(identity != null);

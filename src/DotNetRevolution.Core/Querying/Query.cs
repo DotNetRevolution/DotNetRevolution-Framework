@@ -1,19 +1,18 @@
-﻿using DotNetRevolution.Core.GuidGeneration;
-using System;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Querying
 {
     public class Query<TResult> : IQuery<TResult>
         where TResult : class
     {
-        private readonly Guid _id = GuidGenerator.Default.Create();
+        public Guid QueryId { get; }
 
-        public Guid QueryId
+        public Query(Guid queryId)
         {
-            get
-            {
-                return _id;
-            }
+            Contract.Requires(queryId != Guid.Empty);
+            
+            QueryId = queryId;
         }
     }
 }

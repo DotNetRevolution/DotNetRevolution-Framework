@@ -5,32 +5,32 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventProvider : IEventProvider
     {
-        public Identity GlobalIdentity { get; }
+        public EventProviderIdentity EventProviderIdentity { get; }
 
-        public EventProviderType EventProviderType { get; }
+        public AggregateRootType AggregateRootType { get; }
 
-        public Identity Identity { get; }        
+        public AggregateRootIdentity AggregateRootIdentity { get; }        
         
-        public EventProvider(Identity globalIdentity,
-            EventProviderType type,
-            Identity identity)
+        public EventProvider(EventProviderIdentity eventProviderIdentity,
+            AggregateRootType type,
+            AggregateRootIdentity aggregateRootIdentity)
         {            
             Contract.Requires(type != null);
+            Contract.Requires(aggregateRootIdentity != null);
+            Contract.Requires(eventProviderIdentity != null);
 
-            Contract.Assume(identity != null);
-            Contract.Assume(globalIdentity != null);
-
-            GlobalIdentity = globalIdentity;
-            EventProviderType = type;
-            Identity = identity;
+            EventProviderIdentity = eventProviderIdentity;
+            AggregateRootType = type;
+            AggregateRootIdentity = aggregateRootIdentity;
         }
 
-        public EventProvider(IDomainEventCollection domainEventCollection)
-            : this(Identity.New(),
-                   new EventProviderType(domainEventCollection.AggregateRoot.GetType()),
+        public EventProvider(EventProviderIdentity eventProviderIdentity, IDomainEventCollection domainEventCollection)
+            : this(eventProviderIdentity,
+                   new AggregateRootType(domainEventCollection.AggregateRoot.GetType()),
                    domainEventCollection.AggregateRoot.Identity)
         {
-            Contract.Requires(domainEventCollection?.AggregateRoot != null);
+            Contract.Requires(eventProviderIdentity != null);
+            Contract.Requires(domainEventCollection?.AggregateRoot?.Identity != null);
         }
     }
 }

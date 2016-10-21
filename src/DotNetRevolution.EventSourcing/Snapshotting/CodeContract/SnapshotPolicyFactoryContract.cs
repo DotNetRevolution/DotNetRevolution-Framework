@@ -6,14 +6,14 @@ namespace DotNetRevolution.EventSourcing.Snapshotting.CodeContract
     [ContractClassFor(typeof(ISnapshotPolicyFactory))]
     internal abstract class SnapshotPolicyFactoryContract : ISnapshotPolicyFactory
     {
-        public void AddPolicy(EventProviderType eventProviderType, ISnapshotPolicy snapshotPolicy)
+        public void AddPolicy(AggregateRootType eventProviderType, ISnapshotPolicy snapshotPolicy)
         {
             Contract.Requires(eventProviderType != null);
             Contract.Requires(snapshotPolicy != null);
             Contract.Ensures(GetPolicy(eventProviderType) == snapshotPolicy);
         }
 
-        public ISnapshotPolicy GetPolicy(EventProviderType eventProviderType)
+        public ISnapshotPolicy GetPolicy(AggregateRootType eventProviderType)
         {
             Contract.Requires(eventProviderType != null);
             Contract.Ensures(Contract.Result<ISnapshotPolicy>() != null);

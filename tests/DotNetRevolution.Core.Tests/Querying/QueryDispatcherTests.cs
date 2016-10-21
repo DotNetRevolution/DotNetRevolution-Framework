@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Querying;
 using DotNetRevolution.Core.Tests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.Core.Tests.Querying
@@ -24,7 +25,7 @@ namespace DotNetRevolution.Core.Tests.Querying
         [TestMethod]        
         public void CanDispatchRegisteredQuery()
         {
-            var result = _dispatcher.Dispatch(new Query1());
+            var result = _dispatcher.Dispatch(new Query1(Guid.NewGuid()));
 
             Assert.IsNotNull(result);
         }
@@ -32,7 +33,7 @@ namespace DotNetRevolution.Core.Tests.Querying
         [TestMethod]
         public void CannotDispatchUnregisteredQuery()
         {
-            var query = new Query2();
+            var query = new Query2(Guid.NewGuid());
 
             try
             {

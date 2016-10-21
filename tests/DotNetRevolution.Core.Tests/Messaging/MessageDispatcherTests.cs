@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Messaging;
 using DotNetRevolution.Core.Tests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.Core.Tests.Messaging
@@ -24,14 +25,14 @@ namespace DotNetRevolution.Core.Tests.Messaging
         [TestMethod]        
         public void CanDispatchRegisteredMessage()
         {
-            _dispatcher.Dispatch(new Message1());
+            _dispatcher.Dispatch(new Message1(Guid.NewGuid()));
         }
 
         [TestMethod]
         [ExpectedException(typeof(MessageHandlingException))]
         public void CannotDispatchUnregisteredMessage()
         {
-            _dispatcher.Dispatch(new Message2());
+            _dispatcher.Dispatch(new Message2(Guid.NewGuid()));
         }
     }
 }

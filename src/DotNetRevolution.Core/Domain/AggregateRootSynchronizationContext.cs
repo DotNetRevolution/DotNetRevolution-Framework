@@ -8,9 +8,9 @@ namespace DotNetRevolution.Core.Domain
     public class AggregateRootSynchronizationContext : Disposable, IAggregateRootSynchronizationContext
     {
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
-        private readonly Identity _identity;
+        private readonly AggregateRootIdentity _identity;
 
-        public Identity Identity
+        public AggregateRootIdentity Identity
         {
             get
             {
@@ -18,7 +18,7 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        public AggregateRootSynchronizationContext(Identity identity)
+        public AggregateRootSynchronizationContext(AggregateRootIdentity identity)
         {
             Contract.Requires(identity != null);
 

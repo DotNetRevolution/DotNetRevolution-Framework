@@ -1,22 +1,16 @@
-﻿using DotNetRevolution.Core.Base;
-using DotNetRevolution.Core.GuidGeneration;
+﻿using DotNetRevolution.Core.GuidGeneration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.Core.Tests.Base
+namespace DotNetRevolution.Core.Tests.GuidGeneration
 {
-    [TestClass]
-    public class SequentialGuidTests
+    public class GuidGeneratorTests
     {
-        [TestInitialize]
-        public void Init()
-        {
-        }
+        protected IGuidGenerator GuidGenerator { get; set; }
 
-        [TestMethod]
-        public void AssertNoClash()
+        public virtual void AssertNoClash()
         {
             var set0 = new HashSet<Guid>();
             var set1 = new HashSet<Guid>();
@@ -27,7 +21,7 @@ namespace DotNetRevolution.Core.Tests.Base
             var set6 = new HashSet<Guid>();
             var set7 = new HashSet<Guid>();
             var set8 = new HashSet<Guid>();
-            var set9 = new HashSet<Guid>();            
+            var set9 = new HashSet<Guid>();
 
             var tasks = new List<Task>();
 
@@ -40,7 +34,7 @@ namespace DotNetRevolution.Core.Tests.Base
             tasks.Add(new Task(() => CreateGuids(set6, 10000)));
             tasks.Add(new Task(() => CreateGuids(set7, 10000)));
             tasks.Add(new Task(() => CreateGuids(set8, 10000)));
-            tasks.Add(new Task(() => CreateGuids(set9, 10000)));            
+            tasks.Add(new Task(() => CreateGuids(set9, 10000)));
 
             tasks.ForEach(task => task.Start());
 
@@ -96,7 +90,7 @@ namespace DotNetRevolution.Core.Tests.Base
         {
             for (var i = 0; i < count; i++)
             {
-                Assert.IsTrue(set.Add(GuidGenerator.Default.Create()));
+                Assert.IsTrue(set.Add(GuidGenerator.Create()));
             }
         }
     }

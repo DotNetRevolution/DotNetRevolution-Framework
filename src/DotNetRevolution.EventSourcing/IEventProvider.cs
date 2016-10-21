@@ -7,8 +7,10 @@ namespace DotNetRevolution.EventSourcing
     [ContractClass(typeof(EventProviderContract))]
     public interface IEventProvider
     {
-        Identity GlobalIdentity { [Pure] get; }
-        Identity Identity { [Pure] get; }
-        EventProviderType EventProviderType { [Pure] get; }
+        EventProviderIdentity EventProviderIdentity { [Pure] get; }
+
+        AggregateRootType AggregateRootType { [Pure] get; }
+
+        AggregateRootIdentity AggregateRootIdentity { [Pure] get; }
     }
 }

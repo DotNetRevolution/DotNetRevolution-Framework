@@ -13,10 +13,13 @@ namespace DotNetRevolution.EventSourcing
 
         public IEventProvider EventProvider { get; }
 
-        public EventStream(IDomainEventCollection domainEvents)
-            : this(new EventProvider(domainEvents), new DomainEventRevision(domainEvents))
+        public EventStream(EventProviderIdentity eventProviderIdentity, IDomainEventCollection domainEvents)
+            : this(new EventProvider(eventProviderIdentity, domainEvents), new DomainEventRevision(domainEvents))
         {
-            Contract.Requires(domainEvents?.AggregateRoot != null);
+            Contract.Requires(eventProviderIdentity != null);
+            Contract.Requires(domainEvents != null);
+            Contract.Requires(domainEvents.AggregateRoot != null);
+            Contract.Requires(domainEvents.AggregateRoot.Identity != null);
         }
 
         public EventStream(IEventProvider eventProvider, IReadOnlyCollection<EventStreamRevision> revisions)

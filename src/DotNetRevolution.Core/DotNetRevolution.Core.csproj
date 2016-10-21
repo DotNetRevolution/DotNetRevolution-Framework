@@ -99,13 +99,19 @@
     <Compile Include="Caching\LazyCache.cs" />
     <Compile Include="Caching\ReflectionCache.cs" />
     <Compile Include="Commanding\AggregateRootCommand.cs" />
+    <Compile Include="Commanding\AggregateRootCommandHandlingResult.cs" />
+    <Compile Include="Commanding\CodeContract\CommandContract.cs" />
+    <Compile Include="Commanding\CommandHandlingResult.cs" />
+    <Compile Include="Commanding\ICommandHandlingResult.cs" />
     <Compile Include="Commanding\StaticCommandEntry.cs" />
     <Compile Include="Commanding\SynchronizedAggregateRootCommandHandler.cs" />
     <Compile Include="Commanding\CodeContract\RepositoryContract.cs" />
     <Compile Include="Commanding\IAggregateRootCommand.cs" />
     <Compile Include="Commanding\IRepository.cs" />
     <Compile Include="Commanding\AggregateRootCommandHandler.cs" />
+    <Compile Include="Commanding\TransactionIdentity.cs" />
     <Compile Include="Domain\AggregateRootBuilder.cs" />
+    <Compile Include="Domain\AggregateRootIdentity.cs" />
     <Compile Include="Domain\AggregateRootState.cs" />
     <Compile Include="Domain\AggregateRootStateBuilder.cs" />
     <Compile Include="Domain\AggregateRootSynchronizationContext.cs" />
@@ -127,7 +133,6 @@
     <Compile Include="Domain\IStateTracker.cs" />
     <Compile Include="GuidGeneration\CodeContract\GuidGeneratorContract.cs" />
     <Compile Include="GuidGeneration\CodeContract\SequentialGuidGeneratorContract.cs" />
-    <Compile Include="GuidGeneration\GuidGenerator.cs" />
     <Compile Include="GuidGeneration\SequentialAsBytesGuidGenerator.cs" />
     <Compile Include="GuidGeneration\SequentialAsStringGuidGenerator.cs" />
     <Compile Include="GuidGeneration\SequentialAtEndGuidGenerator.cs" />
@@ -178,7 +183,6 @@
     <Compile Include="Domain\DomainException.cs" />
     <Compile Include="GuidGeneration\DefaultGenerator.cs" />
     <Compile Include="Domain\IAggregateRoot.cs" />
-    <Compile Include="Domain\Identity.cs" />
     <Compile Include="Domain\IDomainEvent.cs" />
     <Compile Include="Domain\IDomainEventCatalog.cs" />
     <Compile Include="Domain\IDomainEventCollection.cs" />
@@ -191,7 +195,7 @@
     <Compile Include="GuidGeneration\SequentialGuidGenerator.cs" />
     <Compile Include="Domain\IDomainEventHandler`1.cs" />
     <Compile Include="GuidGeneration\IGuidGenerator.cs" />
-    <Compile Include="Domain\ValueObject.cs" />
+    <Compile Include="Base\ValueObject.cs" />
     <Compile Include="Extension\DictionaryExtension.AsReadOnly.cs" />
     <Compile Include="Extension\DictionaryExtension.ToString.cs" />
     <Compile Include="Extension\EnumerableExtension.ForEach.cs" />
@@ -200,11 +204,16 @@
     <Compile Include="Hashing\IHashProvider.cs" />
     <Compile Include="Hashing\MD5HashProvider.cs" />
     <Compile Include="Extension\MemoryCache.LazyAddOrGet.cs" />
+    <Compile Include="Messaging\CodeContract\MessageContract.cs" />
     <Compile Include="Messaging\CodeContract\MessageHandlerContract`1.cs" />
     <Compile Include="Messaging\IMessage.cs" />
     <Compile Include="Messaging\IMessageHandler`1.cs" />
     <Compile Include="Messaging\Message.cs" />
     <Compile Include="Persistence\AggregateRootConcurrencyException.cs" />
+    <Compile Include="Projecting\IProject.cs" />
+    <Compile Include="Projecting\MemoryProjection.cs" />
+    <Compile Include="Projecting\Projection.cs" />
+    <Compile Include="Projecting\ProjectionIdentity.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />
@@ -311,7 +320,7 @@
   <Target Name="BeforeBuild">
   </Target>
   -->
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
+  <!-- <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release'">
     <Exec Command="nuget pack $(ProjectFileName) -Prop Configuration=Release" />
-  </Target>
+  </Target> -->
 </Project>

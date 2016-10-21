@@ -8,7 +8,7 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(AggregateRootSynchronizationContextContract))]
     public interface IAggregateRootSynchronizationContext : IDisposable
     {
-        Identity Identity { get; }
+        AggregateRootIdentity Identity { get; }
 
         void Lock();
         Task LockAsync();

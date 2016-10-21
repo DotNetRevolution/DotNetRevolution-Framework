@@ -69,7 +69,7 @@
   <ItemGroup>
     <Build Include="dbo\Tables\EventProvider.sql" />
     <Build Include="dbo\Tables\EventProviderDescriptor.sql" />
-    <Build Include="dbo\Tables\EventProviderType.sql" />
+    <Build Include="dbo\Tables\AggregateRootType.sql" />
     <Build Include="dbo\Tables\EventProviderTransaction.sql" />
     <Build Include="dbo\Tables\TransactionCommand.sql" />
     <Build Include="dbo\Tables\TransactionCommandType.sql" />
@@ -83,6 +83,7 @@
     <Build Include="dbo\Tables\ProjectionLog.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshot.sql" />
     <Build Include="dbo\Tables\EventProviderSnapshotType.sql" />
+    <Build Include="dbo\Tables\ProjectionType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DotNetRevolution.EventSourcing.Database.refactorlog" />

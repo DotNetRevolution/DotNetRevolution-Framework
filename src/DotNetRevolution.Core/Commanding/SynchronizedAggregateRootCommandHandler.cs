@@ -26,7 +26,7 @@ namespace DotNetRevolution.Core.Commanding
             _cache = cache;
         }
 
-        protected override TAggregateRoot GetAggregateRoot(Identity identity)
+        protected override TAggregateRoot GetAggregateRoot(AggregateRootIdentity identity)
         {
             // retrieve from cache or get from base handler and store in cache
             var aggregateRoot = _cache.AddOrGetExisting(GetCacheKey(identity), new Lazy<TAggregateRoot>(() => base.GetAggregateRoot(identity)));
@@ -35,7 +35,7 @@ namespace DotNetRevolution.Core.Commanding
             return aggregateRoot;
         }
 
-        protected override async Task<TAggregateRoot> GetAggregateRootAsync(Identity identity)
+        protected override async Task<TAggregateRoot> GetAggregateRootAsync(AggregateRootIdentity identity)
         {
             // retrieve from cache or get from base handler and store in cache
             var task = _cache.AddOrGetExisting(GetCacheKey(identity), new Lazy<Task<TAggregateRoot>>(() => base.GetAggregateRootAsync(identity)));
@@ -44,7 +44,7 @@ namespace DotNetRevolution.Core.Commanding
             return await task;
         }
 
-        public override void Handle(TCommand command)
+        public override ICommandHandlingResult Handle(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
@@ -54,7 +54,7 @@ namespace DotNetRevolution.Core.Commanding
                 try
                 {                    
                     // call base class to handle command
-                    Handle(command, context.Identity);
+                    return Handle(command, context.Identity);
                 }
                 catch
                 {
@@ -66,7 +66,7 @@ namespace DotNetRevolution.Core.Commanding
             }
         }
 
-        public override async Task HandleAsync(TCommand command)
+        public override async Task<ICommandHandlingResult> HandleAsync(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
@@ -76,7 +76,7 @@ namespace DotNetRevolution.Core.Commanding
                 try
                 {
                     // call base class to handle command
-                    await HandleAsync(command, context.Identity);
+                    return await HandleAsync(command, context.Identity);
                 }
                 catch
                 {
@@ -88,7 +88,7 @@ namespace DotNetRevolution.Core.Commanding
             }
         }
 
-        private static string GetCacheKey(Identity identity)
+        private static string GetCacheKey(AggregateRootIdentity identity)
         {
             Contract.Requires(identity != null);
             Contract.Ensures(string.IsNullOrWhiteSpace(Contract.Result<string>()) == false);

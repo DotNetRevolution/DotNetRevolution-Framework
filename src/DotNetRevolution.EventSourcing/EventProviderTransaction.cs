@@ -6,17 +6,17 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventProviderTransaction
     {
-        private readonly Identity _identity;
+        private readonly TransactionIdentity _identity;
         private readonly ICommand _command;
         private readonly IEventStream _eventStream;
         private readonly EventProviderDescriptor _descriptor;
 
-        public Identity Identity
+        public TransactionIdentity Identity
         {
             [Pure]
             get
             {
-                Contract.Ensures(Contract.Result<Identity>() != null);
+                Contract.Ensures(Contract.Result<TransactionIdentity>() != null);
 
                 return _identity;
             }
@@ -54,18 +54,8 @@ namespace DotNetRevolution.EventSourcing
                 return _descriptor;
             }
         }
-
-        public EventProviderTransaction(ICommand command, IEventStream eventStream, IAggregateRoot aggregateRoot)
-            : this(command, eventStream, aggregateRoot, Identity.New())
-        {
-            Contract.Requires(command != null);
-            Contract.Requires(aggregateRoot != null);
-            Contract.Requires(eventStream != null);
-            Contract.Requires(eventStream.GetUncommittedRevisions() != null);
-            Contract.Requires(eventStream.GetUncommittedRevisions().Count > 0);
-        }
-
-        public EventProviderTransaction(ICommand command, IEventStream eventStream, IAggregateRoot aggregateRoot, Identity identity)
+        
+        public EventProviderTransaction(ICommand command, IEventStream eventStream, IAggregateRoot aggregateRoot, TransactionIdentity identity)
         {
             Contract.Requires(command != null);
             Contract.Requires(aggregateRoot != null);

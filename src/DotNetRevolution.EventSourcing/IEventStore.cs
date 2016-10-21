@@ -14,10 +14,10 @@ namespace DotNetRevolution.EventSourcing
         Task CommitAsync(EventProviderTransaction transaction);
 
         [Pure]
-        IEventStream GetEventStream<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot;
+        IEventStream GetEventStream<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot;
 
         [Pure]
-        Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(Identity identity) where TAggregateRoot : class, IAggregateRoot;
+        Task<IEventStream> GetEventStreamAsync<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot;
 
         event EventHandler<TransactionCommittedEventArgs> TransactionCommitted;
     }

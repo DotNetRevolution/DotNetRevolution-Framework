@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[Projection]
 (
-	[ProjectionId]	BINARY(16) NOT NULL PRIMARY KEY NONCLUSTERED,
-	[FullName]		VARCHAR(512) NOT NULL	
+	[ProjectionId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,
+	[ProjectionTypeId] BINARY(16) NOT NULL
 )
 
 GO
 
-CREATE UNIQUE CLUSTERED INDEX [IX_Projection] ON [dbo].[Projection] ([FullName])
+CREATE UNIQUE CLUSTERED INDEX [IX_Projection] ON [dbo].[Projection] ([ProjectionTypeId])

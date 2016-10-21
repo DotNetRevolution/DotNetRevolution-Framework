@@ -3,9 +3,9 @@ using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing.Snapshotting
 {
-    public class SnapshotPolicyFactory : Dictionary<EventProviderType, ISnapshotPolicy>, ISnapshotPolicyFactory
+    public class SnapshotPolicyFactory : Dictionary<AggregateRootType, ISnapshotPolicy>, ISnapshotPolicyFactory
     {
-        private readonly Dictionary<EventProviderType, ISnapshotPolicy> _policies = new Dictionary<EventProviderType, ISnapshotPolicy>();
+        private readonly Dictionary<AggregateRootType, ISnapshotPolicy> _policies = new Dictionary<AggregateRootType, ISnapshotPolicy>();
         private readonly ISnapshotPolicy _defaultPolicy;
 
         public SnapshotPolicyFactory(ISnapshotPolicy defaultPolicy)
@@ -15,14 +15,14 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
             _defaultPolicy = defaultPolicy;
         }
 
-        public void AddPolicy(EventProviderType eventProviderType, ISnapshotPolicy snapshotPolicy)
+        public void AddPolicy(AggregateRootType eventProviderType, ISnapshotPolicy snapshotPolicy)
         {
             _policies.Add(eventProviderType, snapshotPolicy);
 
             Contract.Assume(GetPolicy(eventProviderType) == snapshotPolicy);
         }
 
-        public ISnapshotPolicy GetPolicy(EventProviderType eventProviderType)
+        public ISnapshotPolicy GetPolicy(AggregateRootType eventProviderType)
         {
             ISnapshotPolicy policy;
 

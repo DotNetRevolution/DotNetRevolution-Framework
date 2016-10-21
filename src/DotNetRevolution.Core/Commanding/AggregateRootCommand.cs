@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using System;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -8,8 +9,11 @@ namespace DotNetRevolution.Core.Commanding
     {
         public Guid AggregateRootId { get; }
 
-        public AggregateRootCommand(Guid aggregateRootId)            
+        public AggregateRootCommand(Guid commandId, Guid aggregateRootId)            
+            : base(commandId)
         {
+            Contract.Requires(commandId != Guid.Empty);
+            
             AggregateRootId = aggregateRootId;
         }
     }

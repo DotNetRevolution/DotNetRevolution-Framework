@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 
-namespace DotNetRevolution.Core.Domain
+namespace DotNetRevolution.Core.Base
 {
     public abstract class ValueObject<T> : IEquatable<T>
         where T : ValueObject<T>

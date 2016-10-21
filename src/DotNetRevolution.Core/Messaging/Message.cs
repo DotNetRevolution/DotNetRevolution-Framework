@@ -1,18 +1,17 @@
-﻿using DotNetRevolution.Core.GuidGeneration;
-using System;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Messaging
 {
     public abstract class Message : IMessage
     {
-        private readonly Guid _id = GuidGenerator.Default.Create();
+        public Guid MessageId { get; }
 
-        public Guid MessageId
+        public Message(Guid messageId)
         {
-            get
-            {
-                return _id;
-            }
+            Contract.Requires(messageId != Guid.Empty);
+
+            MessageId = messageId;
         }
     }
 }

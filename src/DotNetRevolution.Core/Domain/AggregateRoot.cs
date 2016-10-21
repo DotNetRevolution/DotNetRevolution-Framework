@@ -5,11 +5,11 @@ namespace DotNetRevolution.Core.Domain
 {
     public abstract class AggregateRoot : IAggregateRoot
     {
-        public Identity Identity { get; }
+        public AggregateRootIdentity Identity { get; }
 
         public IAggregateRootState State { get; }
 
-        public AggregateRoot(Identity identity,
+        public AggregateRoot(AggregateRootIdentity identity,
                              IAggregateRootState state)
         {
             Contract.Requires(identity != null);

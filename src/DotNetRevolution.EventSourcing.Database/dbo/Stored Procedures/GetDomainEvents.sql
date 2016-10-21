@@ -1,13 +1,13 @@
 ﻿CREATE PROCEDURE [dbo].[GetDomainEvents]
-	  @eventProviderId UNIQUEIDENTIFIER	
-	, @eventProviderTypeId BINARY(16)
+	  @aggregateRootId UNIQUEIDENTIFIER	
+	, @aggregateRootTypeId BINARY(16)
 AS	
 	SET NOCOUNT ON;
 
 	DECLARE @snapshotId UNIQUEIDENTIFIER
 		  , @snapshotTypeId BINARY(16)
 		  , @snapshotData VARBINARY(MAX)
-		  , @eventProviderGuid UNIQUEIDENTIFIER
+		  , @eventProviderId UNIQUEIDENTIFIER
 		  , @snapshotVersion INT
 		  
     DECLARE @transactionTable TABLE 
@@ -17,17 +17,17 @@ AS
 		  )
 	
 	-- get event provider table id
-	SET @eventProviderGuid = (SELECT ep.EventProviderGuid
+	SET @eventProviderId = (SELECT ep.EventProviderId
 								FROM dbo.EventProvider ep
-							   WHERE ep.EventProviderId = @eventProviderId
-								 AND ep.EventProviderTypeId = @eventProviderTypeId)
+							   WHERE ep.AggregateRootId = @aggregateRootId
+								 AND ep.AggregateRootTypeId = @aggregateRootTypeId)
 
 	-- get transactions for event provider
 	INSERT INTO @transactionTable (TransactionId, EventProviderVersion)
 	SELECT t.EventProviderTransactionId
 		 , t.EventProviderVersion
 	  FROM dbo.[EventProviderTransaction] t
-	 WHERE t.EventProviderGuid = @eventProviderGuid
+	 WHERE t.EventProviderId = @eventProviderId
 	 
 	-- get snapshot
 	SELECT TOP 1 
@@ -40,7 +40,7 @@ AS
 		ORDER BY t.EventProviderVersion DESC
 
 	-- select event provider data
-	SELECT @eventProviderGuid 'guid'
+	SELECT @eventProviderId 'eventProviderId'
 		 , @snapshotVersion 'snapshotVersion'
 		 , @snapshotTypeId 'snapshotTypeId'
 	     , @snapshotData 'snapshotData'	  

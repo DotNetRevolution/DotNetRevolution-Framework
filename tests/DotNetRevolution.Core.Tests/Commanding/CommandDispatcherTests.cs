@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Tests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -25,20 +26,20 @@ namespace DotNetRevolution.Core.Tests.Commanding
         [TestMethod]
         public void CanDispatchRegisteredCommand()
         {
-            _dispatcher.Dispatch(new Command1());
+            _dispatcher.Dispatch(new Command1(Guid.NewGuid()));
         }
 
         [TestMethod]
         public void CanDispatchRegisteredCommandAsync()
         {
-            Task.WaitAll(_dispatcher.DispatchAsync(new Command1()));
+            Task.WaitAll(_dispatcher.DispatchAsync(new Command1(Guid.NewGuid())));
         }
 
         [TestMethod]
         [ExpectedException(typeof(CommandHandlingException))]
         public void CannotDispatchUnregisteredCommand()
         {
-            _dispatcher.Dispatch(new Command2());
+            _dispatcher.Dispatch(new Command2(Guid.NewGuid()));
         }
     }
 }

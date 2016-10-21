@@ -75,7 +75,7 @@ namespace DotNetRevolution.Core.Domain
         {
             Contract.Requires(aggregateRootId != Guid.Empty);
 
-            return new AggregateRootSynchronizationContext(new Identity(aggregateRootId));
+            return new AggregateRootSynchronizationContext(new AggregateRootIdentity(aggregateRootId));
         }
 
         private IAggregateRootSynchronizationContext AddOrGetCacheItem(Guid aggregateRootId, string key)

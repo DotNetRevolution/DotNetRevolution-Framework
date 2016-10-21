@@ -6,9 +6,9 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
     [ContractClass(typeof(SnapshotProviderFactoryContract))]
     public interface ISnapshotProviderFactory
     {
-        void AddProvider(EventProviderType eventProviderType, ISnapshotProvider snapshotProvider);
+        void AddProvider(AggregateRootType eventProviderType, ISnapshotProvider snapshotProvider);
 
         [Pure]
-        ISnapshotProvider GetProvider(EventProviderType eventProviderType);
+        ISnapshotProvider GetProvider(AggregateRootType eventProviderType);
     }
 }

@@ -8,9 +8,9 @@ namespace DotNetRevolution.Core.Domain
     public interface IRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
-        TAggregateRoot GetByIdentity(Identity identity);
+        TAggregateRoot GetByIdentity(AggregateRootIdentity identity);
 
-        Task<TAggregateRoot> GetByIdentityAsync(Identity identity);
+        Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity);
 
         void Commit(TAggregateRoot aggregateRoot);
 

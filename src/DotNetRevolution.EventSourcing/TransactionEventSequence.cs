@@ -1,8 +1,8 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class TransactionEventSequence : ValueObject<TransactionEventType>
+    public class TransactionEventSequence : ValueObject<TransactionEventSequence>
     {
         private int _currentValue = 0;
 

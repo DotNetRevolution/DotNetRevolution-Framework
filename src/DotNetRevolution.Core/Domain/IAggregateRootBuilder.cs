@@ -8,6 +8,6 @@ namespace DotNetRevolution.Core.Domain
         where TAggregateRoot : class, IAggregateRoot<TAggregateRootState>
         where TAggregateRootState : class, IAggregateRootState
     {
-        TAggregateRoot Build(Identity identity, TAggregateRootState state);
+        TAggregateRoot Build(AggregateRootIdentity identity, TAggregateRootState state);
     }
 }

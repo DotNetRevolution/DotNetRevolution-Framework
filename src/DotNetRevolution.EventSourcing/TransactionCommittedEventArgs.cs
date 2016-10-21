@@ -8,7 +8,7 @@ namespace DotNetRevolution.EventSourcing
 {
     public class TransactionCommittedEventArgs : EventArgs
     {
-        public Identity TransactionIdentity { get; }
+        public TransactionIdentity TransactionIdentity { get; }
 
         public IEventProvider EventProvider { get; }
 

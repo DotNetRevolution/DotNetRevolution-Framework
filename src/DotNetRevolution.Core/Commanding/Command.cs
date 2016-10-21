@@ -1,18 +1,17 @@
-﻿using DotNetRevolution.Core.GuidGeneration;
-using System;
+﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Commanding
 {
     public abstract class Command : ICommand
     {
-        private readonly Guid _id = GuidGenerator.Default.Create();
+        public Guid CommandId { get; }
 
-        public Guid CommandId
+        public Command(Guid commandId)
         {
-            get
-            {
-                return _id;
-            }
+            Contract.Requires(commandId != Guid.Empty);
+
+            CommandId = commandId;
         }
     }
 }

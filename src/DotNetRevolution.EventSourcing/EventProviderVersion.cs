@@ -1,4 +1,4 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
 using System;
 using System.Diagnostics.Contracts;
 

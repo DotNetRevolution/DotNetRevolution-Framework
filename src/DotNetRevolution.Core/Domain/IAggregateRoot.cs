@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(AggregateRootContract))]
     public interface IAggregateRoot
     {
-        Identity Identity { [Pure] get; }
+        AggregateRootIdentity Identity { [Pure] get; }
 
         IAggregateRootState State { [Pure] get; }
 

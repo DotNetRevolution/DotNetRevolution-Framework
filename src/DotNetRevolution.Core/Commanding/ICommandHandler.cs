@@ -13,12 +13,12 @@ namespace DotNetRevolution.Core.Commanding
         /// Handles the specified command.
         /// </summary>
         /// <param name="command">The command.</param>
-        void Handle(ICommand command);
+        ICommandHandlingResult Handle(ICommand command);
 
         /// <summary>
         /// Handles the specified command asynchronously.
         /// </summary>
         /// <param name="command">The command.</param>
-        Task HandleAsync(ICommand command);
+        Task<ICommandHandlingResult> HandleAsync(ICommand command);
     }
 }

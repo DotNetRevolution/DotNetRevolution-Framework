@@ -53,8 +53,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Base\SequentialGuidTests.cs" />
     <Compile Include="Domain\DomainEventHandlerFactoryTests.cs" />
+    <Compile Include="GuidGeneration\GuidGeneratorTests.cs" />
+    <Compile Include="GuidGeneration\SequentialAsBytesGuidGeneratorTests.cs" />
+    <Compile Include="GuidGeneration\SequentialAsStringGuidGeneratorTests.cs" />
+    <Compile Include="GuidGeneration\SequentialAtEndGuidGeneratorTests.cs" />
     <Compile Include="Hashing\HashProviderTests.cs" />
     <Compile Include="Hashing\MD5HashProviderTests.cs" />
     <Compile Include="Mock\MethodClass.cs" />

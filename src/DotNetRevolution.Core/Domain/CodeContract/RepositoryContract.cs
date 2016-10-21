@@ -15,7 +15,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             throw new NotImplementedException();
         }
 
-        public TAggregateRoot GetByIdentity(Identity identity)
+        public TAggregateRoot GetByIdentity(AggregateRootIdentity identity)
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<TAggregateRoot>() != null);
@@ -31,7 +31,7 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             throw new NotImplementedException();
         }
 
-        public Task<TAggregateRoot> GetByIdentityAsync(Identity identity)
+        public Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity)
         {
             Contract.Requires(identity != null);
             Contract.Ensures(Contract.Result<Task<TAggregateRoot>>() != null);

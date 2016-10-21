@@ -1,17 +1,16 @@
-﻿using System;
-using DotNetRevolution.Core.Commanding;
+﻿using DotNetRevolution.Core.Commanding;
 using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class TransferFundsHandler : CommandHandler<TransferFunds>
     {
-        public override void Handle(TransferFunds command)
+        public override ICommandHandlingResult Handle(TransferFunds command)
         {
-            throw new NotImplementedException();
+            return new CommandHandlingResult(command.CommandId);
         }
 
-        public override Task HandleAsync(TransferFunds command)
+        public override Task<ICommandHandlingResult> HandleAsync(TransferFunds command)
         {
             return Task.Run(() => Handle(command));
         }

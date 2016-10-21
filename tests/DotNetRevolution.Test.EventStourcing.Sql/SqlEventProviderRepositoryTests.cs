@@ -16,11 +16,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 {
     [TestClass]
     public class SqlEventProviderRepositoryTests : EventProviderRepositoryTests
-    {        
+    {
+        private IGuidGenerator _guidGenerator;
+
         [TestInitialize]
         public void Init()
         {
-            GuidGenerator.Default = new SequentialAtEndGuidGenerator();
+            _guidGenerator = new SequentialAtEndGuidGenerator();
+
             var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
 
             var hash = typeFactory.GetHash(typeof(Created));
@@ -34,7 +37,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
 
-            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor);
+            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor, _guidGenerator);
         }
 
         [TestMethod]
@@ -172,7 +175,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
         protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)
         {
-            return new EventStreamStateTracker(new EventStream(domainEvents));
+            return new EventStreamStateTracker(new EventStream(_guidGenerator.Create(), domainEvents));
         }
     }
 }

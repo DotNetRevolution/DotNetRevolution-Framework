@@ -7,11 +7,11 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     [ContractClassFor(typeof(IAggregateRoot))]
     public abstract class AggregateRootContract : IAggregateRoot
     {
-        public Identity Identity
+        public AggregateRootIdentity Identity
         {
             get
             {
-                Contract.Ensures(Contract.Result<Identity>() != null);
+                Contract.Ensures(Contract.Result<AggregateRootIdentity>() != null);
 
                 throw new NotImplementedException();
             }

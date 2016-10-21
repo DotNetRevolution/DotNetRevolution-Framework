@@ -1,4 +1,5 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing

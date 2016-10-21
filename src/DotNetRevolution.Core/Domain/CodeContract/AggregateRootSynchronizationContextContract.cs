@@ -7,11 +7,11 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     [ContractClassFor(typeof(IAggregateRootSynchronizationContext))]
     internal abstract class AggregateRootSynchronizationContextContract : IAggregateRootSynchronizationContext
     {
-        public Identity Identity
+        public AggregateRootIdentity Identity
         {
             get
             {
-                Contract.Ensures(Contract.Result<Identity>() != null);
+                Contract.Ensures(Contract.Result<AggregateRootIdentity>() != null);
 
                 throw new NotImplementedException();
             }

@@ -5,16 +5,16 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
 {
     public class SnapshotProviderFactory : ISnapshotProviderFactory
     {
-        private readonly Dictionary<EventProviderType, ISnapshotProvider> _providers = new Dictionary<EventProviderType, ISnapshotProvider>();
+        private readonly Dictionary<AggregateRootType, ISnapshotProvider> _providers = new Dictionary<AggregateRootType, ISnapshotProvider>();
         
-        public void AddProvider(EventProviderType eventProviderType, ISnapshotProvider snapshotProvider)
+        public void AddProvider(AggregateRootType eventProviderType, ISnapshotProvider snapshotProvider)
         {
             _providers.Add(eventProviderType, snapshotProvider);
 
             Contract.Assume(GetProvider(eventProviderType) == snapshotProvider);
         }
 
-        public ISnapshotProvider GetProvider(EventProviderType eventProviderType)
+        public ISnapshotProvider GetProvider(AggregateRootType eventProviderType)
         {
             ISnapshotProvider provider;
 

@@ -1,10 +1,11 @@
 ﻿using DotNetRevolution.Core.Serialization;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.Core.Domain;
 using System.Data.SqlClient;
 using System.Text;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.Domain;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -32,7 +33,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             _typeFactory = typeFactory;
         }
 
-        protected override EventStream GetEventStream(EventProviderType eventProviderType, Identity identity)
+        protected override EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity identity)
         {
             // establish command
             var command = new GetDomainEventsCommand(_serializer, _typeFactory, eventProviderType, identity);
@@ -50,7 +51,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             return command.GetResults();
         }
 
-        protected override async Task<EventStream> GetEventStreamAsync(EventProviderType eventProviderType, Identity identity)
+        protected override async Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity identity)
         {
             // establish command
             var command = new GetDomainEventsCommand(_serializer, _typeFactory, eventProviderType, identity);

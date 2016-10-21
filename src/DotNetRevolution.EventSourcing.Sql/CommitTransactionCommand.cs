@@ -120,10 +120,10 @@ namespace DotNetRevolution.EventSourcing.Sql
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
             sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _serializer.SerializeObject(command);
             
-            sqlCommand.Parameters.Add("@eventProviderGuid", SqlDbType.UniqueIdentifier).Value = eventProvider.GlobalIdentity.Value;
-            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.Identity.Value;
-            sqlCommand.Parameters.Add("@eventProviderTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.EventProviderType.Type);
-            sqlCommand.Parameters.Add("@eventProviderTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.EventProviderType.Type.FullName;
+            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.EventProviderIdentity.Value;
+            sqlCommand.Parameters.Add("@aggregateRootId", SqlDbType.UniqueIdentifier).Value = eventProvider.AggregateRootIdentity.Value;
+            sqlCommand.Parameters.Add("@aggregateRootTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.AggregateRootType.Type);
+            sqlCommand.Parameters.Add("@aggregateRootTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.AggregateRootType.Type.FullName;
             sqlCommand.Parameters.Add("@eventProviderDescriptor", SqlDbType.VarChar).Value = transaction.Descriptor.Value;
             
             // event user defined table type

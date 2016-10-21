@@ -1,8 +1,8 @@
 ﻿CREATE TABLE [dbo].[EventProviderDescriptor]
 (
-    [EventProviderGuid] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+    [EventProviderId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
     [Descriptor] VARCHAR(MAX) NOT NULL, 
-    CONSTRAINT [FK_EventProviderDescription_EventProvider] FOREIGN KEY ([EventProviderGuid]) REFERENCES [dbo].[EventProvider]([EventProviderGuid]), 
+    CONSTRAINT [FK_EventProviderDescription_EventProvider] FOREIGN KEY ([EventProviderId]) REFERENCES [dbo].[EventProvider]([EventProviderId]), 
 )
 
 GO
