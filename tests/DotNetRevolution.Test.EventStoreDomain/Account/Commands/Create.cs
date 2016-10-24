@@ -7,8 +7,8 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
     {
         public decimal BeginningBalance { get; }
         
-        public Create(Guid commandId, Guid aggregateRootIdentity, decimal beginningBalance) 
-            : base(commandId, aggregateRootIdentity)
+        public Create(Guid aggregateRootIdentity, decimal beginningBalance) 
+            : base(aggregateRootIdentity)
         {
             BeginningBalance = beginningBalance;
         }

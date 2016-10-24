@@ -11,8 +11,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 
         public decimal Amount { get; }
 
-        public TransferFunds(Guid commandId, Guid fromAccountId, Guid toAccountId, decimal amount)
-            : base(commandId)
+        public TransferFunds(Guid fromAccountId, Guid toAccountId, decimal amount)            
         {
             FromAccountId = fromAccountId;
             ToAccountId = toAccountId;

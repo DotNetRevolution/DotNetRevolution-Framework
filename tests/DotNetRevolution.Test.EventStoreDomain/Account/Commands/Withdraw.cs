@@ -9,8 +9,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 
         public decimal Amount { get; }
 
-        public Withdraw(Guid commandId, Guid accountId, decimal amount)
-            : base(commandId)
+        public Withdraw(Guid accountId, decimal amount)            
         {
             AccountId = accountId;
             Amount = amount;

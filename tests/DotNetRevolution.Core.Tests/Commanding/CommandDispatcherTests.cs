@@ -26,20 +26,20 @@ namespace DotNetRevolution.Core.Tests.Commanding
         [TestMethod]
         public void CanDispatchRegisteredCommand()
         {
-            _dispatcher.Dispatch(new Command1(Guid.NewGuid()));
+            _dispatcher.Dispatch(new Command1());
         }
 
         [TestMethod]
         public void CanDispatchRegisteredCommandAsync()
         {
-            Task.WaitAll(_dispatcher.DispatchAsync(new Command1(Guid.NewGuid())));
+            Task.WaitAll(_dispatcher.DispatchAsync(new Command1()));
         }
 
         [TestMethod]
         [ExpectedException(typeof(CommandHandlingException))]
         public void CannotDispatchUnregisteredCommand()
         {
-            _dispatcher.Dispatch(new Command2(Guid.NewGuid()));
+            _dispatcher.Dispatch(new Command2());
         }
     }
 }

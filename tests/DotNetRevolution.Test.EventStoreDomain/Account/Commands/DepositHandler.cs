@@ -11,7 +11,7 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
         {
             Contract.Assume(command.Amount > decimal.Zero);
 
-            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), Guid.NewGuid(), 50));
+            var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
             
             domainEvents.AggregateRoot.Execute(command);
 

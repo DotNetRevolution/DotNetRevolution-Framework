@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Commanding
 {
@@ -7,11 +6,9 @@ namespace DotNetRevolution.Core.Commanding
     {
         public Guid CommandId { get; }
 
-        public Command(Guid commandId)
+        public Command()
         {
-            Contract.Requires(commandId != Guid.Empty);
-
-            CommandId = commandId;
+            CommandId = Guid.NewGuid();
         }
     }
 }

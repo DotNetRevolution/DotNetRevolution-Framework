@@ -18,7 +18,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
         public virtual void CanGetAggregateRoot()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -32,9 +32,9 @@ namespace DotNetRevolution.Test.EventStourcing
 
         public virtual async Task CanGetAggregateRootAsync(int i)
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), i);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
-
+            
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
 
             await Repository.CommitAsync(command, domainEvents.AggregateRoot as AccountAggregateRoot);
@@ -46,7 +46,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProvider()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -61,13 +61,13 @@ namespace DotNetRevolution.Test.EventStourcing
 
             for (var i = 0; i < 100; i++)
             {
-                ch.Handle(new Deposit(SequentialAtEndGuidGenerator.NewGuid(), account.Identity, i));
+                ch.Handle(new Deposit(account.Identity, i));
             }
         }
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -82,13 +82,13 @@ namespace DotNetRevolution.Test.EventStourcing
             
             Parallel.For(0, 100, (i) =>
             {
-                dispatcher.Dispatch(new Deposit(SequentialAtEndGuidGenerator.NewGuid(), account.Identity, i));
+                dispatcher.Dispatch(new Deposit(account.Identity, i));
             });
         }
 
         public async Task CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyExceptionAsync(int i)
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), i);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -105,7 +105,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
             for (var j = 0; j < 100; j++)
             {
-                tasks[j] = dispatcher.DispatchAsync(new Deposit(SequentialAtEndGuidGenerator.NewGuid(), account.Identity, j));
+                tasks[j] = dispatcher.DispatchAsync(new Deposit(account.Identity, j));
             };
 
             try
@@ -121,7 +121,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -135,14 +135,14 @@ namespace DotNetRevolution.Test.EventStourcing
 
             Parallel.For(0, 100, (i) =>
             {
-                ch.Handle(new Deposit(SequentialAtEndGuidGenerator.NewGuid(), account.Identity, i));
+                ch.Handle(new Deposit(account.Identity, i));
             });
         }
         
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync(int i)
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), SequentialAtEndGuidGenerator.NewGuid(), i);
+            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
@@ -158,7 +158,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
             for ( var j = 0; j < 100;  j++)
             {
-                tasks[j] =  ch.HandleAsync(new Deposit(SequentialAtEndGuidGenerator.NewGuid(), account.Identity, j));
+                tasks[j] =  ch.HandleAsync(new Deposit(account.Identity, j));
             }
 
             try

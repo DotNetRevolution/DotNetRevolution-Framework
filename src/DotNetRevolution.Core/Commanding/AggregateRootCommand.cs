@@ -9,10 +9,9 @@ namespace DotNetRevolution.Core.Commanding
     {
         public Guid AggregateRootId { get; }
 
-        public AggregateRootCommand(Guid commandId, Guid aggregateRootId)            
-            : base(commandId)
+        public AggregateRootCommand(Guid aggregateRootId)                        
         {
-            Contract.Requires(commandId != Guid.Empty);
+            Contract.Requires(aggregateRootId != Guid.Empty);
             
             AggregateRootId = aggregateRootId;
         }
