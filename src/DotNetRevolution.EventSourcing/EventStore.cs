@@ -28,6 +28,14 @@ namespace DotNetRevolution.EventSourcing
             _usernameProvider = usernameProvider;
         }
 
+        protected abstract EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
+
+        protected abstract Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
+
+        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
+
+        protected abstract Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
+        
         public IEventStream GetEventStream<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {            
             try
@@ -118,27 +126,19 @@ namespace DotNetRevolution.EventSourcing
             Contract.Assume(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
         }
 
-        protected abstract EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
-
-        protected abstract Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
-
-        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
-
-        protected abstract Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
-
         private void RaiseTransactionCommitted(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
             Contract.Requires(transaction != null);
             Contract.Requires(uncommittedRevisions != null);
 
             var domainEventRevisions = uncommittedRevisions.Where(x => x is DomainEventRevision).Cast<DomainEventRevision>().ToList();
-            var domainEvents = domainEventRevisions.Aggregate(new List<IDomainEvent>(), (s, r) => 
+            var domainEvents = domainEventRevisions.Aggregate(new List<IDomainEvent>(), (s, r) =>
             {
                 s.AddRange(r.DomainEvents);
                 return s;
             });
             Contract.Assume(domainEvents != null);
-            
+
             TransactionCommitted(this, new TransactionCommittedEventArgs(transaction, domainEvents));
         }
 

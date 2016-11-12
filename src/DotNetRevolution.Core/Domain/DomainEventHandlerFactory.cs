@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -7,6 +8,7 @@ namespace DotNetRevolution.Core.Domain
 {
     public class DomainEventHandlerFactory : IDomainEventHandlerFactory
     {
+        private readonly ConcurrentDictionary<Type, object> _locks = new ConcurrentDictionary<Type, object>();
         private readonly IDictionary<Type, IDictionary<Type, IDomainEventHandler>> _handlers = new Dictionary<Type, IDictionary<Type, IDomainEventHandler>>();
 
         public IDomainEventCatalog Catalog { get; }
@@ -34,8 +36,11 @@ namespace DotNetRevolution.Core.Domain
 
             var results = new Collection<IDomainEventHandler>();
 
-            // lock cache for concurrency
-            lock (_handlers)
+            // find a lock object for this domain event type
+            var lockObj = _locks.GetOrAdd(domainEventType, new object());
+
+            // lock for concurrency
+            lock (lockObj)
             {
                 foreach (var entry in entries)
                 {
@@ -159,6 +164,7 @@ namespace DotNetRevolution.Core.Domain
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
+            Contract.Invariant(_locks != null);
             Contract.Invariant(_handlers != null);
         }
     }

@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Commanding
+namespace DotNetRevolution.EventSourcing
 {
     public class TransactionIdentity : ValueObject<TransactionIdentity>
     {

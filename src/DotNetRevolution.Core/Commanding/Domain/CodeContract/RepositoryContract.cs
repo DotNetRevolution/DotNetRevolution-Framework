@@ -1,9 +1,9 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Domain;
+using System;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.Core.Domain;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.Core.Commanding.CodeContract
+namespace DotNetRevolution.Core.Commanding.Domain.CodeContract
 {
     [ContractClassFor(typeof(IRepository<>))]
     internal abstract class RepositoryContract<TAggregateRoot> : IRepository<TAggregateRoot>

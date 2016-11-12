@@ -1,31 +1,26 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Core.GuidGeneration;
 using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStoreRepository<TAggregateRoot, TAggregateRootState> : Core.Commanding.IRepository<TAggregateRoot>
+    public class EventStoreRepository<TAggregateRoot, TAggregateRootState> : Core.Commanding.Domain.IRepository<TAggregateRoot>
         where TAggregateRootState : class, IAggregateRootState
         where TAggregateRoot : class, IAggregateRoot<TAggregateRootState>
     {
         private readonly IEventStore _eventStore;
         private readonly IEventStreamProcessor<TAggregateRoot, TAggregateRootState> _eventStreamProcessor;
-        private readonly IGuidGenerator _guidGenerator;
 
         public EventStoreRepository(IEventStore eventStore,
-                                    IEventStreamProcessor<TAggregateRoot, TAggregateRootState> eventStreamProcessor,
-                                    IGuidGenerator guidGenerator)
+                                    IEventStreamProcessor<TAggregateRoot, TAggregateRootState> eventStreamProcessor)
         {
             Contract.Requires(eventStore != null);
             Contract.Requires(eventStreamProcessor != null);
-            Contract.Requires(guidGenerator != null);
 
             _eventStore = eventStore;
             _eventStreamProcessor = eventStreamProcessor;
-            _guidGenerator = guidGenerator;
         }
 
         public async Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity)
@@ -85,8 +80,8 @@ namespace DotNetRevolution.EventSourcing
         private TransactionIdentity CreateNewTransactionIdentity()
         {
             Contract.Ensures(Contract.Result<TransactionIdentity>() != null);
-
-            var transactionIdentity = new TransactionIdentity(_guidGenerator.Create());
+            
+            var transactionIdentity = new TransactionIdentity(Guid.NewGuid());
             
             return transactionIdentity;
         }
@@ -112,7 +107,6 @@ namespace DotNetRevolution.EventSourcing
         {
             Contract.Invariant(_eventStore != null);
             Contract.Invariant(_eventStreamProcessor != null);
-            Contract.Invariant(_guidGenerator != null);
         }
     }
 }

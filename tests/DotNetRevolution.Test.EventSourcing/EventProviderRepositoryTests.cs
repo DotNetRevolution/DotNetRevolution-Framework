@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Caching;
 using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Commanding.Domain;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.GuidGeneration;
 using DotNetRevolution.EventSourcing;
@@ -14,7 +15,7 @@ namespace DotNetRevolution.Test.EventStourcing
 {
     public abstract class EventProviderRepositoryTests
     {
-        protected Core.Commanding.IRepository<AccountAggregateRoot> Repository { get; set; }
+        protected Core.Commanding.Domain.IRepository<AccountAggregateRoot> Repository { get; set; }
 
         public virtual void CanGetAggregateRoot()
         {
@@ -59,7 +60,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
             var ch = new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository);
 
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 50; i++)
             {
                 ch.Handle(new Deposit(account.Identity, i));
             }
@@ -80,7 +81,7 @@ namespace DotNetRevolution.Test.EventStourcing
 
             var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })));
             
-            Parallel.For(0, 100, (i) =>
+            Parallel.For(0, 50, (i) =>
             {
                 dispatcher.Dispatch(new Deposit(account.Identity, i));
             });
@@ -101,9 +102,9 @@ namespace DotNetRevolution.Test.EventStourcing
 
             var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })));
 
-            var tasks = new Task[100];
+            var tasks = new Task[50];
 
-            for (var j = 0; j < 100; j++)
+            for (var j = 0; j < 50; j++)
             {
                 tasks[j] = dispatcher.DispatchAsync(new Deposit(account.Identity, j));
             };
@@ -133,7 +134,7 @@ namespace DotNetRevolution.Test.EventStourcing
             Assert.IsNotNull(account);
             var ch = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository, new AggregateRootSynchronizer(new AggregateRootSynchronizationCache()), new AggregateRootCache());
 
-            Parallel.For(0, 100, (i) =>
+            Parallel.For(0, 50, (i) =>
             {
                 ch.Handle(new Deposit(account.Identity, i));
             });
@@ -154,9 +155,9 @@ namespace DotNetRevolution.Test.EventStourcing
             Assert.IsNotNull(account);
             var ch = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository, new AggregateRootSynchronizer(new AggregateRootSynchronizationCache()), new AggregateRootCache());
 
-            var tasks = new Task[100];
+            var tasks = new Task[50];
 
-            for ( var j = 0; j < 100;  j++)
+            for ( var j = 0; j < 50;  j++)
             {
                 tasks[j] =  ch.HandleAsync(new Deposit(account.Identity, j));
             }

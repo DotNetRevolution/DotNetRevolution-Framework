@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace DotNetRevolution.Core.Commanding
+namespace DotNetRevolution.Core.Commanding.Domain
 {
     public abstract class AggregateRootCommand<TAggregateRoot> : Command, IAggregateRootCommand<TAggregateRoot>
         where TAggregateRoot : IAggregateRoot

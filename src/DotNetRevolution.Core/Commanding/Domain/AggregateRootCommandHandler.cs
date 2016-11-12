@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.Core.Commanding
+namespace DotNetRevolution.Core.Commanding.Domain
 {
     public class AggregateRootCommandHandler<TAggregateRoot, TCommand> : CommandHandler<TCommand>
         where TAggregateRoot : class, IAggregateRoot

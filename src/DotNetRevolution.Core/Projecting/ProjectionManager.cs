@@ -1,6 +1,6 @@
-﻿using DotNetRevolution.Core.Commanding;
-using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Domain;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading;
@@ -8,58 +8,109 @@ using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Projecting
 {
-    public abstract class ProjectionManager<TProjection, TAggregateRoot>
-        where TProjection : Projection<TAggregateRoot>
-        where TAggregateRoot : IAggregateRoot
+    public abstract class ProjectionManager : IProjectionManager
     {
-        public abstract bool Processed(TransactionIdentity transactionIdentity);
+        private const string ProjectionTimeoutMessage = "Projection did not process transaction before the timeout period elapsed";
 
-        public void Wait(TransactionIdentity transactionIdentity)
+        private readonly IProjectionFactory _projectionFactory;
+
+        public ProjectionManager(IProjectionFactory projectionFactory)
         {
-            Contract.Requires(transactionIdentity != null);
+            Contract.Requires(projectionFactory != null);
 
-            Wait(transactionIdentity, TimeSpan.MaxValue);
+            _projectionFactory = projectionFactory;
         }
 
-        public void Wait(TransactionIdentity transactionIdentity, TimeSpan timeout)
+        protected abstract bool Processed(Guid domainEventId);
+
+        protected abstract void PrepareProjection(IProjection projection);
+
+        protected abstract void FinalizeProjection(IProjection projection);
+
+        protected abstract void FinalizeProjection(IProjection projection, Exception e);
+
+        protected abstract void SaveProjection(IProjection projection);
+
+        public void Project(IEnumerable<IDomainEvent> domainEvents)
+        {
+            // get projection
+            var projection = _projectionFactory.GetProjection();
+
+            // prepare projection
+            PrepareProjection(projection);
+
+            try
+            {
+                // project
+                foreach (var domainEvent in domainEvents)
+                {
+                    Contract.Assume(domainEvent != null);
+
+                    projection.Project(domainEvent);
+                }
+
+                SaveProjection(projection);
+            }
+            catch (Exception e)
+            {
+                // finalize projection with error
+                FinalizeProjection(projection, e);
+                return;
+            }
+
+            // finalize projection
+            FinalizeProjection(projection);
+        }
+
+        #region Wait
+
+        public void Wait(Guid domainEventId)
+        {
+            Wait(domainEventId, TimeSpan.MaxValue);
+        }
+
+        public void Wait(Guid domainEventId, TimeSpan timeout)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            while (Processed(transactionIdentity) == false)
+            while (Processed(domainEventId) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
-                    throw new TimeoutException("Projection did not process transaction before the timeout period elapsed");
+                    throw new TimeoutException(ProjectionTimeoutMessage);
                 }
 
                 Thread.Sleep(10);
             }
         }
 
-        public Task WaitAsync(TransactionIdentity transactionIdentity)
+        public Task WaitAsync(Guid domainEventId)
         {
-            Contract.Requires(transactionIdentity != null);
-            Contract.Ensures(Contract.Result<Task>() != null);
-
-            return WaitAsync(transactionIdentity, TimeSpan.MaxValue);
+            return WaitAsync(domainEventId, TimeSpan.MaxValue);
         }
 
-        public async Task WaitAsync(TransactionIdentity transactionIdentity, TimeSpan timeout)
-        {
-            Contract.Requires(transactionIdentity != null);
-            Contract.Ensures(Contract.Result<Task>() != null);
-
+        public async Task WaitAsync(Guid domainEventId, TimeSpan timeout)
+        {            
             var stopwatch = Stopwatch.StartNew();
 
-            while (Processed(transactionIdentity) == false)
+            while (Processed(domainEventId) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
-                    throw new TimeoutException("Projection did not process transaction before the timeout period elapsed");
+                    throw new TimeoutException(ProjectionTimeoutMessage);
                 }
 
                 await Task.Delay(10);
             }
+        }
+
+        #endregion
+
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_projectionFactory != null);
         }
     }
 }

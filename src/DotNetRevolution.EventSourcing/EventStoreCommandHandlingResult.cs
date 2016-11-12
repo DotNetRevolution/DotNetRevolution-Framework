@@ -1,5 +1,5 @@
 ﻿using System;
-using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Commanding.Domain;
 using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 

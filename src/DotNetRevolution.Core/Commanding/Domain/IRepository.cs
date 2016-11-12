@@ -1,9 +1,9 @@
-﻿using DotNetRevolution.Core.Commanding.CodeContract;
+﻿using DotNetRevolution.Core.Commanding.Domain.CodeContract;
 using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.Core.Commanding
+namespace DotNetRevolution.Core.Commanding.Domain
 {
     [ContractClass(typeof(RepositoryContract<>))]
     public interface IRepository<TAggregateRoot>

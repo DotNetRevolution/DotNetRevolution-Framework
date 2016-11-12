@@ -88,6 +88,7 @@
     <Compile Include="EventProviderIdentity.cs" />
     <Compile Include="EventStoreCommandHandlingResult.cs" />
     <Compile Include="EventStoreDomainEventDispatcher.cs" />
+    <Compile Include="EventStoreProjectionDispatcher.cs" />
     <Compile Include="EventStoreRepository.cs" />
     <Compile Include="EventStreamProcessor.cs" />
     <Compile Include="EventStreamRevision.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="TransactionCommittedEventArgs.cs" />
     <Compile Include="TransactionEventSequence.cs" />
     <Compile Include="TransactionEventType.cs" />
+    <Compile Include="TransactionIdentity.cs" />
     <Compile Include="TypeNotFoundForHashException.cs" />
   </ItemGroup>
   <ItemGroup>

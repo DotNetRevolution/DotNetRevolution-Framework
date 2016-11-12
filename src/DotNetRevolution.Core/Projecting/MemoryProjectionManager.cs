@@ -1,25 +1,45 @@
-﻿using DotNetRevolution.Core.Commanding;
-using DotNetRevolution.Core.Domain;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System;
 
 namespace DotNetRevolution.Core.Projecting
 {
-    public class MemoryProjectionManager<TProjection, TAggregateRoot> : ProjectionManager<TProjection, TAggregateRoot>
-        where TProjection : Projection<TAggregateRoot>
-        where TAggregateRoot : IAggregateRoot
+    public class MemoryProjectionManager<TProjection> : ProjectionManager
+        where TProjection : IProjection
     {
-        private readonly HashSet<TransactionIdentity> _processedTransactions = new HashSet<TransactionIdentity>();
-        
-        public override bool Processed(TransactionIdentity transactionIdentity)
+        private readonly HashSet<Guid> _processedDomainEvents = new HashSet<Guid>();
+
+        public MemoryProjectionManager(IProjectionFactory projectionFactory) 
+            : base(projectionFactory)
         {
-            return _processedTransactions.Contains(transactionIdentity);
+            Contract.Requires(projectionFactory != null);
         }
-        
+
+        protected override void FinalizeProjection(IProjection projection)
+        {
+        }
+
+        protected override void FinalizeProjection(IProjection projection, Exception e)
+        {
+        }
+
+        protected override void PrepareProjection(IProjection projection)
+        {
+        }
+
+        protected override bool Processed(Guid domainEventId)
+        {
+            return _processedDomainEvents.Contains(domainEventId);
+        }
+
+        protected override void SaveProjection(IProjection projection)
+        {
+        }
+
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_processedTransactions != null);
+            Contract.Invariant(_processedDomainEvents != null);
         }
     }
 }

@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.Core.Commanding
+namespace DotNetRevolution.Core.Commanding.Domain
 {
     public class SynchronizedAggregateRootCommandHandler<TAggregateRoot, TCommand> : AggregateRootCommandHandler<TAggregateRoot, TCommand>
          where TAggregateRoot : class, IAggregateRoot

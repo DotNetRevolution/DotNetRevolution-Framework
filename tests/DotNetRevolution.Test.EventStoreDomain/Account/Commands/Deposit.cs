@@ -1,4 +1,4 @@
-﻿using DotNetRevolution.Core.Commanding;
+﻿using DotNetRevolution.Core.Commanding.Domain;
 using System;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands

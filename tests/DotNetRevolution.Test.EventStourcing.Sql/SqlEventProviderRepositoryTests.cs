@@ -37,7 +37,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
 
-            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor, _guidGenerator);
+            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor);
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProvider()
         {
-            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
-            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -88,7 +88,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync()
         {
-            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -104,7 +104,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
         {
-            Parallel.For(0, 100, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 20, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -140,7 +140,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 10000, i =>
+            Parallel.For(0, 5000, i =>
             {
                 try
                 {
@@ -156,9 +156,9 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecordsAsync()
         {
-            var tasks = new Task[10000];
+            var tasks = new Task[5000];
 
-            for (var i = 0; i < 10000; i++)
+            for (var i = 0; i < 5000; i++)
             {
                 tasks[i] = base.CanGetAggregateRootAsync(i);
             }
