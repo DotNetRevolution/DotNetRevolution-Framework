@@ -32,7 +32,7 @@ namespace DotNetRevolution.EventSourcing
             return _eventStreamProcessor.Process(eventStream);
         }
 
-        public async Task<ICommandHandlingResult> CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
+        public Task CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
         {
             Contract.Assume(command != null);
             Contract.Assume(aggregateRoot?.State != null);
@@ -45,9 +45,7 @@ namespace DotNetRevolution.EventSourcing
 
             var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot, transactionIdentity);
 
-            await _eventStore.CommitAsync(transaction);
-
-            return CreateCommandHandlingResult(command, aggregateRoot, transactionIdentity);
+            return _eventStore.CommitAsync(transaction);
         }
         
         public TAggregateRoot GetByIdentity(AggregateRootIdentity identity)
@@ -59,7 +57,7 @@ namespace DotNetRevolution.EventSourcing
             return _eventStreamProcessor.Process(eventStream);
         }
 
-        public ICommandHandlingResult Commit(ICommand command, TAggregateRoot aggregateRoot)
+        public void Commit(ICommand command, TAggregateRoot aggregateRoot)
         {
             Contract.Assume(command != null);
             Contract.Assume(aggregateRoot?.State != null);
@@ -73,8 +71,6 @@ namespace DotNetRevolution.EventSourcing
             var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot, transactionIdentity);
 
             _eventStore.Commit(transaction);
-
-            return CreateCommandHandlingResult(command, aggregateRoot, transactionIdentity);
         }
 
         private TransactionIdentity CreateNewTransactionIdentity()
@@ -84,22 +80,6 @@ namespace DotNetRevolution.EventSourcing
             var transactionIdentity = new TransactionIdentity(Guid.NewGuid());
             
             return transactionIdentity;
-        }
-        
-        private static ICommandHandlingResult CreateCommandHandlingResult(ICommand command, TAggregateRoot aggregateRoot, TransactionIdentity transactionIdentity)
-        {
-            Contract.Requires(aggregateRoot != null);
-            Contract.Requires(command != null);
-            Contract.Requires(transactionIdentity != null);
-            Contract.Ensures(Contract.Result<ICommandHandlingResult>() != null);
-
-            var aggregateRootIdentity = aggregateRoot.Identity;
-            Contract.Assume(aggregateRootIdentity != null);
-
-            var commandId = command.CommandId;
-            Contract.Assume(commandId != Guid.Empty);
-
-            return new EventStoreCommandHandlingResult(commandId, aggregateRootIdentity, transactionIdentity);
         }
 
         [ContractInvariantMethod]

@@ -18,19 +18,18 @@ namespace DotNetRevolution.Core.Commanding.Domain
             _repository = repository;
         }
 
-        public override ICommandHandlingResult Handle(TCommand command)
+        public override void Handle(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // create identity from command
-            return Handle(command, new AggregateRootIdentity(command.AggregateRootId));
+            Handle(command, new AggregateRootIdentity(command.AggregateRootId));
         }
 
-        protected ICommandHandlingResult Handle(TCommand command, AggregateRootIdentity identity)
+        protected void Handle(TCommand command, AggregateRootIdentity identity)
         {
             Contract.Requires(command != null);
             Contract.Requires(identity != null);
-            Contract.Ensures(Contract.Result<ICommandHandlingResult>() != null);
 
             // use identity to get aggregate root
             TAggregateRoot aggregateRoot = GetAggregateRoot(identity);
@@ -39,10 +38,10 @@ namespace DotNetRevolution.Core.Commanding.Domain
             aggregateRoot.Execute(command);
 
             // commit changes
-            return _repository.Commit(command, aggregateRoot);
+            _repository.Commit(command, aggregateRoot);
         }
 
-        public override Task<ICommandHandlingResult> HandleAsync(TCommand command)
+        public override Task HandleAsync(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
@@ -50,7 +49,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
             return HandleAsync(command, new AggregateRootIdentity(command.AggregateRootId));
         }
 
-        protected async Task<ICommandHandlingResult> HandleAsync(TCommand command, AggregateRootIdentity identity)
+        protected async Task HandleAsync(TCommand command, AggregateRootIdentity identity)
         {
             Contract.Requires(command != null);
             Contract.Requires(identity != null);
@@ -63,7 +62,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
             aggregateRoot.Execute(command);
 
             // commit changes
-            return await _repository.CommitAsync(command, aggregateRoot);
+            await _repository.CommitAsync(command, aggregateRoot);
         }
 
         protected virtual TAggregateRoot GetAggregateRoot(AggregateRootIdentity identity)

@@ -13,8 +13,8 @@ namespace DotNetRevolution.Core.Commanding.Domain
 
         Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity);
 
-        ICommandHandlingResult Commit(ICommand command, TAggregateRoot aggregateRoot);
+        void Commit(ICommand command, TAggregateRoot aggregateRoot);
 
-        Task<ICommandHandlingResult> CommitAsync(ICommand command, TAggregateRoot aggregateRoot);
+        Task CommitAsync(ICommand command, TAggregateRoot aggregateRoot);
     }
 }

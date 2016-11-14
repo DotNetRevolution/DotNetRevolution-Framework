@@ -9,11 +9,10 @@ namespace DotNetRevolution.Core.Commanding.Domain.CodeContract
     internal abstract class RepositoryContract<TAggregateRoot> : IRepository<TAggregateRoot>
         where TAggregateRoot : class, IAggregateRoot
     {
-        public ICommandHandlingResult Commit(ICommand command, TAggregateRoot aggregateRoot)
+        public void Commit(ICommand command, TAggregateRoot aggregateRoot)
         {
             Contract.Requires(command != null);
             Contract.Requires(aggregateRoot != null);
-            Contract.Ensures(Contract.Result<ICommandHandlingResult>() != null);
 
             throw new NotImplementedException();
         }
@@ -25,11 +24,11 @@ namespace DotNetRevolution.Core.Commanding.Domain.CodeContract
 
             throw new NotImplementedException();
         }
-        public Task<ICommandHandlingResult> CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
+        public Task CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
         {
             Contract.Requires(command != null);
             Contract.Requires(aggregateRoot != null);
-            Contract.Ensures(Contract.Result<Task<ICommandHandlingResult>>() != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
 
             throw new NotImplementedException();
         }

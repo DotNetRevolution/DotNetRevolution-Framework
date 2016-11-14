@@ -99,10 +99,7 @@
     <Compile Include="Caching\LazyCache.cs" />
     <Compile Include="Caching\ReflectionCache.cs" />
     <Compile Include="Commanding\Domain\AggregateRootCommand.cs" />
-    <Compile Include="Commanding\Domain\AggregateRootCommandHandlingResult.cs" />
     <Compile Include="Commanding\CodeContract\CommandContract.cs" />
-    <Compile Include="Commanding\CommandHandlingResult.cs" />
-    <Compile Include="Commanding\ICommandHandlingResult.cs" />
     <Compile Include="Commanding\StaticCommandEntry.cs" />
     <Compile Include="Commanding\Domain\SynchronizedAggregateRootCommandHandler.cs" />
     <Compile Include="Commanding\Domain\CodeContract\RepositoryContract.cs" />
