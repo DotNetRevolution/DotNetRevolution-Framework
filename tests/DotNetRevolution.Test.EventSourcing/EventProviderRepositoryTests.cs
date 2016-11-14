@@ -15,6 +15,8 @@ namespace DotNetRevolution.Test.EventStourcing
 {
     public abstract class EventProviderRepositoryTests
     {
+        protected IEventStore EventStore { get; set; }
+
         protected Core.Commanding.Domain.IRepository<AccountAggregateRoot> Repository { get; set; }
 
         public virtual void CanGetAggregateRoot()

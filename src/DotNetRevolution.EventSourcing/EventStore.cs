@@ -132,10 +132,10 @@ namespace DotNetRevolution.EventSourcing
             Contract.Requires(uncommittedRevisions != null);
 
             var domainEventRevisions = uncommittedRevisions.Where(x => x is DomainEventRevision).Cast<DomainEventRevision>().ToList();
-            var domainEvents = domainEventRevisions.Aggregate(new List<IDomainEvent>(), (s, r) =>
+            var domainEvents = domainEventRevisions.Aggregate(new List<IDomainEvent>(), (seed, revision) =>
             {
-                s.AddRange(r.DomainEvents);
-                return s;
+                seed.AddRange(revision.DomainEvents);
+                return seed;
             });
             Contract.Assume(domainEvents != null);
 

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System;
+using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Extension;
 
 namespace DotNetRevolution.Core.Projecting
 {
@@ -15,8 +17,11 @@ namespace DotNetRevolution.Core.Projecting
             Contract.Requires(projectionFactory != null);
         }
 
-        protected override void FinalizeProjection(IProjection projection)
+        protected override void FinalizeProjection(IProjection projection, IDomainEvent[] domainEvents)
         {
+            Contract.Assume(domainEvents != null);
+
+            domainEvents.ForEach(domainEvent => _processedDomainEvents.Add(domainEvent.DomainEventId));
         }
 
         protected override void FinalizeProjection(IProjection projection, Exception e)

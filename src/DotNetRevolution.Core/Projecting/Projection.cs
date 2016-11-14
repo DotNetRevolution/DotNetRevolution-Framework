@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
+using System;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 
@@ -6,8 +7,6 @@ namespace DotNetRevolution.Core.Projecting
 {
     public abstract class Projection : IProjection
     {
-        private static readonly MethodInfo _genericProjectMethod = typeof(IProject<>).GetMethod("Project");
-
         public ProjectionIdentity ProjectionIdentity { get; }
 
         protected Projection(ProjectionIdentity identity)
@@ -19,8 +18,18 @@ namespace DotNetRevolution.Core.Projecting
 
         public void Project(IDomainEvent domainEvent)
         {
-            var projectMethod = _genericProjectMethod.MakeGenericMethod(new[] { domainEvent.GetType() });
-            projectMethod.Invoke(this, new[] { domainEvent });
+            var projectType = typeof(IProject<>);            
+            Contract.Assume(projectType.IsGenericTypeDefinition);
+
+            var types = new Type[] { domainEvent.GetType() };
+            Contract.Assume(types.Length == projectType.GetGenericArguments().Length);
+
+            var genericType = projectType.MakeGenericType(types);            
+
+            var methodInfo = genericType.GetMethod("Project");
+            Contract.Assume(methodInfo != null);
+
+            methodInfo.Invoke(this, new object[] { domainEvent });            
         }        
     }
 

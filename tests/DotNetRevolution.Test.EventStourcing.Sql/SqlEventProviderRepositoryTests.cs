@@ -1,15 +1,18 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.GuidGeneration;
 using DotNetRevolution.Core.Hashing;
+using DotNetRevolution.Core.Projecting;
 using DotNetRevolution.EventSourcing;
 using DotNetRevolution.EventSourcing.Sql;
 using DotNetRevolution.Json;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
+using DotNetRevolution.Test.EventStoreDomain.Account.Projections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Configuration;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
@@ -28,7 +31,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var hash = typeFactory.GetHash(typeof(Created));
 
-            var eventStore = new SqlEventStore(
+            EventStore = new SqlEventStore(
                 new DefaultUsernameProvider("UnitTester"),
                 new JsonSerializer(),
                 typeFactory,
@@ -37,7 +40,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
 
-            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(eventStore, streamProcessor);
+            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(EventStore, streamProcessor);
         }
 
         [TestMethod]
@@ -171,6 +174,33 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             {
                 Assert.Fail(e.ToString());
             }
+        }
+
+        [TestMethod]
+        public void Project()
+        {
+            var projection = new AccountProjection(new ProjectionIdentity(Guid.NewGuid()));
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(projection));
+            
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new StaticProjectionEntry(typeof(AccountProjection), projectionManager));
+            
+            using (var projectionDomainDispatcher = new QueueDomainEventDispatcher(new ProjectionDomainEventDispatcher(new ProjectionManagerFactory(projectionCatalog))))
+            {
+                var announcer = new EventStoreTransactionAnnouncer(EventStore, projectionDomainDispatcher);
+
+                Created createdDomainEvent = null;
+
+                var domainEventCatalog = new DomainEventCatalog();
+                domainEventCatalog.Add(new DomainEventEntry(typeof(Created), new ActionDomainEventHandler<Created>((created) => createdDomainEvent = created)));
+                var announcer2 = new EventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog)));
+
+                base.CanGetAggregateRoot();
+
+                projectionManager.Wait(createdDomainEvent.DomainEventId);
+
+                Assert.AreEqual(projection.Accounts.Count, 1);
+            }            
         }
 
         protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)

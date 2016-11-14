@@ -15,14 +15,8 @@ namespace DotNetRevolution.Core.Domain
 
             _handlerFactory = handlerFactory;
         }
-        
-        public void Publish(IDomainEvent domainEvent)
-        {
-            var handlers = GetHandlers(domainEvent);
-            HandleDomainEvent(domainEvent, handlers);
-        }
-        
-        public void PublishAll(IEnumerable<IDomainEvent> domainEvents)
+
+        public void Publish(params IDomainEvent[] domainEvents)
         {
             // publish events
             foreach (var domainEvent in domainEvents)
@@ -32,7 +26,15 @@ namespace DotNetRevolution.Core.Domain
                 Publish(domainEvent);
             }
         }
-        
+
+        private void Publish(IDomainEvent domainEvent)
+        {
+            Contract.Requires(domainEvent != null);
+
+            var handlers = GetHandlers(domainEvent);
+            HandleDomainEvent(domainEvent, handlers);
+        }
+
         private IDomainEventHandlerCollection GetHandlers(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);

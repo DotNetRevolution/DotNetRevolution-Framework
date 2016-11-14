@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Domain.CodeContract
 {
@@ -11,15 +10,9 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             Contract.Requires(catalog != null);
         }
 
-        public void Publish(IDomainEvent domainEvent)
-        {
-            Contract.Requires(domainEvent != null);
-        }
-        
-        public void PublishAll(IEnumerable<IDomainEvent> domainEvents)
+        public void Publish(params IDomainEvent[] domainEvents)
         {
             Contract.Requires(domainEvents != null);
-            Contract.Requires(Contract.ForAll(domainEvents, o => o != null));
         }
     }
 }

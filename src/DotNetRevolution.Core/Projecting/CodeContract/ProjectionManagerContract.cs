@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using DotNetRevolution.Core.Domain;
@@ -9,7 +8,7 @@ namespace DotNetRevolution.Core.Projecting.CodeContract
     [ContractClassFor(typeof(IProjectionManager))]
     internal abstract class ProjectionManagerContract : IProjectionManager
     {
-        public void Project(IEnumerable<IDomainEvent> domainEvents)
+        public void Project(params IDomainEvent[] domainEvents)
         {
             Contract.Requires(domainEvents != null);
 

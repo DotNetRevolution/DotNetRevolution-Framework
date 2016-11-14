@@ -25,13 +25,13 @@ namespace DotNetRevolution.Core.Projecting
 
         protected abstract void PrepareProjection(IProjection projection);
 
-        protected abstract void FinalizeProjection(IProjection projection);
+        protected abstract void FinalizeProjection(IProjection projection, IDomainEvent[] domainEvents);
 
         protected abstract void FinalizeProjection(IProjection projection, Exception e);
 
         protected abstract void SaveProjection(IProjection projection);
 
-        public void Project(IEnumerable<IDomainEvent> domainEvents)
+        public void Project(params IDomainEvent[] domainEvents)
         {
             // get projection
             var projection = _projectionFactory.GetProjection();
@@ -59,7 +59,7 @@ namespace DotNetRevolution.Core.Projecting
             }
 
             // finalize projection
-            FinalizeProjection(projection);
+            FinalizeProjection(projection, domainEvents);
         }
 
         #region Wait

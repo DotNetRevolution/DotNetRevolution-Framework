@@ -1,23 +1,32 @@
 ﻿using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventStoreDomainEventDispatcher : DomainEventDispatcher
+    public class EventStoreTransactionAnnouncer
     {
-        public EventStoreDomainEventDispatcher(IEventStore eventStore, 
-                                               IDomainEventHandlerFactory handlerFactory) 
-            : base(handlerFactory)
+        private readonly IDomainEventDispatcher _dispatcher;
+
+        public EventStoreTransactionAnnouncer(IEventStore eventStore, IDomainEventDispatcher dispatcher) 
         {
-            Contract.Requires(handlerFactory != null);
+            Contract.Requires(dispatcher != null);
             Contract.Requires(eventStore != null);
+
+            _dispatcher = dispatcher;
 
             eventStore.TransactionCommitted += EventStoreTransactionCommitted;
         }
 
         private void EventStoreTransactionCommitted(object sender, TransactionCommittedEventArgs e)
         {
-            PublishAll(e.DomainEvents);
+            _dispatcher.Publish(e.DomainEvents.ToArray());
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_dispatcher != null);
         }
     }
 }

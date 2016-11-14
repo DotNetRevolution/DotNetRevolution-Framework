@@ -113,6 +113,7 @@
     <Compile Include="Domain\AggregateRootSynchronizationContext.cs" />
     <Compile Include="Domain\AggregateRootSynchronizer.cs" />
     <Compile Include="Domain\AggregateRoot`1.cs" />
+    <Compile Include="Domain\QueueDomainEventDispatcher.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootBuilderContract.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootStateBuilderContract.cs" />
     <Compile Include="Domain\CodeContract\AggregateRootSynchronizationContextContract.cs" />
@@ -217,7 +218,6 @@
     <Compile Include="Projecting\IProjectionManagerFactory.cs" />
     <Compile Include="Projecting\MemoryProjectionFactory.cs" />
     <Compile Include="Projecting\ProjectionFactory.cs" />
-    <Compile Include="Projecting\ProjectionQueueItem.cs" />
     <Compile Include="Projecting\IProject.cs" />
     <Compile Include="Projecting\IProjectionCatalog.cs" />
     <Compile Include="Projecting\IProjectionEntry.cs" />

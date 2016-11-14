@@ -46,10 +46,19 @@ namespace DotNetRevolution.Core.Domain
                 {
                     Contract.Assume(entry != null);
 
-                    IDictionary<Type, IDomainEventHandler> cachedHandlers = GetCachedHandlers(domainEventType);
+                    // check for preinitialized handler
+                    if (entry.DomainEventHandler == null)
+                    {
+                        IDictionary<Type, IDomainEventHandler> cachedHandlers = GetCachedHandlers(domainEventType);
 
-                    // add handlers to results
-                    results.Add(GetHandler(entry.DomainEventHandlerType, cachedHandlers));
+                        // add handlers to results
+                        results.Add(GetHandler(entry.DomainEventHandlerType, cachedHandlers));
+                    }
+                    else
+                    {
+                        // add preinitialized handler to results
+                        results.Add(entry.DomainEventHandler);
+                    }
                 }
             }
 

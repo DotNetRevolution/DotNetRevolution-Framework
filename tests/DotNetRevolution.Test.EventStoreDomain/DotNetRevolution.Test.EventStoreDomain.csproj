@@ -59,6 +59,7 @@
     <Compile Include="Account\DomainEvent\DebitApplied.cs" />
     <Compile Include="Account\Exceptions\CreditDeclinedException.cs" />
     <Compile Include="Account\Exceptions\DebitDeclinedException.cs" />
+    <Compile Include="Account\Projections\AccountProjection.cs" />
     <Compile Include="Account\Snapshots\AccountSnapshot.cs" />
     <Compile Include="Account\Snapshots\AccountSnapshotProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
