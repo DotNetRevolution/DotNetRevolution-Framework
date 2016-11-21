@@ -10,5 +10,7 @@ namespace DotNetRevolution.Core.Projecting
         Type ProjectionType { get; }
 
         Type ProjectionManagerType { get; }
+
+        IProjectionManager ProjectionManager { get; }
     }
 }

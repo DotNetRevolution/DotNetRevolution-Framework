@@ -20,7 +20,6 @@ namespace DotNetRevolution.Core.Projecting.CodeContract
         public IProjectionManager GetManager(Type projectionType)
         {
             Contract.Requires(projectionType != null);
-            Contract.Ensures(Contract.Result<IProjectionManager>() != null);
 
             throw new NotImplementedException();
         }

@@ -1,7 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using System;
 using System.Diagnostics.Contracts;
-using System.Reflection;
 
 namespace DotNetRevolution.Core.Projecting
 {

@@ -44,7 +44,7 @@ namespace DotNetRevolution.Core.Domain
         {
             try
             {
-                while (true)
+                while (_cancellationToken.IsCancellationRequested == false)
                 {
                     // wait for next queue item
                     var queueItem = GetNextQueueItem();

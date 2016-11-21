@@ -6,27 +6,33 @@ namespace DotNetRevolution.EventSourcing
 {
     public class EventStoreTransactionAnnouncer
     {
-        private readonly IDomainEventDispatcher _dispatcher;
+        private readonly IDomainEventDispatcher[] _dispatchers;
 
-        public EventStoreTransactionAnnouncer(IEventStore eventStore, IDomainEventDispatcher dispatcher) 
+        public EventStoreTransactionAnnouncer(IEventStore eventStore, params IDomainEventDispatcher[] dispatchers) 
         {
-            Contract.Requires(dispatcher != null);
+            Contract.Requires(dispatchers != null);
             Contract.Requires(eventStore != null);
 
-            _dispatcher = dispatcher;
+            _dispatchers = dispatchers;
 
             eventStore.TransactionCommitted += EventStoreTransactionCommitted;
         }
 
         private void EventStoreTransactionCommitted(object sender, TransactionCommittedEventArgs e)
         {
-            _dispatcher.Publish(e.DomainEvents.ToArray());
+            for(var i = 0; i < _dispatchers.Length; i++)
+            {
+                var dispatcher = _dispatchers[i];
+                Contract.Assume(dispatcher != null);
+
+                dispatcher.Publish(e.DomainEvents.ToArray());
+            }
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_dispatcher != null);
+            Contract.Invariant(_dispatchers != null);
         }
     }
 }

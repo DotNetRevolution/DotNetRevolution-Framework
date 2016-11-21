@@ -22,31 +22,7 @@ namespace DotNetRevolution.Core.Projecting
         {
             var entry = GetEntry(projectionType);
 
-            // cast as static projection entry to check for preinitialized projection manager
-            var staticEntry = entry as StaticProjectionEntry;
-
-            // check if entry is static entry
-            if (staticEntry == null)
-            {
-                // lock cache for concurrency
-                lock (_managers)
-                {
-                    // find manager in cache
-                    var manager = GetCachedManager(projectionType);
-
-                    // if manager is not cached, create and cache
-                    if (manager == null)
-                    {
-                        manager = CreateManager(entry.ProjectionManagerType);
-
-                        CacheManager(projectionType, manager);
-                    }
-
-                    return manager;
-                }
-            }
-
-            return staticEntry.Manager;
+            return GetManager(entry);
         }
 
         public IEnumerable<IProjectionManager> GetManagers()
@@ -58,42 +34,49 @@ namespace DotNetRevolution.Core.Projecting
             {
                 Contract.Assume(entry != null);
 
-                // cast as static projection entry to check for preinitialized projection manager
-                var staticEntry = entry as StaticProjectionEntry;
+                var manager = GetManager(entry);
 
-                // check if entry is static entry
-                if (staticEntry == null)
+                if (manager == null)
                 {
-                    // lock cache for concurrency
-                    lock (_managers)
-                    {
-                        var projectionType = entry.ProjectionType;
-
-                        // find manager in cache
-                        var manager = GetCachedManager(projectionType);
-
-                        // if manager is not cached, create and cache
-                        if (manager == null)
-                        {
-                            manager = CreateManager(entry.ProjectionManagerType);
-
-                            CacheManager(projectionType, manager);
-                        }
-
-                        // add manager to list
-                        managers.Add(manager);
-                    }
+                    continue;
                 }
-                else
-                {
-                    // add static manager to list
-                    managers.Add(staticEntry.Manager);
-                }
+
+                managers.Add(manager);
             }
 
             // return managers
             return managers;
-        }        
+        }
+
+        private IProjectionManager GetManager(IProjectionEntry entry)
+        {
+            Contract.Requires(entry != null);
+
+            var projectionType = entry.ProjectionType;
+
+            // check for preinitialized projection manager
+            var manager = entry.ProjectionManager;
+
+            if (manager == null)
+            {
+                // lock cache for concurrency
+                lock (_managers)
+                {
+                    // find manager in cache
+                    manager = GetCachedManager(projectionType);
+
+                    // if manager is not cached, create and cache
+                    if (manager == null)
+                    {
+                        manager = CreateManager(entry.ProjectionManagerType);
+
+                        CacheManager(projectionType, manager);
+                    }
+                }
+            }
+
+            return manager;
+        }
 
         [Pure]
         protected virtual IProjectionManager CreateManager(Type managerType)
