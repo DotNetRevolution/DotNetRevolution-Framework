@@ -86,6 +86,7 @@
     <Compile Include="DefaultTypeFactory.cs" />
     <Compile Include="DomainEventRevision.cs" />
     <Compile Include="EventProviderIdentity.cs" />
+    <Compile Include="EventStoreCommandHandlingResult.cs" />
     <Compile Include="EventStoreDomainEventDispatcher.cs" />
     <Compile Include="EventStoreProjectionDispatcher.cs" />
     <Compile Include="EventStoreRepository.cs" />

@@ -13,16 +13,16 @@ namespace DotNetRevolution.Core.Commanding
             get { return true; }
         }
 
-        public abstract void Handle(TCommand command);
+        public abstract ICommandHandlingResult Handle(TCommand command);
 
-        public abstract Task HandleAsync(TCommand command);
+        public abstract Task<ICommandHandlingResult> HandleAsync(TCommand command);
         
-        public void Handle(ICommand command)
+        public ICommandHandlingResult Handle(ICommand command)
         {
-            Handle((TCommand) command);
+            return Handle((TCommand) command);
         }
 
-        public Task HandleAsync(ICommand command)
+        public Task<ICommandHandlingResult> HandleAsync(ICommand command)
         {
             return HandleAsync((TCommand)command);
         }

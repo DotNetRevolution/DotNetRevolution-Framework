@@ -17,16 +17,18 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             _domainEventDispatcher = domainEventDispatcher;
         }
 
-        public override void Handle(Withdraw command)
+        public override ICommandHandlingResult Handle(Withdraw command)
         {
             Contract.Assume(command.Amount > decimal.Zero);
 
             var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
 
             domainEvents.AggregateRoot.Execute(command);
+
+            return new CommandHandlingResult(command.CommandId);
         }
 
-        public override Task HandleAsync(Withdraw command)
+        public override Task<ICommandHandlingResult> HandleAsync(Withdraw command)
         {
             return Task.Run(() => Handle(command));
         }

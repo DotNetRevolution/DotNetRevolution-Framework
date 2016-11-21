@@ -10,21 +10,22 @@ namespace DotNetRevolution.Core.Commanding.CodeContract
     {
         public abstract bool Reusable { get; }
 
-        public abstract void Handle(ICommand command);
+        public abstract ICommandHandlingResult Handle(ICommand command);
 
-        public abstract Task HandleAsync(ICommand command);
+        public abstract Task<ICommandHandlingResult> HandleAsync(ICommand command);
         
-        public void Handle(TCommand command)
+        public ICommandHandlingResult Handle(TCommand command)
         {
             Contract.Requires(command != null);
+            Contract.Ensures(Contract.Result<ICommandHandlingResult>() != null);
 
             throw new NotImplementedException();
         }
 
-        public Task HandleAsync(TCommand command)
+        public Task<ICommandHandlingResult> HandleAsync(TCommand command)
         {
             Contract.Requires(command != null);
-            Contract.Ensures(Contract.Result<Task>() != null);
+            Contract.Ensures(Contract.Result<Task<ICommandHandlingResult>>() != null);
 
             throw new NotImplementedException();
         }

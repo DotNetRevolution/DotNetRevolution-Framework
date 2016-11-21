@@ -44,7 +44,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
             return await task;
         }
 
-        public override void Handle(TCommand command)
+        public override ICommandHandlingResult Handle(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
@@ -54,7 +54,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
                 try
                 {                    
                     // call base class to handle command
-                    Handle(command, context.Identity);
+                    return Handle(command, context.Identity);
                 }
                 catch
                 {
@@ -66,7 +66,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
             }
         }
 
-        public override async Task HandleAsync(TCommand command)
+        public override async Task<ICommandHandlingResult> HandleAsync(TCommand command)
         {
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
@@ -76,7 +76,7 @@ namespace DotNetRevolution.Core.Commanding.Domain
                 try
                 {
                     // call base class to handle command
-                    await HandleAsync(command, context.Identity);
+                    return await HandleAsync(command, context.Identity);
                 }
                 catch
                 {
