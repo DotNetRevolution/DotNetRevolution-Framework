@@ -230,7 +230,6 @@
     <Compile Include="Projecting\ProjectionIdentity.cs" />
     <Compile Include="Projecting\ProjectionManager.cs" />
     <Compile Include="Projecting\ProjectionManagerFactory.cs" />
-    <Compile Include="Projecting\StaticProjectionEntry.cs" />
     <Compile Include="Properties\GlobalSuppressions.cs" />
     <Compile Include="Helper\BooleanHelper.cs" />
     <Compile Include="Helper\DictionaryHelper.cs" />

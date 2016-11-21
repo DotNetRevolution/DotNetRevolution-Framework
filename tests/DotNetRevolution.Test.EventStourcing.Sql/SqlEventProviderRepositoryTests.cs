@@ -183,7 +183,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(projection));
             
             var projectionCatalog = new ProjectionCatalog();
-            projectionCatalog.Add(new StaticProjectionEntry(typeof(AccountProjection), projectionManager));
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountProjection), projectionManager));
             
             using (var projectionDomainDispatcher = new QueueDomainEventDispatcher(new ProjectionDomainEventDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
@@ -199,7 +199,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
                 projectionManager.Wait(createdDomainEvent.DomainEventId);
 
-                Assert.AreEqual(projection.Accounts.Count, 1);
+                Assert.AreEqual(projection.State.Accounts.Count, 1);
             }            
         }
 
