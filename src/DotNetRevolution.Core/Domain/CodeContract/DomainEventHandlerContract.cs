@@ -7,9 +7,9 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     {
         public abstract bool Reusable { get; }
 
-        public void Handle(IDomainEvent domainEvent)
+        public void Handle(IDomainEventHandlerContext context)
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(context != null);
         }
     }
 }

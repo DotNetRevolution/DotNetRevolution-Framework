@@ -30,9 +30,8 @@ namespace DotNetRevolution.Core.Domain
                 Add(entry);
             }
         }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-        public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
+        
+        public void Add(IDomainEventEntry entry)
         {
             List<IDomainEventEntry> domainEventEntries;
 
@@ -46,8 +45,6 @@ namespace DotNetRevolution.Core.Domain
             {
                 _entries.Add(entry.DomainEventType, new List<IDomainEventEntry> { entry });
             }
-            
-            return new DomainEventEntryRegistration(this, entry);
         }
 
         public IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType)

@@ -17,10 +17,9 @@ namespace DotNetRevolution.Core.Domain.CodeContract
             }
         }
         
-        public IDomainEventEntryRegistration Add(IDomainEventEntry entry)
+        public void Add(IDomainEventEntry entry)
         {
             Contract.Requires(entry != null);
-            Contract.Ensures(Contract.Result<IDomainEventEntryRegistration>() != null);
             
             throw new NotImplementedException();
         }

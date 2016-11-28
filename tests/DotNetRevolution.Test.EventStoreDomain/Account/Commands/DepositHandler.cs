@@ -7,8 +7,10 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class DepositHandler : CommandHandler<Deposit>
     {        
-        public override ICommandHandlingResult Handle(Deposit command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<Deposit> context)
         {
+            var command = context.Command;
+
             Contract.Assume(command.Amount > decimal.Zero);
 
             var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
@@ -18,9 +20,9 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             return new CommandHandlingResult(command.CommandId);
         }        
 
-        public override Task<ICommandHandlingResult> HandleAsync(Deposit command)
+        public override Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<Deposit> context)
         {
-            return Task.Run(() => Handle(command));
+            return Task.Run(() => Handle(context));
         }
 
         private bool CanCreditAccount(AccountState account, decimal amount, out string declinationReason)

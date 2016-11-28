@@ -12,7 +12,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
         public TAggregateRoot Process(IEventStream stream)
         {
             Contract.Requires(stream != null);
-            Contract.Ensures(Contract.Result<TAggregateRoot>() != null);
+            Contract.Ensures(Contract.Result<TAggregateRoot>()?.State != null);
 
             throw new NotImplementedException();
         }

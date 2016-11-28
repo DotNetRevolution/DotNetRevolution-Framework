@@ -1,9 +1,7 @@
-﻿using DotNetRevolution.Core.Domain;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -11,17 +9,10 @@ namespace DotNetRevolution.EventSourcing
     {
         private readonly List<EventStreamRevision> _revisions = new List<EventStreamRevision>();
 
+        private EventProviderVersion _latestVersion;
+
         public IEventProvider EventProvider { get; }
-
-        public EventStream(EventProviderIdentity eventProviderIdentity, IDomainEventCollection domainEvents)
-            : this(new EventProvider(eventProviderIdentity, domainEvents), new DomainEventRevision(domainEvents))
-        {
-            Contract.Requires(eventProviderIdentity != null);
-            Contract.Requires(domainEvents != null);
-            Contract.Requires(domainEvents.AggregateRoot != null);
-            Contract.Requires(domainEvents.AggregateRoot.Identity != null);
-        }
-
+        
         public EventStream(IEventProvider eventProvider, IReadOnlyCollection<EventStreamRevision> revisions)
             : this(eventProvider, revisions.AsEnumerable())
         {
@@ -43,42 +34,43 @@ namespace DotNetRevolution.EventSourcing
 
             EventProvider = eventProvider;
             _revisions.AddRange(revisions);
+
+            _latestVersion = GetLatestVersion();
         }
 
-        public void Append(IReadOnlyCollection<IDomainEvent> domainEvents)
-        {
-            // find latest version
-            var latestVersion = GetLatestVersion();
-
-            // create new revision using last revision's version to increment from
-            var newRevision = new DomainEventRevision(latestVersion.Increment(), domainEvents);
-
-            // add new revision to stream
-            _revisions.Add(newRevision);
+        public void Append(EventStreamRevision revision)
+        {            
+            _revisions.Add(revision);
         }
 
-        public void Append(IDomainEvent domainEvent)
+        public EventProviderVersion GetNextVersion()
         {
-            Append(new Collection<IDomainEvent> { domainEvent });
-        }
-
-        public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()
-        {
-            return _revisions.Where(x => x.Committed == false)
-                             .ToList();
+            return _latestVersion = _latestVersion.Increment();
         }
 
         private EventProviderVersion GetLatestVersion()
         {
             Contract.Ensures(Contract.Result<EventProviderVersion>() != null);
 
-            var orderedRevisions = _revisions.OrderBy(x => x.Version);
-            Contract.Assume(orderedRevisions.Count() > 0);
+            // check for any revisions
+            if (_revisions.Any())
+            {
+                // order revisions by version
+                var orderedRevisions = _revisions.OrderBy(x => x.Version);
+                Contract.Assume(orderedRevisions.Count() > 0);
 
-            var lastRevision = orderedRevisions.Last();
-            Contract.Assume(lastRevision != null);
+                // grab last revision
+                var lastRevision = orderedRevisions.Last();
+                Contract.Assume(lastRevision != null);
 
-            return lastRevision.Version;
+                // return last revision's version
+                return lastRevision.Version;
+            }
+            else
+            {
+                // no revisions, return new
+                return EventProviderVersion.New;
+            }
         }
 
         IEnumerator<EventStreamRevision> IEnumerable<EventStreamRevision>.GetEnumerator()
@@ -94,7 +86,8 @@ namespace DotNetRevolution.EventSourcing
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_revisions != null);            
+            Contract.Invariant(_revisions != null);
+            Contract.Invariant(_latestVersion != null);
         }
     }
 }

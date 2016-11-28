@@ -5,16 +5,16 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class CreateHandler : CommandHandler<Create>
     {
-        public override ICommandHandlingResult Handle(Create command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<Create> context)
         {
-            var domainEvents = AccountAggregateRoot.Create(command);
+            var domainEvents = AccountAggregateRoot.Create(context.Command);
 
-            return new CommandHandlingResult(command.CommandId);
+            return new CommandHandlingResult(context.Command.CommandId);
         }
 
-        public override Task<ICommandHandlingResult> HandleAsync(Create command)
+        public override Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<Create> context)
         {
-            return Task.Run(() => Handle(command));
+            return Task.Run(() => Handle(context));
         }
     }
 }

@@ -18,8 +18,23 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             }
         }
 
+        public IReadOnlyCollection<EventStreamRevision> Revisions
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<IReadOnlyCollection<EventStreamRevision>>() != null);
+
+                throw new NotImplementedException();
+            }
+        }
+
         public abstract void Apply(IReadOnlyCollection<IDomainEvent> domainEvents);
 
         public abstract void Apply(IDomainEvent domainEvent);
+
+        public void Commit()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

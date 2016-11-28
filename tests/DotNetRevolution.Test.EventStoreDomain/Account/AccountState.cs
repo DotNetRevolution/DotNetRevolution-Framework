@@ -1,7 +1,7 @@
 ﻿using DotNetRevolution.Core.Base;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Reflection;
-using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
+using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent;
 using DotNetRevolution.Test.EventStoreDomain.Account.Snapshots;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;

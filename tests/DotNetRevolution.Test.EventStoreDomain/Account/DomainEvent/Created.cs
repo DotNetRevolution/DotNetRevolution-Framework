@@ -2,7 +2,7 @@
 using DotNetRevolution.Core.Domain;
 using System;
 
-namespace DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents
+namespace DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent
 {
     public class Created : IDomainEvent
     {

@@ -7,22 +7,27 @@ namespace DotNetRevolution.Core.Commanding
 {
     public class CommandDispatcher : ICommandDispatcher
     {
+        private readonly ICommandHandlerContextFactory _contextFactory;
         private readonly ICommandHandlerFactory _handlerFactory;
 
-        public CommandDispatcher(ICommandHandlerFactory handlerFactory)
+        public CommandDispatcher(ICommandHandlerFactory handlerFactory,
+                                 ICommandHandlerContextFactory contextFactory)
         {
             Contract.Requires(handlerFactory != null);
+            Contract.Requires(contextFactory != null);
 
             _handlerFactory = handlerFactory;
+            _contextFactory = contextFactory;
         }
   
         public void Dispatch(ICommand command)
-        {
+        {            
             var handler = GetHandler(command);
+            var context = GetContext(command);
 
             try
             {
-                handler.Handle(command);
+                handler.Handle(context);
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -39,10 +44,11 @@ namespace DotNetRevolution.Core.Commanding
         public async Task DispatchAsync(ICommand command)
         {
             var handler = GetHandler(command);
+            var context = GetContext(command);
 
             try
             {
-                await handler.HandleAsync(command);
+                await handler.HandleAsync(context);
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -54,6 +60,13 @@ namespace DotNetRevolution.Core.Commanding
                 // re-throw exception as a command handling exception
                 throw new CommandHandlingException(command, e, "Exception occurred in command handler, check inner exception for details.");
             }
+        }
+        
+        private ICommandHandlerContext GetContext(ICommand command)
+        {
+            Contract.Requires(command != null);
+
+            return _contextFactory.GetContext(command);
         }
 
         private ICommandHandler GetHandler(ICommand command)
@@ -77,6 +90,7 @@ namespace DotNetRevolution.Core.Commanding
         private void ObjectInvariants()
         {
             Contract.Invariant(_handlerFactory != null);
+            Contract.Invariant(_contextFactory != null);
         }
     }
 }

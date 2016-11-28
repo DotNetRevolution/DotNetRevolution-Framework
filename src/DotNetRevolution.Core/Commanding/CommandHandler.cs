@@ -13,18 +13,36 @@ namespace DotNetRevolution.Core.Commanding
             get { return true; }
         }
 
-        public abstract ICommandHandlingResult Handle(TCommand command);
+        public abstract ICommandHandlingResult Handle(ICommandHandlerContext<TCommand> context);
 
-        public abstract Task<ICommandHandlingResult> HandleAsync(TCommand command);
+        public abstract Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<TCommand> context);
         
-        public ICommandHandlingResult Handle(ICommand command)
+        public ICommandHandlingResult Handle(ICommandHandlerContext context)
         {
-            return Handle((TCommand) command);
+            var genericContext = context as ICommandHandlerContext<TCommand>;
+
+            if (genericContext == null)
+            {
+                return Handle(new CommandHandlerContext<TCommand>(context));
+            }
+            else
+            {
+                return Handle(genericContext);
+            }
         }
 
-        public Task<ICommandHandlingResult> HandleAsync(ICommand command)
+        public Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext context)
         {
-            return HandleAsync((TCommand)command);
+            var genericContext = context as ICommandHandlerContext<TCommand>;
+
+            if (genericContext == null)
+            {
+                return HandleAsync(new CommandHandlerContext<TCommand>(context));
+            }
+            else
+            {
+                return HandleAsync(genericContext);
+            }
         }
     }
 }

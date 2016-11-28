@@ -17,7 +17,7 @@ namespace DotNetRevolution.EventSourcing.CodeContract
             }
         }
 
-        public EventProviderIdentity EventProviderIdentity
+        public EventProviderIdentity Identity
         {
             get
             {

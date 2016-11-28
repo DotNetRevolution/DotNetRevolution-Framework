@@ -7,6 +7,7 @@ namespace DotNetRevolution.EventSourcing
     public class EventProviderVersion : ValueObject<EventProviderVersion>, IComparable<EventProviderVersion>
     {
         public static EventProviderVersion Initial = new EventProviderVersion(1);
+        public static EventProviderVersion New = new EventProviderVersion(0);
 
         public int Value { [Pure] get; }
 

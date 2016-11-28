@@ -2,6 +2,6 @@
 {
     public interface IAggregateRootState : IStateTracker
     {
-        IStateTracker InternalStateTracker { get; set; }
+        IStateTracker ExternalStateTracker { get; set; }
     }
 }

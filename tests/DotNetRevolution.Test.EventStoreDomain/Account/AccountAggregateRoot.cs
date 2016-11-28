@@ -1,10 +1,11 @@
 ﻿using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
+using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
 using DotNetRevolution.Core.Reflection;
 using System;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account
 {
@@ -21,14 +22,46 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
         
         private void Execute(Deposit command)
         {
-            State.Apply(new CreditApplied(Guid.NewGuid(), Identity, command.Amount, State.Balance + command.Amount));
+            var newBalance = State.Balance + command.Amount;
+
+            var domainEvents = new List<IDomainEvent>();
+            domainEvents.Add(new CreditApplied(Guid.NewGuid(), Identity, command.Amount, newBalance));
+            
+            if (newBalance < 0)
+            {
+                domainEvents.Add(new Overdrawn(Guid.NewGuid(), Identity, newBalance));
+            }
+
+            State.Apply(domainEvents);
         }
 
         private void Execute(Withdraw command)
         {
-            State.Apply(new CreditApplied(Guid.NewGuid(), Identity, command.Amount, State.Balance - command.Amount));
+            var newBalance = State.Balance - command.Amount;
+
+            var domainEvents = new List<IDomainEvent>();
+            domainEvents.Add(new DebitApplied(Guid.NewGuid(), Identity, command.Amount, newBalance));
+
+            if (newBalance < 0)
+            {
+                domainEvents.Add(new Overdrawn(Guid.NewGuid(), Identity, newBalance));
+            }
+
+            State.Apply(domainEvents);
         }
         
+        private void Execute(Withdraw2 command)
+        {
+            var newBalance = State.Balance - command.Amount;
+            
+            if (newBalance < 0)
+            {
+                State.Apply(new Overdrawn(Guid.NewGuid(), Identity, newBalance));
+            }
+
+            State.Apply(new DebitApplied(Guid.NewGuid(), Identity, command.Amount, newBalance));
+        }
+
         public static DomainEventCollection Create(Create command)
         {
             var identity = new AggregateRootIdentity(command.AggregateRootId);

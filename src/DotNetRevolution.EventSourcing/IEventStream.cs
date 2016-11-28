@@ -1,5 +1,4 @@
-﻿using DotNetRevolution.Core.Domain;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using DotNetRevolution.EventSourcing.CodeContract;
 using System.Collections.Generic;
 
@@ -12,12 +11,8 @@ namespace DotNetRevolution.EventSourcing
         IEventProvider EventProvider { get; }
 
         [Pure]
-        void Append(IDomainEvent domainEvent);
+        void Append(EventStreamRevision revision);
 
-        [Pure]
-        void Append(IReadOnlyCollection<IDomainEvent> domainEvents);
-
-        [Pure]
-        IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions();
+        EventProviderVersion GetNextVersion();
     }
 }

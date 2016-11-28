@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 namespace DotNetRevolution.Core.Commanding
 {
     [ContractClass(typeof(CommandHandlerContract<>))]
-    public interface ICommandHandler<in TCommand> : ICommandHandler
+    public interface ICommandHandler<TCommand> : ICommandHandler
         where TCommand : ICommand
     {
         /// <summary>
         /// Handles the specified command.
         /// </summary>
         /// <param name="command">The command.</param>
-        ICommandHandlingResult Handle(TCommand command);
+        ICommandHandlingResult Handle(ICommandHandlerContext<TCommand> context);
 
         /// <summary>
         /// Handles the specified command asynchronously.
         /// </summary>
         /// <param name="command">The command.</param>
-        Task<ICommandHandlingResult> HandleAsync(TCommand command);
+        Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<TCommand> context);
     }
 }

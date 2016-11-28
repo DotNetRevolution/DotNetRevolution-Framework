@@ -1,6 +1,7 @@
 ﻿CREATE TYPE [dbo].[udttEvent] AS TABLE 
 (
 	  [EventId]					UNIQUEIDENTIFIER NOT NULL
+	, [EventProviderRevisionId] UNIQUEIDENTIFIER NOT NULL
 	, [EventProviderVersion]	INT				 NOT NULL
     , [Sequence]				INT              NOT NULL
 	, [TypeId]					BINARY(16)		 NOT NULL

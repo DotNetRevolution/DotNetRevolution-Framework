@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.GuidGeneration;
 using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
@@ -11,16 +12,20 @@ namespace DotNetRevolution.EventSourcing
         where TAggregateRoot : class, IAggregateRoot<TAggregateRootState>
     {
         private readonly IEventStore _eventStore;
-        private readonly IEventStreamProcessor<TAggregateRoot, TAggregateRootState> _eventStreamProcessor;
+        private readonly IEventStreamProcessor<TAggregateRoot, TAggregateRootState> _eventStreamProcessor;        
+        private readonly IGuidGenerator _guidGenerator;
 
         public EventStoreRepository(IEventStore eventStore,
-                                    IEventStreamProcessor<TAggregateRoot, TAggregateRootState> eventStreamProcessor)
+                                    IEventStreamProcessor<TAggregateRoot, TAggregateRootState> eventStreamProcessor,
+                                    IGuidGenerator guidGenerator)
         {
             Contract.Requires(eventStore != null);
             Contract.Requires(eventStreamProcessor != null);
+            Contract.Requires(guidGenerator!= null);
 
             _eventStore = eventStore;
             _eventStreamProcessor = eventStreamProcessor;
+            _guidGenerator = guidGenerator;
         }
 
         public async Task<TAggregateRoot> GetByIdentityAsync(AggregateRootIdentity identity)
@@ -29,59 +34,93 @@ namespace DotNetRevolution.EventSourcing
 
             var eventStream = await _eventStore.GetEventStreamAsync<TAggregateRoot>(identity);
 
-            return _eventStreamProcessor.Process(eventStream);
+            // build aggregate root from event stream
+            var aggregateRoot = _eventStreamProcessor.Process(eventStream);
+
+            // set external state tracker
+            aggregateRoot.State.ExternalStateTracker = new EventStreamStateTracker(eventStream, _guidGenerator);
+
+            return aggregateRoot;
         }
 
-        public async Task<ICommandHandlingResult> CommitAsync(ICommand command, TAggregateRoot aggregateRoot)
+        public async Task<ICommandHandlingResult> CommitAsync(ICommandHandlerContext context, TAggregateRoot aggregateRoot)
         {
-            Contract.Assume(command != null);
+            Contract.Assume(context != null);
             Contract.Assume(aggregateRoot?.State != null);
 
-            var stateTracker = aggregateRoot.State.InternalStateTracker as IEventStreamStateTracker;
-            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions() != null);
-            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions().Count > 0);
+            var command = context.Command;
 
+            // get state tracker from aggregate root state
+            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventStreamStateTracker;
+            Contract.Assume(stateTracker?.Revisions != null);
+
+            // make new transaction identity
             TransactionIdentity transactionIdentity = CreateNewTransactionIdentity();
 
-            var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot, transactionIdentity);
+            // create new transaction
+            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventStream.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata.AsReadOnlyCollection());
 
+            // store transaction
             await _eventStore.CommitAsync(transaction);
 
+            // commit state tracker
+            stateTracker.Commit();
+
+            // return result
             return CreateCommandHandlingResult(command, aggregateRoot, transactionIdentity);
-        }
-        
+        }        
+
         public TAggregateRoot GetByIdentity(AggregateRootIdentity identity)
         {
             Contract.Assume(identity != null);
                         
             var eventStream = _eventStore.GetEventStream<TAggregateRoot>(identity);
+
+            // build aggregate root from event stream
+            var aggregateRoot = _eventStreamProcessor.Process(eventStream);
             
-            return _eventStreamProcessor.Process(eventStream);
+            // set external state tracker
+            aggregateRoot.State.ExternalStateTracker = new EventStreamStateTracker(eventStream, _guidGenerator);
+
+            return aggregateRoot;
         }
 
-        public ICommandHandlingResult Commit(ICommand command, TAggregateRoot aggregateRoot)
+        public ICommandHandlingResult Commit(ICommandHandlerContext context, TAggregateRoot aggregateRoot)
         {
-            Contract.Assume(command != null);
+            Contract.Assume(context?.Command != null);
+            Contract.Assume(context.Metadata != null);
             Contract.Assume(aggregateRoot?.State != null);
 
-            var stateTracker = aggregateRoot.State.InternalStateTracker as IEventStreamStateTracker;
-            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions() != null);
-            Contract.Assume(stateTracker?.EventStream.GetUncommittedRevisions().Count > 0);
+            var command = context.Command;
 
+            // get state tracker from aggregate root state
+            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventStreamStateTracker;
+            Contract.Assume(stateTracker?.Revisions != null);
+
+            // make new transaction identity
             TransactionIdentity transactionIdentity = CreateNewTransactionIdentity();
 
-            var transaction = new EventProviderTransaction(command, stateTracker.EventStream, aggregateRoot, transactionIdentity);
+            // create new transaction
+            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventStream.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata);
 
+            // store transaction
             _eventStore.Commit(transaction);
 
+            // commit state tracker
+            stateTracker.Commit();
+
+            // return result
             return CreateCommandHandlingResult(command, aggregateRoot, transactionIdentity);
         }
 
         private TransactionIdentity CreateNewTransactionIdentity()
         {
             Contract.Ensures(Contract.Result<TransactionIdentity>() != null);
-            
-            var transactionIdentity = new TransactionIdentity(Guid.NewGuid());
+
+            var transactionGuid = _guidGenerator.Create();
+            Contract.Assume(transactionGuid != Guid.Empty);
+
+            var transactionIdentity = new TransactionIdentity(transactionGuid);
             
             return transactionIdentity;
         }
@@ -107,6 +146,7 @@ namespace DotNetRevolution.EventSourcing
         {
             Contract.Invariant(_eventStore != null);
             Contract.Invariant(_eventStreamProcessor != null);
+            Contract.Invariant(_guidGenerator != null);
         }
     }
 }

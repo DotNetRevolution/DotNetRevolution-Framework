@@ -8,6 +8,7 @@ namespace DotNetRevolution.Core.Domain
     public interface IDomainEventHandler
     {
         bool Reusable { [Pure] get; }
-        void Handle(IDomainEvent domainEvent);
+
+        void Handle(IDomainEventHandlerContext context);
     }
 }

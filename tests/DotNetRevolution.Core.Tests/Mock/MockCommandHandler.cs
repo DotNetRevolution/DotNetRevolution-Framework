@@ -14,14 +14,14 @@ namespace DotNetRevolution.Core.Tests.Mock
             }
         }
 
-        public override ICommandHandlingResult Handle(TCommand command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<TCommand> context)
         {
-            return new CommandHandlingResult(command.CommandId);
+            return new CommandHandlingResult(context.Command.CommandId);
         }
 
-        public override Task<ICommandHandlingResult> HandleAsync(TCommand command)
+        public override Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<TCommand> context)
         {
-            return Task.Run(() => Handle(command));
+            return Task.Run(() => Handle(context));
         }
     }
 }

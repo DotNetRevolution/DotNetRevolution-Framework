@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
@@ -8,31 +7,48 @@ namespace DotNetRevolution.Core.Domain
     public class DomainEventDispatcher : IDomainEventDispatcher
     {
         private readonly IDomainEventHandlerFactory _handlerFactory;
+        private readonly IDomainEventHandlerContextFactory _contextFactory;
 
-        public DomainEventDispatcher(IDomainEventHandlerFactory handlerFactory)
+        public DomainEventDispatcher(IDomainEventHandlerFactory handlerFactory,
+                                     IDomainEventHandlerContextFactory contextFactory)
         {
             Contract.Requires(handlerFactory != null);
+            Contract.Requires(contextFactory != null);
 
             _handlerFactory = handlerFactory;
+            _contextFactory = contextFactory;
+        }
+
+        public void Publish(params IDomainEventHandlerContext[] contexts)
+        {
+            foreach (var context in contexts)
+            {
+                Contract.Assume(context != null);
+
+                var handlers = GetHandlers(context.DomainEvent);
+
+                HandleDomainEvent(context, handlers);
+            }
         }
 
         public void Publish(params IDomainEvent[] domainEvents)
         {
-            // publish events
             foreach (var domainEvent in domainEvents)
             {
                 Contract.Assume(domainEvent != null);
+                
+                var handlers = GetHandlers(domainEvent);
+                var context = GetContext(domainEvent);
 
-                Publish(domainEvent);
+                HandleDomainEvent(context, handlers);
             }
         }
-
-        private void Publish(IDomainEvent domainEvent)
+        
+        private IDomainEventHandlerContext GetContext(IDomainEvent domainEvent)
         {
             Contract.Requires(domainEvent != null);
 
-            var handlers = GetHandlers(domainEvent);
-            HandleDomainEvent(domainEvent, handlers);
+            return _contextFactory.GetContext(domainEvent);
         }
 
         private IDomainEventHandlerCollection GetHandlers(IDomainEvent domainEvent)
@@ -52,10 +68,10 @@ namespace DotNetRevolution.Core.Domain
             }
         }
 
-        private static void HandleDomainEvent(IDomainEvent domainEvent, IDomainEventHandlerCollection handlers)
+        private static void HandleDomainEvent(IDomainEventHandlerContext context, IDomainEventHandlerCollection handlers)
         {
             Contract.Requires(handlers != null);
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(context != null);
 
             var exceptions = new Collection<Exception>();
 
@@ -65,7 +81,7 @@ namespace DotNetRevolution.Core.Domain
 
                 try
                 {
-                    HandleDomainEvent(domainEvent, handler);
+                    HandleDomainEvent(context, handler);
                 }
                 catch (DomainEventHandlingException exception)
                 {
@@ -75,25 +91,25 @@ namespace DotNetRevolution.Core.Domain
 
             if (exceptions.Count > 1)
             {
-                // rethrow exceptions as an aggregate
+                // re-throw exceptions as an aggregate
                 throw new AggregateException("One or more domain event handling exceptions occurred.", exceptions);
             }
         }
 
-        private static void HandleDomainEvent(IDomainEvent domainEvent, IDomainEventHandler handler)
+        private static void HandleDomainEvent(IDomainEventHandlerContext context, IDomainEventHandler handler)
         {
             Contract.Requires(handler != null);
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(context != null);
 
             try
             {
                 // handle command
-                handler.Handle(domainEvent);
+                handler.Handle(context);
             }
             catch (Exception e)
             {
                 // re-throw exception as a domain event handling exception
-                throw new DomainEventHandlingException(domainEvent, e, "Exception occurred in domain event handler, check inner exception for details.");
+                throw new DomainEventHandlingException(context.DomainEvent, e, "Exception occurred in domain event handler, check inner exception for details.");
             }
         }
 
@@ -101,6 +117,7 @@ namespace DotNetRevolution.Core.Domain
         private void ObjectInvariants()
         {
             Contract.Invariant(_handlerFactory != null);
+            Contract.Invariant(_contextFactory != null);
         }
     }
 }

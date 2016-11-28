@@ -13,7 +13,7 @@ namespace DotNetRevolution.Core.Tests.Mock
             }
         }
 
-        public override void Handle(TDomainEvent domainEvent)
+        public override void Handle(IDomainEventHandlerContext<TDomainEvent> context)
         {
         }        
     }

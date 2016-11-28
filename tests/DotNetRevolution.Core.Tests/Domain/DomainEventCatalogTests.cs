@@ -77,24 +77,24 @@ namespace DotNetRevolution.Core.Tests.Domain
             Assert.IsTrue(entries.Count == 1);
         }
 
-        [TestMethod]
-        public void CanCreateTemporaryEntry()
-        {
-            IReadOnlyCollection<IDomainEventEntry> entries;
-            bool result;
+        //[TestMethod]
+        //public void CanCreateTemporaryEntry()
+        //{
+        //    IReadOnlyCollection<IDomainEventEntry> entries;
+        //    bool result;
 
-            using (_catalog.Add(new DomainEventEntry(typeof(DomainEvent1), typeof(MockDomainEventHandler<DomainEvent1>))))
-            {
-                result = _catalog.TryGetEntries(typeof(DomainEvent1), out entries);
+        //    using (_catalog.Add(new DomainEventEntry(typeof(DomainEvent1), typeof(MockDomainEventHandler<DomainEvent1>))))
+        //    {
+        //        result = _catalog.TryGetEntries(typeof(DomainEvent1), out entries);
 
-                Assert.IsTrue(result);
-                Assert.IsTrue(entries.Count == 1);
-            }
+        //        Assert.IsTrue(result);
+        //        Assert.IsTrue(entries.Count == 1);
+        //    }
                         
-            result = _catalog.TryGetEntries(typeof(DomainEvent1), out entries);
+        //    result = _catalog.TryGetEntries(typeof(DomainEvent1), out entries);
 
-            Assert.IsTrue(result);
-            Assert.IsTrue(entries.Count == 0);
-        }
+        //    Assert.IsTrue(result);
+        //    Assert.IsTrue(entries.Count == 0);
+        //}
     }
 }

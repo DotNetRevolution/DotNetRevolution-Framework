@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[CreateTransaction]
-	  @transactionId				UNIQUEIDENTIFIER
-	, @user							NVARCHAR(256)
+	  @transactionId				UNIQUEIDENTIFIER	
+	, @metadata						VARBINARY(MAX)
 	, @commandId					UNIQUEIDENTIFIER	
 	, @commandTypeId				BINARY(16)	
     , @commandTypeFullName			VARCHAR(512)	
@@ -8,9 +8,9 @@
 	, @eventProviderId				UNIQUEIDENTIFIER
 	, @aggregateRootId				UNIQUEIDENTIFIER
     , @aggregateRootTypeId			BINARY(16)		
-	, @aggregateRootTypeFullName	VARCHAR (512)   
-	, @eventProviderDescriptor		VARCHAR (MAX)   
-	, @events						dbo.udttEvent READONLY	    
+	, @aggregateRootTypeFullName	VARCHAR(512)   
+	, @eventProviderDescriptor		VARCHAR(MAX)   
+	, @events						dbo.udttEvent READONLY	    	
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -36,12 +36,20 @@ BEGIN
 					 		WHERE FullName = @commandTypeFullName)
 
 		-- insert transaction event types  
-		INSERT INTO dbo.TransactionEventType (TransactionEventTypeId, FullName)
+		INSERT INTO dbo.EventProviderEventType (EventProviderEventTypeId, FullName)
 		SELECT e.TypeId, e.TypeFullName
 		  FROM @events e
-	 LEFT JOIN dbo.TransactionEventType tet ON e.TypeFullName = tet.FullName		
-		 WHERE tet.TransactionEventTypeId IS NULL
+	 LEFT JOIN dbo.EventProviderEventType epet ON e.TypeFullName = epet.FullName		
+		 WHERE epet.EventProviderEventTypeId IS NULL
 		
+		-- insert transaction
+		INSERT INTO dbo.[Transaction] (TransactionId, [Metadata])
+		VALUES (@transactionId, @metadata)
+			
+		-- insert command
+		INSERT INTO dbo.TransactionCommand (TransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
+		VALUES (@transactionId, @commandTypeId, @commandId, @commandData)
+						
 		BEGIN TRY	
 
 			-- event provider
@@ -61,10 +69,9 @@ BEGIN
 			WHEN MATCHED THEN
 				UPDATE SET Descriptor = source.Descriptor;
 				
-
-			-- create transaction
-			INSERT INTO dbo.[EventProviderTransaction] (EventProviderTransactionId, EventProviderId, EventProviderVersion) 
-			SELECT @transactionId, @eventProviderId, e.EventProviderVersion
+			-- create revision
+			INSERT INTO dbo.[EventProviderRevision] ([EventProviderRevisionId], TransactionId, EventProviderId, EventProviderVersion) 
+			SELECT DISTINCT e.EventProviderRevisionId, @transactionId, @eventProviderId, e.EventProviderVersion
 				FROM @events e
 
 		END TRY
@@ -78,20 +85,10 @@ BEGIN
 			
 		END CATCH
 
-		-- insert transaction information
-		INSERT INTO dbo.[TransactionInformation] (EventProviderTransactionId, [User])
-		VALUES (@transactionId, @user)
-			
-		-- insert command
-		INSERT INTO dbo.TransactionCommand (EventProviderTransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
-		VALUES (@transactionId, @commandTypeId, @commandId, @commandData)
-						
-		-- insert transaction events
-		INSERT INTO dbo.TransactionEvent (EventProviderTransactionId, TransactionEventTypeId, TransactionEventId, [Sequence], [Data])
-		SELECT ept.EventProviderTransactionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
-		  FROM @events e
-		  JOIN dbo.EventProviderTransaction ept ON  e.EventProviderVersion = ept.EventProviderVersion
-												AND ept.EventProviderId = @eventProviderId
+		-- insert event provider events
+		INSERT INTO dbo.EventProviderEvent ([EventProviderRevisionId], [EventProviderEventTypeId], [EventProviderEventId], [Sequence], [Data])
+		SELECT e.EventProviderRevisionId, e.TypeId, e.EventId, e.[Sequence], e.[Data]
+		  FROM @events e		  
 		  
 		IF @@ROWCOUNT = 0		
 		BEGIN

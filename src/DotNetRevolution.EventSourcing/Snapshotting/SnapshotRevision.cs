@@ -15,23 +15,11 @@ namespace DotNetRevolution.EventSourcing.Snapshotting
                 return _snapshot;
             }
         }
-
-        public SnapshotRevision(Snapshot snapshot)
-            : this(EventProviderVersion.Initial, snapshot, false)
+                        
+        public SnapshotRevision(EventStreamRevisionIdentity identity, EventProviderVersion version, Snapshot snapshot)
+            : base(identity, version)
         {
-            Contract.Requires(snapshot != null);
-        }
-
-        public SnapshotRevision(EventProviderVersion version, Snapshot snapshot)
-            : this(version, snapshot, false)
-        {
-            Contract.Requires(version != null);
-            Contract.Requires(snapshot != null);
-        }
-
-        public SnapshotRevision(EventProviderVersion version, Snapshot snapshot, bool committed)
-            : base(version, committed)
-        {
+            Contract.Requires(identity != null);
             Contract.Requires(version != null);
             Contract.Requires(snapshot != null);
 

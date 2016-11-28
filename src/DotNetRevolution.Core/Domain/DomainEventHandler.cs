@@ -11,11 +11,20 @@
             }
         }
 
-        public abstract void Handle(TDomainEvent domainEvent);
+        public abstract void Handle(IDomainEventHandlerContext<TDomainEvent> context);
 
-        public void Handle(IDomainEvent domainEvent)
+        public void Handle(IDomainEventHandlerContext context)
         {
-            Handle((TDomainEvent)domainEvent);
+            var genericContext = context as IDomainEventHandlerContext<TDomainEvent>;
+
+            if (genericContext == null)
+            {
+                Handle(new DomainEventHandlerContext<TDomainEvent>(context));
+            }
+            else
+            {
+                Handle(genericContext);
+            }
         }
     }
 }

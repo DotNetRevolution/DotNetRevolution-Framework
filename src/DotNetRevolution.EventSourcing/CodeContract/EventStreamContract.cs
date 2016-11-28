@@ -2,24 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.Core.Domain;
-using DotNetRevolution.EventSourcing.Snapshotting;
 
 namespace DotNetRevolution.EventSourcing.CodeContract
 {
     [ContractClassFor(typeof(IEventStream))]
     internal abstract class EventStreamContract : IEventStream
     {
-        public IReadOnlyCollection<IDomainEvent> DomainEvents
-        {
-            get
-            {
-                Contract.Ensures(Contract.Result<IReadOnlyCollection<IDomainEvent>>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
         public IEventProvider EventProvider
         {
             get
@@ -29,35 +17,20 @@ namespace DotNetRevolution.EventSourcing.CodeContract
                 throw new NotImplementedException();
             }
         }
-
-        public Snapshot Snapshot
+        
+        public void Append(EventStreamRevision revision)
         {
-            get
-            {
-                Contract.Ensures(Contract.Result<Snapshot>() != null);
-
-                throw new NotImplementedException();
-            }
-        }
-
-        public void Append(IReadOnlyCollection<IDomainEvent> domainEvents)
-        {
-            Contract.Requires(domainEvents != null);
-
-            throw new NotImplementedException();
-        }
-
-        public void Append(IDomainEvent domainEvent)
-        {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(revision != null);
 
             throw new NotImplementedException();
         }
         
         public abstract IEnumerator<EventStreamRevision> GetEnumerator();
 
-        public IReadOnlyCollection<EventStreamRevision> GetUncommittedRevisions()
+        public EventProviderVersion GetNextVersion()
         {
+            Contract.Ensures(Contract.Result<EventProviderVersion>() != null);
+
             throw new NotImplementedException();
         }
 

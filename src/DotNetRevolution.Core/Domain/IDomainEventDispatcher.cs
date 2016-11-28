@@ -6,6 +6,8 @@ namespace DotNetRevolution.Core.Domain
     [ContractClass(typeof(DomainEventDispatcherContract))]
     public interface IDomainEventDispatcher
     {
+        void Publish(params IDomainEventHandlerContext[] contexts);
+
         void Publish(params IDomainEvent[] domainEvents);        
     }
 }

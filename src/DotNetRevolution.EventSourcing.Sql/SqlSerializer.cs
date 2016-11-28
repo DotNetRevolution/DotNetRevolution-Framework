@@ -1,5 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Core.Helper;
+using DotNetRevolution.Core.Hashing;
 using DotNetRevolution.Core.Serialization;
 using DotNetRevolution.EventSourcing.Snapshotting;
 using System.Collections.Generic;

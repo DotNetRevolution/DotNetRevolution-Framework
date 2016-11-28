@@ -1,7 +1,9 @@
 ﻿using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Metadata;
 using DotNetRevolution.Core.Tests.Mock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -20,7 +22,7 @@ namespace DotNetRevolution.Core.Tests.Commanding
                     new CommandEntry(typeof(Command1), typeof(MockCommandHandler<Command1>))
                 });            
             
-            _dispatcher = new CommandDispatcher(new CommandHandlerFactory(catalog));
+            _dispatcher = new CommandDispatcher(new CommandHandlerFactory(catalog), new CommandHandlerContextFactory(new List<IMetaFactory>()));
         }
 
         [TestMethod]

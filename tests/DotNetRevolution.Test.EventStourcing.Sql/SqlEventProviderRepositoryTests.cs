@@ -1,19 +1,20 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.GuidGeneration;
 using DotNetRevolution.Core.Hashing;
-using DotNetRevolution.Core.Projecting;
+using DotNetRevolution.EventSourcing.Projecting;
 using DotNetRevolution.EventSourcing;
 using DotNetRevolution.EventSourcing.Sql;
 using DotNetRevolution.Json;
 using DotNetRevolution.Test.EventStoreDomain.Account;
-using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
+using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent;
 using DotNetRevolution.Test.EventStoreDomain.Account.Projections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Configuration;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using DotNetRevolution.Core.Metadata;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
 {
@@ -27,12 +28,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         {
             _guidGenerator = new SequentialAtEndGuidGenerator();
 
+            MetaFactories.Add(new MetaFactory(new Meta("ApplicationName", "Tests")));
+            MetaFactories.Add(new MetaFactory(new Meta("Username", "Tester")));
+
             var typeFactory = new DefaultTypeFactory(new MD5HashProvider(Encoding.UTF8));
 
             var hash = typeFactory.GetHash(typeof(Created));
 
             EventStore = new SqlEventStore(
-                new DefaultUsernameProvider("UnitTester"),
                 new JsonSerializer(),
                 typeFactory,
                 Encoding.UTF8,
@@ -40,7 +43,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var streamProcessor = new EventStreamProcessor<AccountAggregateRoot, AccountState>(new AggregateRootBuilder<AccountAggregateRoot, AccountState>(), new AggregateRootStateBuilder<AccountState>());
 
-            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(EventStore, streamProcessor);
+            Repository = new EventStoreRepository<AccountAggregateRoot, AccountState>(EventStore, streamProcessor, _guidGenerator);
         }
 
         [TestMethod]
@@ -59,7 +62,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProvider()
         {
-            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -75,7 +78,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
-            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -91,7 +94,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyAsync()
         {
-            Parallel.For(0, 50, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -107,7 +110,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public override void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyException()
         {
-            Parallel.For(0, 20, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            Parallel.For(0, 10, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
                 try
                 {
@@ -123,9 +126,9 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyExceptionAsync()
         {
-            var tasks = new Task[10];
+            var tasks = new Task[4];
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 4; i++)
             {
                 tasks[i] = CanAddMultipleDomainEventsToSingleEventProviderConcurrentlyWithConcurrencyExceptionAsync(i);
             }
@@ -143,7 +146,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecords()
         {
-            Parallel.For(0, 5000, i =>
+            Parallel.For(0, 1000, i =>
             {
                 try
                 {
@@ -159,9 +162,9 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void AddManyRecordsAsync()
         {
-            var tasks = new Task[5000];
+            var tasks = new Task[1000];
 
-            for (var i = 0; i < 5000; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 tasks[i] = base.CanGetAggregateRootAsync(i);
             }
@@ -176,7 +179,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             }
         }
 
-        [TestMethod]
+       // [TestMethod]
         public void Project()
         {
             var projection = new AccountProjection(new ProjectionIdentity(Guid.NewGuid()));
@@ -187,13 +190,13 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             
             using (var projectionDomainDispatcher = new QueueDomainEventDispatcher(new ProjectionDomainEventDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
-                var announcer = new EventStoreTransactionAnnouncer(EventStore, projectionDomainDispatcher);
+                var announcer = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, projectionDomainDispatcher);
 
                 Created createdDomainEvent = null;
 
                 var domainEventCatalog = new DomainEventCatalog();
                 domainEventCatalog.Add(new DomainEventEntry(typeof(Created), new ActionDomainEventHandler<Created>((created) => createdDomainEvent = created)));
-                var announcer2 = new EventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog)));
+                var announcer2 = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog), new DomainEventHandlerContextFactory(new Collection<IMetaFactory>())));
 
                 base.CanGetAggregateRoot();
 
@@ -205,7 +208,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
         protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)
         {
-            return new EventStreamStateTracker(new EventStream(_guidGenerator.Create(), domainEvents));
+            return new EventStreamStateTracker(new EventStream(new EventProvider(_guidGenerator.Create(), domainEvents)), _guidGenerator, domainEvents);
         }
     }
 }

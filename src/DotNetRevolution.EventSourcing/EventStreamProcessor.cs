@@ -27,13 +27,10 @@ namespace DotNetRevolution.EventSourcing
         public TAggregateRoot Process(IEventStream stream)
         {
             var state = CreateState(stream);
-
-            // set stream as internal state tracker
-            state.InternalStateTracker = new EventStreamStateTracker(stream);
-
+            
             // create aggregate root with state
             var aggregateRoot = _aggregateRootBuilder.Build(stream.EventProvider.AggregateRootIdentity, state);
-            Contract.Assume(aggregateRoot != null);
+            Contract.Assume(aggregateRoot?.State != null);
 
             return aggregateRoot;
         }

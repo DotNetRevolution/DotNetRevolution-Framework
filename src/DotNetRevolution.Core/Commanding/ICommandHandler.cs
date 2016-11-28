@@ -8,17 +8,9 @@ namespace DotNetRevolution.Core.Commanding
     public interface ICommandHandler
     {
         bool Reusable { [Pure] get; }
-
-        /// <summary>
-        /// Handles the specified command.
-        /// </summary>
-        /// <param name="command">The command.</param>
-        ICommandHandlingResult Handle(ICommand command);
-
-        /// <summary>
-        /// Handles the specified command asynchronously.
-        /// </summary>
-        /// <param name="command">The command.</param>
-        Task<ICommandHandlingResult> HandleAsync(ICommand command);
+        
+        ICommandHandlingResult Handle(ICommandHandlerContext context);
+                
+        Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext context);
     }
 }

@@ -13,8 +13,10 @@ namespace DotNetRevolution.EventSourcing.CodeContract
         public void Commit(EventProviderTransaction transaction)
         {
             Contract.Requires(transaction != null);
-            Contract.Ensures(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
-            Contract.EnsuresOnThrow<Exception>(transaction.EventStream.GetUncommittedRevisions()?.Count > 0);
+
+            // static checker fails when using ForAll
+            //Contract.Ensures(Contract.ForAll(transaction.Revisions, o => o.Committed));
+            //Contract.EnsuresOnThrow<Exception>(Contract.ForAll(transaction.Revisions, o => o.Committed == false));
         }
 
         public Task CommitAsync(EventProviderTransaction transaction)

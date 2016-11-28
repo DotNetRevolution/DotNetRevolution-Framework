@@ -32,9 +32,9 @@ namespace DotNetRevolution.Core.Domain
             _reusable = reusable;
         }
 
-        public override void Handle(TDomainEvent domainEvent)
+        public override void Handle(IDomainEventHandlerContext<TDomainEvent> context)
         {
-            _action(domainEvent);
+            _action(context.DomainEvent);
         }
 
         [ContractInvariantMethod]

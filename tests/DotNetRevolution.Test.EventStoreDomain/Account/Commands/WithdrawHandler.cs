@@ -17,8 +17,10 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             _domainEventDispatcher = domainEventDispatcher;
         }
 
-        public override ICommandHandlingResult Handle(Withdraw command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<Withdraw> context)
         {
+            var command = context.Command;
+
             Contract.Assume(command.Amount > decimal.Zero);
 
             var domainEvents = AccountAggregateRoot.Create(new Create(Guid.NewGuid(), 50));
@@ -28,9 +30,9 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
             return new CommandHandlingResult(command.CommandId);
         }
 
-        public override Task<ICommandHandlingResult> HandleAsync(Withdraw command)
+        public override Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<Withdraw> context)
         {
-            return Task.Run(() => Handle(command));
+            return Task.Run(() => Handle(context));
         }
 
         private bool CanDebitAccount(AccountState account, decimal amount, out string declinationReason)

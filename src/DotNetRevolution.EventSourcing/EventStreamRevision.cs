@@ -2,10 +2,22 @@
 
 namespace DotNetRevolution.EventSourcing
 {
-    public abstract class EventStreamRevision : IEventStreamRevision
+    public abstract class EventStreamRevision
     {
         private readonly EventProviderVersion _version;
-                
+        private readonly EventStreamRevisionIdentity _identity;
+
+        [Pure]
+        public EventStreamRevisionIdentity Identity
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<EventStreamRevisionIdentity>() != null);
+
+                return _identity;
+            }
+        }
+
         [Pure]
         public EventProviderVersion Version
         {
@@ -15,27 +27,21 @@ namespace DotNetRevolution.EventSourcing
 
                 return _version;
             }
-        }
-        
-        [Pure]
-        public bool Committed { get; private set; }
-                
-        public EventStreamRevision(EventProviderVersion version, bool committed)
+        }        
+
+        public EventStreamRevision(EventStreamRevisionIdentity identity, EventProviderVersion version)
         {
+            Contract.Requires(identity != null);
             Contract.Requires(version != null);
-                        
+
+            _identity = identity;
             _version = version;
-            Committed = committed;
-        }
-        
-        internal void Commit()
-        {
-            Committed = true;
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
+            Contract.Invariant(_identity != null);
             Contract.Invariant(_version != null);
         }
     }

@@ -2,10 +2,9 @@
 using System.Diagnostics.Contracts;
 using System.Data.SqlClient;
 using System.Text;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetRevolution.Core.Base;
 using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Hashing;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -15,17 +14,15 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly ITypeFactory _typeFactory;
         private readonly string _connectionString;        
 
-        public SqlEventStore(IUsernameProvider usernameProvider,
-                             ISerializer serializer,
+        public SqlEventStore(ISerializer serializer,
                              ITypeFactory typeFactory,
                              Encoding encoding,
                              string connectionString)
-            : base(usernameProvider, serializer)
+            : base(serializer)
         {
             Contract.Requires(encoding != null);
             Contract.Requires(serializer != null);
             Contract.Requires(typeFactory != null);
-            Contract.Requires(usernameProvider != null);
             Contract.Requires(string.IsNullOrEmpty(connectionString) == false);
             
             _connectionString = connectionString;
@@ -69,10 +66,10 @@ namespace DotNetRevolution.EventSourcing.Sql
             return command.GetResults();
         }
 
-        protected override void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        protected override void CommitTransaction(EventProviderTransaction transaction)
         {
             // establish command
-            var command = CreateCommand(username, transaction, uncommittedRevisions);
+            var command = CreateCommand(transaction);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -85,10 +82,10 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        protected override async Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        protected override async Task CommitTransactionAsync(EventProviderTransaction transaction)
         {
             // establish command
-            var command = CreateCommand(username, transaction, uncommittedRevisions);
+            var command = CreateCommand(transaction);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -101,13 +98,12 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        private CommitTransactionCommand CreateCommand(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        private CommitTransactionCommand CreateCommand(EventProviderTransaction transaction)
         {
             return new CommitTransactionCommand(_serializer,
                 _typeFactory,
-                username,
                 transaction,
-                uncommittedRevisions);
+                transaction.Revisions);
         }
     }
 }

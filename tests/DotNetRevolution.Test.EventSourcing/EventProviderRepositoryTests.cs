@@ -3,6 +3,7 @@ using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Commanding.Domain;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.GuidGeneration;
+using DotNetRevolution.Core.Metadata;
 using DotNetRevolution.EventSourcing;
 using DotNetRevolution.Test.EventStoreDomain.Account;
 using DotNetRevolution.Test.EventStoreDomain.Account.Commands;
@@ -15,6 +16,13 @@ namespace DotNetRevolution.Test.EventStourcing
 {
     public abstract class EventProviderRepositoryTests
     {
+        public EventProviderRepositoryTests()
+        {
+            MetaFactories = new List<IMetaFactory>();
+        }
+
+        protected List<IMetaFactory> MetaFactories { get; set; }
+
         protected IEventStore EventStore { get; set; }
 
         protected Core.Commanding.Domain.IRepository<AccountAggregateRoot> Repository { get; set; }
@@ -24,9 +32,9 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
@@ -38,9 +46,9 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
             
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            await Repository.CommitAsync(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            await Repository.CommitAsync(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = await Repository.GetByIdentityAsync(domainEvents.AggregateRoot.Identity);
             
@@ -52,19 +60,23 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
 
             var ch = new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository);
+            var ch1 = new AggregateRootCommandHandler<AccountAggregateRoot, Withdraw>(Repository);
 
-            for (var i = 0; i < 50; i++)
+            var random = new Random();
+
+            for (var i = 0; i < 15; i++)
             {
-                ch.Handle(new Deposit(account.Identity, i));
+                ch.Handle(new CommandHandlerContext(new Deposit(account.Identity, i)));
+                ch1.Handle(new CommandHandlerContext(new Withdraw(account.Identity, random.Next(1, 10) * i)));
             }
         }
 
@@ -73,17 +85,17 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
-
-            var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })));
             
-            Parallel.For(0, 50, (i) =>
+            var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })), new CommandHandlerContextFactory(MetaFactories));
+            
+            Parallel.For(0, 30, (i) =>
             {
                 dispatcher.Dispatch(new Deposit(account.Identity, i));
             });
@@ -94,19 +106,19 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            await Repository.CommitAsync(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            await Repository.CommitAsync(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = await Repository.GetByIdentityAsync(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
 
-            var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })));
+            var dispatcher = new CommandDispatcher(new CommandHandlerFactory(new CommandCatalog(new List<ICommandEntry> { new StaticCommandEntry(typeof(Deposit), new AggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository)) })), new CommandHandlerContextFactory(MetaFactories));
 
-            var tasks = new Task[50];
+            var tasks = new Task[30];
 
-            for (var j = 0; j < 50; j++)
+            for (var j = 0; j < 30; j++)
             {
                 tasks[j] = dispatcher.DispatchAsync(new Deposit(account.Identity, j));
             };
@@ -127,18 +139,25 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
-            var ch = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository, new AggregateRootSynchronizer(new AggregateRootSynchronizationCache()), new AggregateRootCache());
+            var synchronizer = new AggregateRootSynchronizer(new AggregateRootSynchronizationCache());
+            var aggregateRootCache = new AggregateRootCache();
 
-            Parallel.For(0, 50, (i) =>
+            var ch = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository, synchronizer, aggregateRootCache);
+            var ch1 = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Withdraw2>(Repository, synchronizer, aggregateRootCache);
+
+            var random = new Random();
+
+            Parallel.For(0, 20, (i) =>
             {
-                ch.Handle(new Deposit(account.Identity, i));
+                ch.Handle(new CommandHandlerContext(new Deposit(account.Identity, i)));
+                ch1.Handle(new CommandHandlerContext(new Withdraw2(account.Identity, random.Next(1, 10) * i)));
             });
         }
         
@@ -148,20 +167,20 @@ namespace DotNetRevolution.Test.EventStourcing
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), i);
             var domainEvents = AccountAggregateRoot.Create(command);
 
-            domainEvents.AggregateRoot.State.InternalStateTracker = GetStateTracker(domainEvents);
+            domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(command, domainEvents.AggregateRoot as AccountAggregateRoot);
+            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
             var ch = new SynchronizedAggregateRootCommandHandler<AccountAggregateRoot, Deposit>(Repository, new AggregateRootSynchronizer(new AggregateRootSynchronizationCache()), new AggregateRootCache());
 
-            var tasks = new Task[50];
+            var tasks = new Task[10];
 
-            for ( var j = 0; j < 50;  j++)
+            for ( var j = 0; j < 10;  j++)
             {
-                tasks[j] =  ch.HandleAsync(new Deposit(account.Identity, j));
+                tasks[j] = ch.HandleAsync(new CommandHandlerContext(new Deposit(account.Identity, j)));
             }
 
             try

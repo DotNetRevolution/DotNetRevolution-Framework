@@ -6,15 +6,15 @@ namespace DotNetRevolution.Core.Domain
 {
     public abstract class AggregateRootState : IAggregateRootState
     {
-        public IStateTracker InternalStateTracker { get; set; }
+        public IStateTracker ExternalStateTracker { get; set; }
         
         protected abstract void Redirect(object param);        
 
         public void Apply(IReadOnlyCollection<IDomainEvent> domainEvents)
         {
-            if (InternalStateTracker != null)
+            if (ExternalStateTracker != null)
             {
-                InternalStateTracker.Apply(domainEvents);
+                ExternalStateTracker.Apply(domainEvents);
             }
 
             Redirect(domainEvents);
@@ -22,9 +22,9 @@ namespace DotNetRevolution.Core.Domain
 
         public void Apply(IDomainEvent domainEvent)
         {
-            if (InternalStateTracker != null)
+            if (ExternalStateTracker != null)
             {
-                InternalStateTracker.Apply(domainEvent);
+                ExternalStateTracker.Apply(domainEvent);
             }
 
             Redirect(domainEvent);

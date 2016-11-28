@@ -5,14 +5,14 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
     public class TransferFundsHandler : CommandHandler<TransferFunds>
     {
-        public override ICommandHandlingResult Handle(TransferFunds command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<TransferFunds> context)
         {
-            return new CommandHandlingResult(command.CommandId);
+            return new CommandHandlingResult(context.Command.CommandId);
         }
 
-        public override Task<ICommandHandlingResult> HandleAsync(TransferFunds command)
+        public override Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<TransferFunds> context)
         {
-            return Task.Run(() => Handle(command));
+            return Task.Run(() => Handle(context));
         }
     }
 }

@@ -49,6 +49,7 @@
     <Compile Include="Account\Commands\DepositHandler.cs" />
     <Compile Include="Account\Commands\TransferFunds.cs" />
     <Compile Include="Account\Commands\TransferFundsHandler.cs" />
+    <Compile Include="Account\Commands\Withdraw2.cs" />
     <Compile Include="Account\Commands\Withdraw.cs" />
     <Compile Include="Account\Commands\WithdrawHandler.cs" />
     <Compile Include="Account\Delegate\CanCreditAccount.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Account\DomainEvent\CreditApplied.cs" />
     <Compile Include="Account\DomainEvent\CreditAppliedHandler.cs" />
     <Compile Include="Account\DomainEvent\DebitApplied.cs" />
+    <Compile Include="Account\DomainEvent\Overdrawn.cs" />
     <Compile Include="Account\Exceptions\CreditDeclinedException.cs" />
     <Compile Include="Account\Exceptions\DebitDeclinedException.cs" />
     <Compile Include="Account\Projections\Account.cs" />

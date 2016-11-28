@@ -44,44 +44,46 @@ namespace DotNetRevolution.Core.Commanding.Domain
             return await task;
         }
 
-        public override ICommandHandlingResult Handle(TCommand command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<TCommand> context)
         {
+            var command = context.Command;
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // enter aggregate root synchronization
-            using (var context = _synchronizer.Enter(typeof(TAggregateRoot), command.AggregateRootId))
+            using (var syncContext = _synchronizer.Enter(typeof(TAggregateRoot), command.AggregateRootId))
             {
                 try
                 {                    
                     // call base class to handle command
-                    return Handle(command, context.Identity);
+                    return Handle(context, syncContext.Identity);
                 }
                 catch
                 {
                     // remove aggregate root from cache in case of error
-                    _cache.Remove(GetCacheKey(context.Identity));
+                    _cache.Remove(GetCacheKey(syncContext.Identity));
 
                     throw;
                 }
             }
         }
 
-        public override async Task<ICommandHandlingResult> HandleAsync(TCommand command)
+        public override async Task<ICommandHandlingResult> HandleAsync(ICommandHandlerContext<TCommand> context)
         {
+            var command = context.Command;
             Contract.Assume(command.AggregateRootId != Guid.Empty);
 
             // enter aggregate root synchronization
-            using (var context = await _synchronizer.EnterAsync(typeof(TAggregateRoot), command.AggregateRootId))
+            using (var syncContext = await _synchronizer.EnterAsync(typeof(TAggregateRoot), command.AggregateRootId))
             {
                 try
                 {
                     // call base class to handle command
-                    return await HandleAsync(command, context.Identity);
+                    return await HandleAsync(context, syncContext.Identity);
                 }
                 catch
                 {
                     // remove aggregate root from cache in case of error
-                    _cache.Remove(GetCacheKey(context.Identity));
+                    _cache.Remove(GetCacheKey(syncContext.Identity));
 
                     throw;
                 }

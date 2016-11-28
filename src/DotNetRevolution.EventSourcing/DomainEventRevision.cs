@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
@@ -9,22 +10,18 @@ namespace DotNetRevolution.EventSourcing
         [Pure]
         public IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
 
-        public DomainEventRevision(IDomainEventCollection domainEvents)
-            : this(EventProviderVersion.Initial, domainEvents, false)
+        public DomainEventRevision(EventStreamRevisionIdentity identity, EventProviderVersion version, IDomainEvent domainEvent)
+            : this(identity, version, new Collection<IDomainEvent> { domainEvent })
         {
-            Contract.Requires(domainEvents != null);
-        }
-
-        public DomainEventRevision(EventProviderVersion version, IReadOnlyCollection<IDomainEvent> domainEvents)
-            : this(version, domainEvents, false)
-        {
+            Contract.Requires(identity != null);
             Contract.Requires(version != null);
-            Contract.Requires(domainEvents != null);
+            Contract.Requires(domainEvent != null);
         }
 
-        public DomainEventRevision(EventProviderVersion version, IReadOnlyCollection<IDomainEvent> domainEvents, bool committed)
-            : base(version, committed)
+        public DomainEventRevision(EventStreamRevisionIdentity identity, EventProviderVersion version, IReadOnlyCollection<IDomainEvent> domainEvents)
+            : base(identity, version)
         {
+            Contract.Requires(identity != null);
             Contract.Requires(version != null);
             Contract.Requires(domainEvents != null);
 

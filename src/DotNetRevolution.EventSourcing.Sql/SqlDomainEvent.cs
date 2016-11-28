@@ -4,6 +4,8 @@ namespace DotNetRevolution.EventSourcing.Sql
 {
     internal class SqlDomainEvent
     {
+        public Guid EventProviderRevisionId { get; }
+
         public int EventProviderVersion { get; }
 
         public int Sequence { get; }
@@ -12,11 +14,13 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         public byte[] Data { get; }
         
-        public SqlDomainEvent(int eventProviderVersion,
+        public SqlDomainEvent(Guid eventProviderRevisionId, 
+                              int eventProviderVersion,
                               int sequence,
                               byte[] eventTypeId,
                               byte[] data)
         {
+            EventProviderRevisionId = eventProviderRevisionId;
             EventProviderVersion = eventProviderVersion;
             Sequence = sequence;
             EventTypeId = eventTypeId;

@@ -9,8 +9,8 @@ namespace DotNetRevolution.Core.Domain
     public interface IDomainEventCatalog
     {        
         IReadOnlyCollection<Type> DomainEventTypes { [Pure] get; }
-        
-        IDomainEventEntryRegistration Add(IDomainEventEntry entry);
+
+        void Add(IDomainEventEntry entry);
 
         [Pure]
         IReadOnlyCollection<IDomainEventEntry> GetEntries(Type domainEventType);

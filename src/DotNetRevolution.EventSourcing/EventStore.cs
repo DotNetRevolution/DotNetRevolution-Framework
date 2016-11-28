@@ -1,12 +1,9 @@
 ﻿using DotNetRevolution.Core.Domain;
-using DotNetRevolution.Core.Extension;
 using DotNetRevolution.Core.Serialization;
 using System;
 using System.Diagnostics.Contracts;
-using System.Collections.Generic;
 using DotNetRevolution.Core.Persistence;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -14,27 +11,21 @@ namespace DotNetRevolution.EventSourcing
     {
         private const string ErrorGettingEventStream = "Error processing request to get event stream.";
         private const string ErrorCommittingTransaction = "Error processing request to commit transaction.";
-
-        private readonly IUsernameProvider _usernameProvider;
-
+        
         public event EventHandler<TransactionCommittedEventArgs> TransactionCommitted = (s, e) => { };
 
-        public EventStore(IUsernameProvider usernameProvider,
-                          ISerializer serializer)
+        public EventStore(ISerializer serializer)
         {     
             Contract.Requires(serializer != null);
-            Contract.Requires(usernameProvider != null);
-                     
-            _usernameProvider = usernameProvider;
         }
 
         protected abstract EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
 
         protected abstract Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
 
-        protected abstract void CommitTransaction(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
+        protected abstract void CommitTransaction(EventProviderTransaction transaction);
 
-        protected abstract Task CommitTransactionAsync(string username, EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions);
+        protected abstract Task CommitTransactionAsync(EventProviderTransaction transaction);
         
         public IEventStream GetEventStream<TAggregateRoot>(AggregateRootIdentity identity) where TAggregateRoot : class, IAggregateRoot
         {            
@@ -80,14 +71,10 @@ namespace DotNetRevolution.EventSourcing
         {
             try
             {
-                var uncommittedRevisions = transaction.EventStream.GetUncommittedRevisions();
-                Contract.Assume(uncommittedRevisions != null);
+                CommitTransaction(transaction);
 
-                CommitTransaction(_usernameProvider.GetUsername(), transaction, uncommittedRevisions);
-
-                uncommittedRevisions.ForEach(x => x.Commit());
-
-                RaiseTransactionCommitted(transaction, uncommittedRevisions);
+                // raise transaction committed event for any listeners
+                RaiseTransactionCommitted(transaction);
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -97,22 +84,16 @@ namespace DotNetRevolution.EventSourcing
             {
                 throw new EventStoreException(ErrorCommittingTransaction, ex);
             }
-
-            Contract.Assume(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
         }
 
         public async Task CommitAsync(EventProviderTransaction transaction)
         {
             try
             {
-                var uncommittedRevisions = transaction.EventStream.GetUncommittedRevisions();
-                Contract.Assume(uncommittedRevisions != null);
+                await CommitTransactionAsync(transaction);
 
-                await CommitTransactionAsync(_usernameProvider.GetUsername(), transaction, uncommittedRevisions);
-
-                uncommittedRevisions.ForEach(x => x.Commit());
-
-                RaiseTransactionCommitted(transaction, uncommittedRevisions);
+                // raise transaction committed event for any listeners
+                RaiseTransactionCommitted(transaction);
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -122,30 +103,18 @@ namespace DotNetRevolution.EventSourcing
             {
                 throw new EventStoreException(ErrorCommittingTransaction, ex);
             }
-
-            Contract.Assume(transaction.EventStream.GetUncommittedRevisions()?.Count == 0);
         }
 
-        private void RaiseTransactionCommitted(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
+        private void RaiseTransactionCommitted(EventProviderTransaction transaction)
         {
-            Contract.Requires(transaction != null);
-            Contract.Requires(uncommittedRevisions != null);
+            Contract.Requires(transaction != null);            
 
-            var domainEventRevisions = uncommittedRevisions.Where(x => x is DomainEventRevision).Cast<DomainEventRevision>().ToList();
-            var domainEvents = domainEventRevisions.Aggregate(new List<IDomainEvent>(), (seed, revision) =>
-            {
-                seed.AddRange(revision.DomainEvents);
-                return seed;
-            });
-            Contract.Assume(domainEvents != null);
-
-            TransactionCommitted(this, new TransactionCommittedEventArgs(transaction, domainEvents));
+            TransactionCommitted(this, new TransactionCommittedEventArgs(transaction));
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_usernameProvider != null);
             Contract.Invariant(TransactionCommitted != null);
         }        
     }

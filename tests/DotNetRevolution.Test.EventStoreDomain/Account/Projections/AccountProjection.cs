@@ -1,6 +1,6 @@
-﻿using DotNetRevolution.Core.Projecting;
+﻿using DotNetRevolution.EventSourcing.Projecting;
 using System.Diagnostics.Contracts;
-using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvents;
+using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent;
 using System;
 using System.Linq;
 

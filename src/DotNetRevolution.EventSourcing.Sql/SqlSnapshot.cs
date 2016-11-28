@@ -7,9 +7,12 @@
         public byte[] Data { get; }
 
         public EventProviderVersion Version { get; }
+
+        public EventStreamRevisionIdentity Identity { get; }
         
-        public SqlSnapshot(EventProviderVersion version, byte[] typeId, byte[] data)
+        public SqlSnapshot(EventStreamRevisionIdentity identity, EventProviderVersion version, byte[] typeId, byte[] data)
         {
+            Identity = identity;
             Version = version;
             TypeId = typeId;
             Data = data;

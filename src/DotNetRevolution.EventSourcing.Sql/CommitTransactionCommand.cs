@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Hashing;
 using DotNetRevolution.Core.Persistence;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,6 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         public CommitTransactionCommand(SqlSerializer serializer,
             ITypeFactory typeFactory, 
-            string username,          
             EventProviderTransaction transaction,
             IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
@@ -30,7 +30,6 @@ namespace DotNetRevolution.EventSourcing.Sql
             Contract.Requires(typeFactory != null);
             Contract.Requires(transaction != null);
             Contract.Requires(uncommittedRevisions != null);
-            Contract.Requires(string.IsNullOrWhiteSpace(username) == false);
 
             _serializer = serializer;
             _typeFactory = typeFactory;
@@ -40,7 +39,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                     Direction = ParameterDirection.ReturnValue
                 };
 
-            _command = CreateSqlCommand(transaction, uncommittedRevisions, username);
+            _command = CreateSqlCommand(transaction, uncommittedRevisions);
         }
 
         public void Execute(SqlConnection conn)
@@ -99,13 +98,13 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        private SqlCommand CreateSqlCommand(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions, string user)
+        private SqlCommand CreateSqlCommand(EventProviderTransaction transaction, IReadOnlyCollection<EventStreamRevision> uncommittedRevisions)
         {
             var sqlCommand = new SqlCommand("[dbo].[CreateTransaction]");
             sqlCommand.CommandType = CommandType.StoredProcedure;
 
             var command = transaction.Command;
-            var eventProvider = transaction.EventStream.EventProvider;
+            var eventProvider = transaction.EventProvider;
             var commandType = command.GetType();
 
             // set return parameter
@@ -113,32 +112,32 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             // set parameters
             sqlCommand.Parameters.Add("@transactionId", SqlDbType.UniqueIdentifier).Value = transaction.Identity.Value;
-            sqlCommand.Parameters.Add("@user", SqlDbType.NVarChar, 256).Value = user;
+            sqlCommand.Parameters.Add("@metadata", SqlDbType.VarBinary).Value = _serializer.SerializeObject(transaction.Metadata);
 
             sqlCommand.Parameters.Add("@commandId", SqlDbType.UniqueIdentifier).Value = command.CommandId;
             sqlCommand.Parameters.Add("@commandTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(commandType);
             sqlCommand.Parameters.Add("@commandTypeFullName", SqlDbType.VarChar, 512).Value = commandType.FullName;
             sqlCommand.Parameters.Add("@commandData", SqlDbType.VarBinary).Value = _serializer.SerializeObject(command);
             
-            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.EventProviderIdentity.Value;
+            sqlCommand.Parameters.Add("@eventProviderId", SqlDbType.UniqueIdentifier).Value = eventProvider.Identity.Value;
             sqlCommand.Parameters.Add("@aggregateRootId", SqlDbType.UniqueIdentifier).Value = eventProvider.AggregateRootIdentity.Value;
             sqlCommand.Parameters.Add("@aggregateRootTypeId", SqlDbType.Binary, 16).Value = _typeFactory.GetHash(eventProvider.AggregateRootType.Type);
             sqlCommand.Parameters.Add("@aggregateRootTypeFullName", SqlDbType.VarChar, 512).Value = eventProvider.AggregateRootType.Type.FullName;
             sqlCommand.Parameters.Add("@eventProviderDescriptor", SqlDbType.VarChar).Value = transaction.Descriptor.Value;
-            
+
             // event user defined table type
             sqlCommand.Parameters.Add(new SqlParameter("@events", SqlDbType.Structured)
             {
                 TypeName = "[dbo].[udttEvent]",
                 Value = GetEventDataTable(uncommittedRevisions)
-            });            
-
+            });
+            
             return sqlCommand;
         }
-        
+
         private DataTable GetEventDataTable(IEnumerable<EventStreamRevision> eventStream)
         {
-            // create data tables            
+            // create data table            
             var eventDataTable = CreateEventDataTable();
                         
             // new sequence object to keep track of the sequence per event provider
@@ -149,22 +148,23 @@ namespace DotNetRevolution.EventSourcing.Sql
             {
                 foreach(var domainEvent in revision.DomainEvents)
                 {
-                    AddEventRow(eventDataTable, sequence.Increment(), revision.Version, domainEvent);
+                    AddEventRow(eventDataTable, revision.Identity, sequence.Increment(), revision.Version, domainEvent);
                 }
             }
 
             return eventDataTable;
         }
-        
-        private void AddEventRow(DataTable dataTable, int sequence, int version, IDomainEvent domainEvent)
+
+        private void AddEventRow(DataTable dataTable, EventStreamRevisionIdentity revisionIdentity, int sequence, int version, IDomainEvent domainEvent)
         {
             // add row to the data table
             var dataRow = dataTable.NewRow();
 
             var eventType = new TransactionEventType(domainEvent.GetType());
-
+            
             // populate data row
             dataRow["EventId"] = domainEvent.DomainEventId;
+            dataRow["EventProviderRevisionId"] = revisionIdentity.Value;
             dataRow["EventProviderVersion"] = version;
             dataRow["Sequence"] = sequence;
             dataRow["TypeId"] = _typeFactory.GetHash(domainEvent.GetType());
@@ -173,13 +173,27 @@ namespace DotNetRevolution.EventSourcing.Sql
 
             // add new row to table
             dataTable.Rows.Add(dataRow);
-        }                
+        }
+
+        private void AddMetadataRow(DataTable dataTable, string key, string value)
+        {
+            // add row to the data table
+            var dataRow = dataTable.NewRow();
+            
+            // populate data row
+            dataRow["Key"] = key;
+            dataRow["Value"] = value;
+
+            // add new row to table
+            dataTable.Rows.Add(dataRow);
+        }
 
         private DataTable CreateEventDataTable()
         {
             var dataTable = new DataTable();
             
             dataTable.Columns.Add("EventId", typeof(Guid));
+            dataTable.Columns.Add("EventProviderRevisionId", typeof(Guid));
             dataTable.Columns.Add("EventProviderVersion", typeof(int));
             dataTable.Columns.Add("Sequence", typeof(int));
             dataTable.Columns.Add("TypeId", typeof(byte[]));

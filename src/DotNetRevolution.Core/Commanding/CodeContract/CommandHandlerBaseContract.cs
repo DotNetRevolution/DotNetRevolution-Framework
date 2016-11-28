@@ -7,8 +7,10 @@ namespace DotNetRevolution.Core.Commanding.CodeContract
     internal abstract class CommandHandlerBaseContract<TCommand> : CommandHandler<TCommand>
         where TCommand : ICommand
     {
-        public override ICommandHandlingResult Handle(TCommand command)
+        public override ICommandHandlingResult Handle(ICommandHandlerContext<TCommand> context)
         {
+            Contract.Ensures(Contract.Result<ICommandHandlingResult>() != null);
+
             throw new NotImplementedException();
         }
     }
