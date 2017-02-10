@@ -10,7 +10,7 @@ namespace DotNetRevolution.Logging.Serilog.Sink
     {
         public LogEventLevel LogEventLevel { get; }
 
-        public SinkWrapper(LogEventLevel logEventLevel)
+        protected SinkWrapper(LogEventLevel logEventLevel)
         {
             LogEventLevel = logEventLevel;
         }

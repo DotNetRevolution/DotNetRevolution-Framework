@@ -27,7 +27,15 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
             throw new NotImplementedException();
         }
 
-        public IProjectionEntry GetEntry(Type projectionType)
+        public ICollection<IProjectionEntry> GetEntries(AggregateRootType aggregateRootType)
+        {
+            Contract.Requires(aggregateRootType != null);
+            Contract.Ensures(Contract.Result<ICollection<IProjectionEntry>>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public IProjectionEntry GetEntry(ProjectionType projectionType)
         {
             Contract.Requires(projectionType != null);
 

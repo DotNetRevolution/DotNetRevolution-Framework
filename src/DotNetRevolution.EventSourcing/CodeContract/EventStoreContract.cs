@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using DotNetRevolution.Core.Domain;
@@ -42,5 +43,23 @@ namespace DotNetRevolution.EventSourcing.CodeContract
 
             throw new NotImplementedException();
         }
+
+        public ICollection<EventProviderTransactionCollection> GetTransactions<TAggregateRoot>(int eventProvidersToSkip, int eventProvidersToTake) where TAggregateRoot : class, IAggregateRoot
+        {
+            Contract.Requires(eventProvidersToSkip >= 0);
+            Contract.Requires(eventProvidersToTake > 0);
+            Contract.Ensures(Contract.Result<ICollection<EventProviderTransactionCollection>>() != null);
+
+            throw new NotImplementedException();
+        }
+
+        public Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync<TAggregateRoot>(int eventProvidersToSkip, int eventProvidersToTake) where TAggregateRoot : class, IAggregateRoot
+        {
+            Contract.Requires(eventProvidersToSkip >= 0);
+            Contract.Requires(eventProvidersToTake > 0);
+            Contract.Ensures(Contract.Result<Task<ICollection<EventProviderTransactionCollection>>>() != null);
+
+            throw new NotImplementedException();
+        }        
     }
 }

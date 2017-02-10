@@ -10,8 +10,8 @@ namespace DotNetRevolution.EventSourcing.Projecting
     {
         IProjectionCatalog Catalog { get; }
 
-        IProjectionManager GetManager(Type projectionType);
+        IProjectionManager GetManager(ProjectionType projectionType);
 
-        IEnumerable<IProjectionManager> GetManagers();
+        ICollection<IProjectionManager> GetManagers(AggregateRootType aggregateRootType);
     }
 }

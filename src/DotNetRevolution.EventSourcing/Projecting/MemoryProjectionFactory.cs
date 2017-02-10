@@ -1,27 +1,43 @@
-﻿using System.Diagnostics.Contracts;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
     public class MemoryProjectionFactory : IProjectionFactory
     {
-        private readonly Projection _projection;
+        private readonly Dictionary<EventProviderIdentity, IProjection> _projections = new Dictionary<EventProviderIdentity, IProjection>();
+        private readonly Type _projectionType;
 
-        public MemoryProjectionFactory(Projection projection)
+        public MemoryProjectionFactory(Type projectionType)
         {
-            Contract.Requires(projection != null);
+            Contract.Requires(projectionType != null);
 
-            _projection = projection;
+            _projectionType = projectionType;
         }
 
-        public IProjection GetProjection()
+        public IProjection GetProjection(IEventProvider eventProvider)
         {
-            return _projection;
+            IProjection projection;
+
+            if (_projections.TryGetValue(eventProvider.Identity, out projection))
+            {
+                Contract.Assume(projection != null);
+                return projection;
+            }
+
+            projection = (IProjection)Activator.CreateInstance(_projectionType);
+
+            _projections.Add(eventProvider.Identity, projection);
+
+            return projection;
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_projection != null);
+            Contract.Invariant(_projections != null);
+            Contract.Invariant(_projectionType != null);
         }
     }
 }

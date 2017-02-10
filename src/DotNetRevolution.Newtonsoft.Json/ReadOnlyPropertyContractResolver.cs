@@ -16,10 +16,10 @@ namespace DotNetRevolution.Json
 
             return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                        .Select(p =>
-                           {
+                           {                               
                                var prop = base.CreateProperty(p, memberSerialization);
 
-                               prop.Writable = true;
+                               prop.Writable = p.SetMethod == null ? false : true;
                                prop.Readable = true;
 
                                return prop;

@@ -10,7 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.EventSourcing.Sql
+namespace DotNetRevolution.EventSourcing.Sql.ReadDomainEvent
 {
     internal class GetDomainEventsCommand
     {
@@ -19,8 +19,7 @@ namespace DotNetRevolution.EventSourcing.Sql
         private readonly SqlCommand _command;
         private readonly AggregateRootType _aggregateRootType;
         private readonly AggregateRootIdentity _aggregateRootIdentity;
-
-        private bool _executed;
+        
         private SqlSnapshot _sqlSnapshot;
         private EventProviderIdentity _eventProviderIdentity;
         private Collection<SqlDomainEvent> _sqlDomainEvents;
@@ -43,7 +42,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             _command = CreateSqlCommand(aggregateRootType, aggregateRootIdentity);
         }
 
-        public void Execute(SqlConnection conn)
+        public EventStream Execute(SqlConnection conn)
         {
             Contract.Requires(conn != null);
 
@@ -55,12 +54,11 @@ namespace DotNetRevolution.EventSourcing.Sql
                 // execute command
                 _sqlDomainEvents = ExecuteSqlCommand(dataReader);
             }
-
-            // set executed so GetResults will return something
-            _executed = true;
+            
+            return GetResult();
         }
 
-        public async Task ExecuteAsync(SqlConnection conn)
+        public async Task<EventStream> ExecuteAsync(SqlConnection conn)
         {
             Contract.Requires(conn != null);
 
@@ -73,14 +71,11 @@ namespace DotNetRevolution.EventSourcing.Sql
                 _sqlDomainEvents = ExecuteSqlCommand(dataReader);
             }
 
-            // set executed so GetResults will return something
-            _executed = true;
+            return GetResult();
         }
 
-        public EventStream GetResults()
+        private EventStream GetResult()
         {
-            Contract.Requires(_executed);
-
             var eventProvider = new EventProvider(_eventProviderIdentity, _aggregateRootType, _aggregateRootIdentity);
             
             // check for snapshot
@@ -98,7 +93,7 @@ namespace DotNetRevolution.EventSourcing.Sql
                     return new EventStream(eventProvider, GetSnapshotRevision());
                 }
 
-                // get revisions and preprend snapshot revision
+                // get revisions and prepend snapshot revision
                 var revisions = GetRevisions();
                 revisions.Insert(0, GetSnapshotRevision());
 
@@ -121,16 +116,14 @@ namespace DotNetRevolution.EventSourcing.Sql
 
         private List<EventStreamRevision> GetRevisions()
         {
-            var versions = _sqlDomainEvents.GroupBy(x => x.EventProviderVersion);
+            var versions = _sqlDomainEvents.GroupBy(x => new { x.EventProviderRevisionId, x.EventProviderVersion });
                                     
             var revisions = new List<EventStreamRevision>(versions.Count());
 
             foreach(var group in versions)
             {
-                var firstDomainEvent = group.First();
-
-                revisions.Add(new DomainEventRevision(firstDomainEvent.EventProviderRevisionId,
-                                                      firstDomainEvent.EventProviderVersion,
+                revisions.Add(new DomainEventRevision(group.Key.EventProviderRevisionId,
+                                                      group.Key.EventProviderVersion,
                                                       _serializer.DeserializeDomainEvents(new Collection<SqlDomainEvent>(group.ToList()))));
             }
             
@@ -173,19 +166,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             // move reader to next result set
             if (dataReader.NextResult())
             {
-                // read until no more rows
-                while (dataReader.Read())
-                {
-                    // create new sql domain event
-                    var sqlDomainEvent = new SqlDomainEvent(dataReader.GetGuid(0),
-                        dataReader.GetInt32(1),
-                        dataReader.GetInt32(2),
-                        (byte[])dataReader[3],
-                        (byte[])dataReader[4]);
-
-                    // add sql domain event to collection
-                    sqlDomainEvents.Add(sqlDomainEvent);
-                }
+                GetEventProviderEvents(dataReader, sqlDomainEvents);
             }
             else
             {
@@ -200,6 +181,20 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
 
             return sqlDomainEvents;
+        }
+
+        private static void GetEventProviderEvents(SqlDataReader dataReader, Collection<SqlDomainEvent> sqlDomainEvents)
+        {
+            // read until no more rows
+            while (dataReader.Read())
+            {
+                // add sql domain event to collection
+                sqlDomainEvents.Add(new SqlDomainEvent(dataReader.GetGuid(0),
+                    dataReader.GetInt32(1),
+                    dataReader.GetInt32(2),
+                    (byte[])dataReader[3],
+                    (byte[])dataReader[4]));
+            }
         }
 
         private void GetEventProviderInformation(SqlDataReader dataReader)

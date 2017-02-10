@@ -6,6 +6,16 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
     [ContractClassFor(typeof(IProjectionEntry))]
     internal abstract class ProjectionEntryContract : IProjectionEntry
     {
+        public AggregateRootType AggregateRootType
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<AggregateRootType>() != null);
+
+                throw new NotImplementedException();
+            }
+        }
+
         public IProjectionManager ProjectionManager
         {
             get
@@ -24,11 +34,11 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
             }
         }
 
-        public Type ProjectionType
+        public ProjectionType ProjectionType
         {
             get
             {
-                Contract.Ensures(Contract.Result<Type>() != null);
+                Contract.Ensures(Contract.Result<ProjectionType>() != null);
 
                 throw new NotImplementedException();
             }

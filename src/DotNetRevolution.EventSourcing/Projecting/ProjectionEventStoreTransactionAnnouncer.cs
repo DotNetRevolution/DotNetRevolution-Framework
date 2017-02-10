@@ -4,36 +4,26 @@ namespace DotNetRevolution.EventSourcing.Projecting
 {
     public class ProjectionEventStoreTransactionAnnouncer : EventStoreTransactionAnnouncer
     {
-        private readonly IProjectionManagerFactory _projectionManagerFactory;
+        private readonly IProjectionDispatcher _dispatcher;
 
-        public ProjectionEventStoreTransactionAnnouncer(IEventStore eventStore, IProjectionManagerFactory projectionManagerFactory) 
+        public ProjectionEventStoreTransactionAnnouncer(IEventStore eventStore, IProjectionDispatcher dispatcher) 
             : base(eventStore)
         {
             Contract.Requires(eventStore != null);
-            Contract.Requires(projectionManagerFactory != null);
+            Contract.Requires(dispatcher != null);
 
-            _projectionManagerFactory = projectionManagerFactory;
+            _dispatcher = dispatcher;
         }
 
         protected override void TransactionCommitted(EventProviderTransaction transaction)
-        {   
-            // get managers
-            var projectionManagers = _projectionManagerFactory.GetManagers();
-
-            // loop through managers and project domain events
-            foreach (var projectionManager in projectionManagers)
-            {
-                Contract.Assume(projectionManager != null);
-
-                // project
-                projectionManager.Project(transaction);
-            }
+        {            
+            _dispatcher.Dispatch(transaction);
         }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_projectionManagerFactory != null);
+            Contract.Invariant(_dispatcher != null);
         }
     }
 }

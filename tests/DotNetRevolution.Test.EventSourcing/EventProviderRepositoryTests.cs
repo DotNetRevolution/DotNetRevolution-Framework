@@ -16,7 +16,7 @@ namespace DotNetRevolution.Test.EventStourcing
 {
     public abstract class EventProviderRepositoryTests
     {
-        public EventProviderRepositoryTests()
+        protected EventProviderRepositoryTests()
         {
             MetaFactories = new List<IMetaFactory>();
         }
@@ -27,18 +27,20 @@ namespace DotNetRevolution.Test.EventStourcing
 
         protected Core.Commanding.Domain.IRepository<AccountAggregateRoot> Repository { get; set; }
 
-        public virtual void CanGetAggregateRoot()
+        public virtual ICommandHandlingResult CanGetAggregateRoot()
         {
             var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
-            Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
+            var result = Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
 
             var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
 
             Assert.IsNotNull(account);
+
+            return result;
         }
 
         public virtual async Task CanGetAggregateRootAsync(int i)
@@ -193,6 +195,13 @@ namespace DotNetRevolution.Test.EventStourcing
             }
         }
 
-        protected abstract EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents);
+        public ICollection<EventProviderTransactionCollection> GetTransactions<TAggregateRoot>(int skip, int take) where TAggregateRoot : class, IAggregateRoot
+        {
+            var transactions = EventStore.GetTransactions<TAggregateRoot>(skip, take);
+            
+            return transactions;
+        }
+
+        protected abstract IStateTracker GetStateTracker(DomainEventCollection domainEvents);
     }
 }

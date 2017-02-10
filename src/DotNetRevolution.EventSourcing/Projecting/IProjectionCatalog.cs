@@ -1,5 +1,4 @@
 ﻿using DotNetRevolution.EventSourcing.Projecting.CodeContract;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
@@ -13,6 +12,9 @@ namespace DotNetRevolution.EventSourcing.Projecting
         IProjectionCatalog Add(IProjectionEntry entry);
 
         [Pure]
-        IProjectionEntry GetEntry(Type projectionType);
+        IProjectionEntry GetEntry(ProjectionType projectionType);
+
+        [Pure]
+        ICollection<IProjectionEntry> GetEntries(AggregateRootType aggregateRootType);
     }
 }

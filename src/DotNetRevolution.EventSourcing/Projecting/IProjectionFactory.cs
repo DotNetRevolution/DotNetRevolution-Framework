@@ -6,6 +6,6 @@ namespace DotNetRevolution.EventSourcing.Projecting
     [ContractClass(typeof(ProjectionFactoryContract))]
     public interface IProjectionFactory
     {
-        IProjection GetProjection();
+        IProjection GetProjection(IEventProvider eventProvider);
     }
 }

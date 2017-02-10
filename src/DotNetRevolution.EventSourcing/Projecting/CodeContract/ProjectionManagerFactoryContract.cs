@@ -17,15 +17,16 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
             }
         }
 
-        public IProjectionManager GetManager(Type projectionType)
+        public IProjectionManager GetManager(ProjectionType projectionType)
         {
             Contract.Requires(projectionType != null);
 
             throw new NotImplementedException();
         }
 
-        public IEnumerable<IProjectionManager> GetManagers()
+        public ICollection<IProjectionManager> GetManagers(AggregateRootType aggregateRootType)
         {
+            Contract.Requires(aggregateRootType != null);
             Contract.Ensures(Contract.Result<IEnumerable<IProjectionManager>>() != null);
 
             throw new NotImplementedException();

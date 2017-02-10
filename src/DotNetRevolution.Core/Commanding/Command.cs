@@ -6,7 +6,7 @@ namespace DotNetRevolution.Core.Commanding
     {
         public Guid CommandId { get; }
 
-        public Command()
+        protected Command()
         {
             CommandId = Guid.NewGuid();
         }

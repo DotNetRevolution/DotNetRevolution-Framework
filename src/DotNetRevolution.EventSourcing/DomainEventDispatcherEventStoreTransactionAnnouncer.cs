@@ -1,4 +1,5 @@
 ﻿using DotNetRevolution.Core.Domain;
+using DotNetRevolution.Core.Metadata;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
@@ -19,7 +20,18 @@ namespace DotNetRevolution.EventSourcing
 
         protected override void TransactionCommitted(EventProviderTransaction transaction)
         {
-            _dispatcher.Publish(transaction.GetDomainEvents().ToArray());
+            // get domain events
+            var domainEvents = transaction.GetDomainEvents();
+
+            // get metadata
+            var metadata = new MetaCollection(transaction.Metadata);
+
+            // create contexts
+            var contexts = domainEvents.Select(x => new DomainEventHandlerContext(x, metadata))
+                                       .ToArray();
+
+            // public contexts
+            _dispatcher.Publish(contexts);
         }
 
         [ContractInvariantMethod]

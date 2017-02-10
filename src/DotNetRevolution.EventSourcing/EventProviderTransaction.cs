@@ -81,7 +81,7 @@ namespace DotNetRevolution.EventSourcing
                 return _metadata;
             }
         }
-                
+
         public EventProviderTransaction(TransactionIdentity identity, IEventProvider eventProvider, ICommand command, IAggregateRoot aggregateRoot, IReadOnlyCollection<EventStreamRevision> revisions, IReadOnlyCollection<Meta> metadata)
         {
             Contract.Requires(command != null);
@@ -97,6 +97,24 @@ namespace DotNetRevolution.EventSourcing
             _eventProvider = eventProvider;
             _revisions = revisions;
             _descriptor = new EventProviderDescriptor(aggregateRoot);
+            _metadata = metadata;
+        }
+
+        public EventProviderTransaction(TransactionIdentity identity, IEventProvider eventProvider, ICommand command, EventProviderDescriptor descriptor, IReadOnlyCollection<EventStreamRevision> revisions, IReadOnlyCollection<Meta> metadata)
+        {
+            Contract.Requires(command != null);
+            Contract.Requires(descriptor != null);
+            Contract.Requires(eventProvider != null);
+            Contract.Requires(revisions != null);
+            Contract.Requires(metadata != null);
+
+            Contract.Assume(identity != null);
+
+            _identity = identity;
+            _command = command;
+            _eventProvider = eventProvider;
+            _revisions = revisions;
+            _descriptor = descriptor;
             _metadata = metadata;
         }
 

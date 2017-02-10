@@ -47,7 +47,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         }
 
         [TestMethod]
-        public override void CanGetAggregateRoot()
+        public new void CanGetAggregateRoot()
         {
             base.CanGetAggregateRoot();
         }
@@ -179,36 +179,136 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             }
         }
 
-       // [TestMethod]
+        [TestMethod]
         public void Project()
         {
-            var projection = new AccountProjection(new ProjectionIdentity(Guid.NewGuid()));
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(projection));
-            
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
             var projectionCatalog = new ProjectionCatalog();
-            projectionCatalog.Add(new ProjectionEntry(typeof(AccountProjection), projectionManager));
-            
-            using (var projectionDomainDispatcher = new QueueDomainEventDispatcher(new ProjectionDomainEventDispatcher(new ProjectionManagerFactory(projectionCatalog))))
-            {
-                var announcer = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, projectionDomainDispatcher);
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
 
-                Created createdDomainEvent = null;
+            var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
-                var domainEventCatalog = new DomainEventCatalog();
-                domainEventCatalog.Add(new DomainEventEntry(typeof(Created), new ActionDomainEventHandler<Created>((created) => createdDomainEvent = created)));
-                var announcer2 = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog), new DomainEventHandlerContextFactory(new Collection<IMetaFactory>())));
+            var announcer = new ProjectionEventStoreTransactionAnnouncer(EventStore, projectionDispatcher);
 
-                base.CanGetAggregateRoot();
+            var result = base.CanGetAggregateRoot();
 
-                projectionManager.Wait(createdDomainEvent.DomainEventId);
+            var waiter = new EventStoreProjectionWaiter(projectionManager);
+            waiter.Wait(result);
 
-                Assert.AreEqual(projection.State.Accounts.Count, 1);
-            }            
+            //Created createdDomainEvent = null;
+
+            //var domainEventCatalog = new DomainEventCatalog();
+            //domainEventCatalog.Add(new DomainEventEntry(typeof(Created), new ActionDomainEventHandler<Created>((created) => createdDomainEvent = created)));
+            //var announcer2 = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog), new DomainEventHandlerContextFactory(new Collection<IMetaFactory>())));
+
         }
 
-        protected override EventStreamStateTracker GetStateTracker(DomainEventCollection domainEvents)
+        [TestMethod]
+        public void ProjectOnBackground()
         {
-            return new EventStreamStateTracker(new EventStream(new EventProvider(_guidGenerator.Create(), domainEvents)), _guidGenerator, domainEvents);
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog)));
+
+            var announcer = new ProjectionEventStoreTransactionAnnouncer(EventStore, projectionDispatcher);
+
+            var result = base.CanGetAggregateRoot();
+
+            var waiter = new EventStoreProjectionWaiter(projectionManager);
+            waiter.Wait(result);
+
+            //Created createdDomainEvent = null;
+
+            //var domainEventCatalog = new DomainEventCatalog();
+            //domainEventCatalog.Add(new DomainEventEntry(typeof(Created), new ActionDomainEventHandler<Created>((created) => createdDomainEvent = created)));
+            //var announcer2 = new DomainEventDispatcherEventStoreTransactionAnnouncer(EventStore, new DomainEventDispatcher(new DomainEventHandlerFactory(domainEventCatalog), new DomainEventHandlerContextFactory(new Collection<IMetaFactory>())));
+
+        }
+
+        [TestMethod]
+        public void GetTransactions()
+        {
+            CanGetAggregateRoot();
+            var transactions = GetTransactions<AccountAggregateRoot>(0, 1);
+
+            Assert.AreEqual(1, transactions.Count);
+        }
+
+        [TestMethod]
+        public void ReadEntireDatabase()
+        {
+            var skip = 0;
+            var take = 1000;
+            var transactions = GetTransactions<AccountAggregateRoot>(skip, take);
+
+            while (transactions.Count > 0)
+            {
+                skip += take;
+                transactions = GetTransactions<AccountAggregateRoot>(skip, take);
+            }
+        }
+
+        [TestMethod]
+        public void RebuildProjections()
+        {
+            CanGetAggregateRoot();
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
+
+            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+            initializer.Initialize<AccountAggregateRoot>();
+
+            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+        }
+
+        [TestMethod]
+        public void RebuildProjectionsWithCustomTake()
+        {
+            CanGetAggregateRoot();
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
+
+            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+            initializer.Initialize<AccountAggregateRoot>(500);
+
+            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+        }
+
+        [TestMethod]
+        public void RebuildProjectionsWithQueueProjectionDispatcher()
+        {
+            CanGetAggregateRoot();
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog)));
+
+            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+            initializer.Initialize<AccountAggregateRoot>(500);
+
+            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+        }
+
+        protected override IStateTracker GetStateTracker(DomainEventCollection domainEvents)
+        {
+            var tracker = new EventProviderStateTracker(new EventProvider(_guidGenerator.Create(), domainEvents), EventProviderVersion.Initial, _guidGenerator);
+            tracker.Apply(domainEvents);
+
+            return tracker;
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DotNetRevolution.EventSourcing.Sql
+namespace DotNetRevolution.EventSourcing.Sql.CommitTransaction
 {
     internal class CommitTransactionCommand
     {        

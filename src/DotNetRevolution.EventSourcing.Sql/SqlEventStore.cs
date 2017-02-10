@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Hashing;
+using DotNetRevolution.EventSourcing.Sql.ReadDomainEvent;
+using DotNetRevolution.EventSourcing.Sql.CommitTransaction;
+using DotNetRevolution.EventSourcing.Sql.ReadTransaction;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -42,10 +46,8 @@ namespace DotNetRevolution.EventSourcing.Sql
                 conn.Open();
 
                 // execute
-                command.Execute(conn);
+                return command.Execute(conn);
             }
-
-            return command.GetResults();
         }
 
         protected override async Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity identity)
@@ -60,16 +62,17 @@ namespace DotNetRevolution.EventSourcing.Sql
                 await conn.OpenAsync();
 
                 // execute
-                await command.ExecuteAsync(conn);
+                return await command.ExecuteAsync(conn);
             }
-
-            return command.GetResults();
         }
 
         protected override void CommitTransaction(EventProviderTransaction transaction)
         {
             // establish command
-            var command = CreateCommand(transaction);
+            var command = new CommitTransactionCommand(_serializer,
+                _typeFactory,
+                transaction,
+                transaction.Revisions);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -85,7 +88,10 @@ namespace DotNetRevolution.EventSourcing.Sql
         protected override async Task CommitTransactionAsync(EventProviderTransaction transaction)
         {
             // establish command
-            var command = CreateCommand(transaction);
+            var command = new CommitTransactionCommand(_serializer,
+                _typeFactory,
+                transaction,
+                transaction.Revisions);
 
             // create connection
             using (var conn = new SqlConnection(_connectionString))
@@ -98,12 +104,36 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        private CommitTransactionCommand CreateCommand(EventProviderTransaction transaction)
+        protected override ICollection<EventProviderTransactionCollection> GetTransactions(AggregateRootType aggregateRootType, int eventProvidersToSkip, int eventProvidersToTake)
         {
-            return new CommitTransactionCommand(_serializer,
-                _typeFactory,
-                transaction,
-                transaction.Revisions);
+            // establish command
+            var command = new GetTransactionsByAggregateRootTypeCommand(_serializer, _typeFactory, aggregateRootType, eventProvidersToSkip, eventProvidersToTake);
+
+            // create connection
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                // connection needs to be open before executing
+                conn.Open();
+
+                // execute
+                return command.Execute(conn);
+            }
+        }
+
+        protected override Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync(AggregateRootType aggregateRootType, int eventProvidersToSkip, int eventProvidersToTake)
+        {
+            // establish command
+            var command = new GetTransactionsByAggregateRootTypeCommand(_serializer, _typeFactory, aggregateRootType, eventProvidersToSkip, eventProvidersToTake);
+
+            // create connection
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                // connection needs to be open before executing
+                conn.OpenAsync();
+
+                // execute
+                return command.ExecuteAsync(conn);
+            }
         }
     }
 }

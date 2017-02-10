@@ -19,9 +19,9 @@ AS
 	
 	-- get event provider table id
 	SET @eventProviderId = (SELECT ep.EventProviderId
-								FROM dbo.EventProvider ep
-							   WHERE ep.AggregateRootTypeId = @aggregateRootTypeId
-								 AND ep.AggregateRootId = @aggregateRootId)
+							  FROM dbo.EventProvider ep
+							 WHERE ep.AggregateRootTypeId = @aggregateRootTypeId
+							   AND ep.AggregateRootId = @aggregateRootId)
 
 	-- get transactions for event provider
 	INSERT INTO @revisionTable (EventProviderRevisionId, EventProviderVersion)
@@ -39,7 +39,7 @@ AS
 			 , @snapshotRevisionId = r.EventProviderRevisionId
 		  FROM dbo.EventProviderSnapshot s
 		  JOIN @revisionTable r ON s.EventProviderRevisionId = r.EventProviderRevisionId
-		ORDER BY r.EventProviderVersion DESC
+	  ORDER BY r.EventProviderVersion DESC
 
 	-- select event provider data
 	SELECT @eventProviderId 'eventProviderId'

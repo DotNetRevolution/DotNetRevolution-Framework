@@ -1,17 +1,28 @@
-﻿using DotNetRevolution.Core.Commanding.Domain;
+﻿using DotNetRevolution.Core.Commanding;
+using DotNetRevolution.Core.Commanding.Domain;
 using System;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Commands
 {
-    public class Withdraw2 : AggregateRootCommand<AccountAggregateRoot>
+    public class Withdraw2 : IAggregateRootCommand<AccountAggregateRoot>
     {
-        public Guid AccountId { get; }
+        public Guid CommandId { get; private set; }
 
-        public decimal Amount { get; }
-
-        public Withdraw2(Guid accountId, decimal amount)            
-            : base(accountId)
+        public Guid AggregateRootId
         {
+            get
+            {
+                return AccountId;
+            }
+        }
+
+        public Guid AccountId { get; private set; }
+
+        public decimal Amount { get; private set; }
+
+        public Withdraw2(Guid accountId, decimal amount)
+        {
+            CommandId = Guid.NewGuid();
             AccountId = accountId;
             Amount = amount;
         }

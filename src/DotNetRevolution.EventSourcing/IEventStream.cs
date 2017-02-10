@@ -11,6 +11,9 @@ namespace DotNetRevolution.EventSourcing
         IEventProvider EventProvider { get; }
 
         [Pure]
+        EventProviderVersion LatestVersion { get; }
+
+        [Pure]
         void Append(EventStreamRevision revision);
 
         EventProviderVersion GetNextVersion();

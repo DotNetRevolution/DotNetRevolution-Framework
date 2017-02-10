@@ -17,7 +17,17 @@ namespace DotNetRevolution.EventSourcing.CodeContract
                 throw new NotImplementedException();
             }
         }
-        
+
+        public EventProviderVersion LatestVersion
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<EventProviderVersion>() != null);
+
+                throw new NotImplementedException();
+            }
+        }
+
         public void Append(EventStreamRevision revision)
         {
             Contract.Requires(revision != null);

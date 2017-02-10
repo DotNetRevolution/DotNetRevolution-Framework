@@ -1,4 +1,4 @@
-﻿namespace DotNetRevolution.EventSourcing.Sql
+﻿namespace DotNetRevolution.EventSourcing.Sql.ReadDomainEvent
 {
     internal class SqlSnapshot
     {

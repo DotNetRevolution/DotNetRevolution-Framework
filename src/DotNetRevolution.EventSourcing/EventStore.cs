@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.Contracts;
 using DotNetRevolution.Core.Persistence;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing
 {
@@ -11,10 +12,11 @@ namespace DotNetRevolution.EventSourcing
     {
         private const string ErrorGettingEventStream = "Error processing request to get event stream.";
         private const string ErrorCommittingTransaction = "Error processing request to commit transaction.";
-        
+        private const string ErrorGettingTransactionCollections = "Error processing request to get transaction collections.";
+
         public event EventHandler<TransactionCommittedEventArgs> TransactionCommitted = (s, e) => { };
 
-        public EventStore(ISerializer serializer)
+        protected EventStore(ISerializer serializer)
         {     
             Contract.Requires(serializer != null);
         }
@@ -22,6 +24,10 @@ namespace DotNetRevolution.EventSourcing
         protected abstract EventStream GetEventStream(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
 
         protected abstract Task<EventStream> GetEventStreamAsync(AggregateRootType eventProviderType, AggregateRootIdentity aggregateRootIdentity);
+
+        protected abstract ICollection<EventProviderTransactionCollection> GetTransactions(AggregateRootType eventProviderType, int eventProvidersToSkip, int eventProvidersToTake);
+
+        protected abstract Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync(AggregateRootType eventProviderType, int eventProvidersToSkip, int eventProvidersToTake);
 
         protected abstract void CommitTransaction(EventProviderTransaction transaction);
 
@@ -67,6 +73,46 @@ namespace DotNetRevolution.EventSourcing
             }
         }
 
+        public ICollection<EventProviderTransactionCollection> GetTransactions<TAggregateRoot>(int eventProvidersToSkip, int eventProvidersToTake) where TAggregateRoot : class, IAggregateRoot
+        {
+            try
+            {
+                // create new event provider type
+                var eventProviderType = new AggregateRootType(typeof(TAggregateRoot));
+
+                // get transactions
+                var transactions = GetTransactions(eventProviderType, eventProvidersToSkip, eventProvidersToTake);
+                Contract.Assume(transactions != null);
+
+                // return transactions
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                throw new EventStoreException(ErrorGettingTransactionCollections, ex);
+            }
+        }
+
+        public async Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync<TAggregateRoot>(int eventProvidersToSkip, int eventProvidersToTake) where TAggregateRoot : class, IAggregateRoot
+        {
+            try
+            {
+                // create new event provider type
+                var eventProviderType = new AggregateRootType(typeof(TAggregateRoot));
+
+                // get transactions
+                var transactions = await GetTransactionsAsync(eventProviderType, eventProvidersToSkip, eventProvidersToTake);
+                Contract.Assume(transactions != null);
+
+                // return transactions
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                throw new EventStoreException(ErrorGettingTransactionCollections, ex);
+            }
+        }
+
         public void Commit(EventProviderTransaction transaction)
         {
             try
@@ -74,7 +120,7 @@ namespace DotNetRevolution.EventSourcing
                 CommitTransaction(transaction);
 
                 // raise transaction committed event for any listeners
-                RaiseTransactionCommitted(transaction);
+                TransactionCommitted(this, new TransactionCommittedEventArgs(transaction));
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -93,7 +139,7 @@ namespace DotNetRevolution.EventSourcing
                 await CommitTransactionAsync(transaction);
 
                 // raise transaction committed event for any listeners
-                RaiseTransactionCommitted(transaction);
+                TransactionCommitted(this, new TransactionCommittedEventArgs(transaction));
             }
             catch (AggregateRootConcurrencyException)
             {
@@ -104,18 +150,11 @@ namespace DotNetRevolution.EventSourcing
                 throw new EventStoreException(ErrorCommittingTransaction, ex);
             }
         }
-
-        private void RaiseTransactionCommitted(EventProviderTransaction transaction)
-        {
-            Contract.Requires(transaction != null);            
-
-            TransactionCommitted(this, new TransactionCommittedEventArgs(transaction));
-        }
-
+        
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
             Contract.Invariant(TransactionCommitted != null);
-        }        
+        }
     }
 }

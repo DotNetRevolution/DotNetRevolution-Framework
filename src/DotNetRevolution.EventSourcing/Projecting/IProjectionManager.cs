@@ -1,18 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using DotNetRevolution.EventSourcing.Projecting.CodeContract;
+﻿using DotNetRevolution.EventSourcing.Projecting.CodeContract;
 using System.Diagnostics.Contracts;
+using System.Collections.Generic;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
     [ContractClass(typeof(ProjectionManagerContract))]
     public interface IProjectionManager
     {
-        void Project(EventProviderTransaction transaction);
+        IReadOnlyCollection<TransactionIdentity> ProcessedTransactions { get; }
 
-        void Wait(Guid domainEventId);
-        void Wait(Guid domainEventId, TimeSpan timeout);
-        Task WaitAsync(Guid domainEventId);
-        Task WaitAsync(Guid domainEventId, TimeSpan timeout);
+        void Handle(IEventProvider eventProvider, params IProjectionContext[] projectionContexts);
     }
 }

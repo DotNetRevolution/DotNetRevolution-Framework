@@ -15,28 +15,16 @@ namespace DotNetRevolution.EventSourcing.Projecting
             Contract.Requires(projectionFactory != null);
         }
 
-        protected override void FinalizeProjection(IProjection projection, EventProviderTransaction transaction)
-        {
-            _processedTransactions.Add(transaction.Identity);
-        }
+        //protected override void Processed(TransactionIdentity transactionIdentity)
+        //{
+        //    _processedTransactions.Add(transactionIdentity);
+        //}
 
-        protected override void FinalizeProjection(IProjection projection, Exception e)
-        {
-        }
-
-        protected override void PrepareProjection(IProjection projection)
-        {
-        }
-
-        protected override bool Processed(TransactionIdentity identity)
-        {
-            return _processedTransactions.Contains(identity.Value);
-        }
-
-        protected override void SaveProjection(IProjection projection)
-        {
-        }
-
+        //protected override bool HasProcessed(TransactionIdentity identity)
+        //{
+        //    return _processedTransactions.Contains(identity.Value);
+        //}
+        
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {

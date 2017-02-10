@@ -5,29 +5,40 @@ namespace DotNetRevolution.EventSourcing.Projecting
 {
     public abstract class Projection : IProjection
     {
-        public ProjectionIdentity ProjectionIdentity { get; }
-
-        protected Projection(ProjectionIdentity identity)
-        {
-            Contract.Requires(identity != null);
-
-            ProjectionIdentity = identity;
-        }
-
         public void Project(IProjectionContext context)
         {
-            var projectType = typeof(IProject<>);            
-            Contract.Assume(projectType.IsGenericTypeDefinition);
+            var genericContextType = CreateGenericType(typeof(IProjectionContext<>), context.Data.GetType());
+            
+            var genericContext = Activator.CreateInstance(CreateGenericType(typeof(ProjectionContext<>), context.Data.GetType()), new object[] { context.Data, context });
 
-            var types = new Type[] { context.DomainEvent.GetType() };
-            Contract.Assume(types.Length == projectType.GetGenericArguments().Length);
+            foreach (var m in GetType().GetMethods())
+            {
+                if (m.Name == "Project")
+                {
+                    foreach(var p in m.GetParameters())
+                    {
+                        Contract.Assume(p != null);
 
-            var genericType = projectType.MakeGenericType(types);            
+                        if (p.ParameterType == genericContextType)
+                        {
+                            m.Invoke(this, new object[] { genericContext });
+                            return;
+                        }
+                    }
+                }
+            }
+        }
 
-            var methodInfo = genericType.GetMethod("Project");
-            Contract.Assume(methodInfo != null);
+        private static Type CreateGenericType(Type typeToMake, Type typeArg)
+        {
+            Contract.Requires(typeToMake != null);
+            Contract.Assume(typeToMake.IsGenericTypeDefinition);
 
-            methodInfo.Invoke(this, new object[] { domainEvent });            
-        }        
+            var types = new Type[] { typeArg };
+            Contract.Assume(types.Length == typeToMake.GetGenericArguments().Length);
+
+            var genericType = typeToMake.MakeGenericType(types);
+            return genericType;
+        }
     }  
 }

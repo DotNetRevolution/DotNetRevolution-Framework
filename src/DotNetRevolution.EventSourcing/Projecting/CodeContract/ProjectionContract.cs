@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
@@ -18,25 +16,11 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
             }
         }
 
-        public void Project(IDomainEvent domainEvent)
+        public void Project(IProjectionContext context)
         {
-            Contract.Requires(domainEvent != null);
+            Contract.Requires(context != null);
 
             throw new NotImplementedException();
-        }
-
-        public void Project(IReadOnlyCollection<IDomainEvent> domainEvents)
-        {
-            Contract.Requires(domainEvents != null);
-
-            throw new NotImplementedException();
-        }
-
-        public void Project(params IDomainEvent[] domainEvents)
-        {
-            Contract.Requires(domainEvents != null);
-
-            throw new NotImplementedException();
-        }
+        }        
     }
 }

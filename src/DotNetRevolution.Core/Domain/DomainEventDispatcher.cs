@@ -19,7 +19,7 @@ namespace DotNetRevolution.Core.Domain
             _contextFactory = contextFactory;
         }
 
-        public void Publish(params IDomainEventHandlerContext[] contexts)
+        public virtual void Publish(params IDomainEventHandlerContext[] contexts)
         {
             foreach (var context in contexts)
             {

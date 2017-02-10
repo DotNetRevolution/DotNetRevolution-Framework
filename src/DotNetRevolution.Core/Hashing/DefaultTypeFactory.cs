@@ -46,8 +46,7 @@ namespace DotNetRevolution.Core.Hashing
         public byte[] GetHash(Type type)
         {
             var hash = _hashProvider.GetHash(type.FullName);
-            Contract.Assume(hash != null);
-
+            
             return hash;
         }
 

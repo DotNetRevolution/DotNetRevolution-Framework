@@ -9,8 +9,8 @@ namespace DotNetRevolution.Core.Domain
 
         public IAggregateRootState State { get; }
 
-        public AggregateRoot(AggregateRootIdentity identity,
-                             IAggregateRootState state)
+        protected AggregateRoot(AggregateRootIdentity identity,
+                                IAggregateRootState state)
         {
             Contract.Requires(identity != null);
             Contract.Requires(state != null);

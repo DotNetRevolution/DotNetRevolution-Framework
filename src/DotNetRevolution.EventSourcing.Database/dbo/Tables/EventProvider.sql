@@ -9,3 +9,5 @@
 GO
 
 CREATE UNIQUE CLUSTERED INDEX [IX_EventProvider] ON [dbo].[EventProvider] ([AggregateRootTypeId],[AggregateRootId])
+
+GO

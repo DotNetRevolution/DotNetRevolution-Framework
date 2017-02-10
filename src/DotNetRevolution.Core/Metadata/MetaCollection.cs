@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNetRevolution.Core.Extension;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
@@ -8,6 +9,18 @@ namespace DotNetRevolution.Core.Metadata
 {
     public class MetaCollection : Collection<Meta>
     {
+        public MetaCollection()
+        {
+        }
+
+        public MetaCollection(IReadOnlyCollection<Meta> collection) 
+        {
+            Contract.Requires(collection != null);
+            Contract.Requires(Contract.ForAll(collection, o => o != null));
+
+            collection.ForEach(Add);
+        }
+
         public void AddOrReplace(Meta item)
         {
             var currentMeta = this.FirstOrDefault(x => x.Key == item.Key);
@@ -27,14 +40,7 @@ namespace DotNetRevolution.Core.Metadata
                 Add(item);
             }
         }
-
-        public IReadOnlyCollection<Meta> AsReadOnlyCollection()
-        {
-            Contract.Ensures(Contract.Result<IReadOnlyCollection<Meta>>() != null);
-
-            return new ReadOnlyCollection<Meta>(this);
-        }
-        
+                
         protected override void InsertItem(int index, Meta item)
         {
             // don't allow null items

@@ -16,7 +16,7 @@ namespace DotNetRevolution.Json
             : this(new JsonSerializerSettings
             {
                 // this setting is required to save the type in the Json string, use this setting when deserializing as well
-                TypeNameHandling = TypeNameHandling.Auto,
+                //TypeNameHandling = TypeNameHandling.Auto,
 
                 // allow for non public constructors to be used when deserializing
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
@@ -25,7 +25,7 @@ namespace DotNetRevolution.Json
                 ContractResolver = new ReadOnlyPropertyContractResolver(),
                    
                 // save references to protect against stack overflow exceptions with self referencing property loops
-                PreserveReferencesHandling = PreserveReferencesHandling.All
+                //PreserveReferencesHandling = PreserveReferencesHandling.All
             })
         {
         }

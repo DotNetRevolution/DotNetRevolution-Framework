@@ -8,10 +8,10 @@ namespace DotNetRevolution.EventSourcing
     public class EventStream : IEventStream
     {
         private readonly List<EventStreamRevision> _revisions = new List<EventStreamRevision>();
-
-        private EventProviderVersion _latestVersion;
-
+        
         public IEventProvider EventProvider { get; }
+
+        public EventProviderVersion LatestVersion { get; private set; }
         
         public EventStream(IEventProvider eventProvider, IReadOnlyCollection<EventStreamRevision> revisions)
             : this(eventProvider, revisions.AsEnumerable())
@@ -35,7 +35,7 @@ namespace DotNetRevolution.EventSourcing
             EventProvider = eventProvider;
             _revisions.AddRange(revisions);
 
-            _latestVersion = GetLatestVersion();
+            LatestVersion = GetLatestVersion();
         }
 
         public void Append(EventStreamRevision revision)
@@ -45,7 +45,7 @@ namespace DotNetRevolution.EventSourcing
 
         public EventProviderVersion GetNextVersion()
         {
-            return _latestVersion = _latestVersion.Increment();
+            return LatestVersion = LatestVersion.Increment();
         }
 
         private EventProviderVersion GetLatestVersion()
@@ -87,7 +87,6 @@ namespace DotNetRevolution.EventSourcing
         private void ObjectInvariants()
         {
             Contract.Invariant(_revisions != null);
-            Contract.Invariant(_latestVersion != null);
         }
     }
 }

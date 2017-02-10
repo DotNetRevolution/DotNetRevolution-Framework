@@ -6,44 +6,38 @@ using System.Linq;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Projections
 {
-    public class AccountProjection : Projection<AccountProjectionState>,
+    public class AccountProjection : Projection,
         IProject<Created>,
         IProject<DebitApplied>,
         IProject<CreditApplied>
     {
-        public AccountProjection(ProjectionIdentity identity)
-            : base(identity, new AccountProjectionState())
+        public void Project(IProjectionContext<Created> context)
         {
-            Contract.Requires(identity != null);
+            //State.Accounts.Add(new Account(context.Data.AccountId, context.Data.Balance));
         }
 
-        public void Project(Created domainEvent)
+        public void Project(IProjectionContext<CreditApplied> context)
         {
-            State.Accounts.Add(new Account(domainEvent.AccountId, domainEvent.Balance));
+            //var account = State.Accounts.FirstOrDefault(x => x.Id == context.Data.AccountId);
+
+            //if (account == null)
+            //{
+            //    throw new ApplicationException("account not found");
+            //}
+
+            //account.Balance = context.Data.NewBalance;
         }
 
-        public void Project(CreditApplied domainEvent)
+        public void Project(IProjectionContext<DebitApplied> context)
         {
-            var account = State.Accounts.FirstOrDefault(x => x.Id == domainEvent.AccountId);
+            //var account = State.Accounts.FirstOrDefault(x => x.Id == context.Data.AccountId);
 
-            if (account == null)
-            {
-                throw new ApplicationException("account not found");
-            }
+            //if (account == null)
+            //{
+            //    throw new ApplicationException("account not found");
+            //}
 
-            account.Balance = domainEvent.NewBalance;
-        }
-
-        public void Project(DebitApplied domainEvent)
-        {
-            var account = State.Accounts.FirstOrDefault(x => x.Id == domainEvent.AccountId);
-
-            if (account == null)
-            {
-                throw new ApplicationException("account not found");
-            }
-
-            account.Balance = domainEvent.NewBalance;
+            //account.Balance = context.Data.NewBalance;
         }
     }
 }

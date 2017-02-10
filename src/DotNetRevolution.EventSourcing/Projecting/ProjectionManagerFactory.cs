@@ -7,7 +7,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
 {
     public class ProjectionManagerFactory : IProjectionManagerFactory
     {
-        private readonly Dictionary<Type, IProjectionManager> _managers = new Dictionary<Type, IProjectionManager>();
+        private readonly Dictionary<ProjectionType, IProjectionManager> _managers = new Dictionary<ProjectionType, IProjectionManager>();
 
         public IProjectionCatalog Catalog { get; }
 
@@ -18,19 +18,19 @@ namespace DotNetRevolution.EventSourcing.Projecting
             Catalog = catalog;
         }
 
-        public IProjectionManager GetManager(Type projectionType)
+        public IProjectionManager GetManager(ProjectionType projectionType)
         {
             var entry = GetEntry(projectionType);
 
             return GetManager(entry);
         }
 
-        public IEnumerable<IProjectionManager> GetManagers()
+        public ICollection<IProjectionManager> GetManagers(AggregateRootType aggregateRootType)
         {
             var managers = new Collection<IProjectionManager>();
 
             // loop through all entries in catalog to retrieve projection managers
-            foreach (var entry in Catalog.Entries)
+            foreach (var entry in Catalog.GetEntries(aggregateRootType))
             {
                 Contract.Assume(entry != null);
 
@@ -87,7 +87,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
             return (IProjectionManager)Activator.CreateInstance(managerType);
         }
 
-        private void CacheManager(Type projectionType, IProjectionManager manager)
+        private void CacheManager(ProjectionType projectionType, IProjectionManager manager)
         {
             Contract.Requires(projectionType != null);
             Contract.Requires(manager != null);
@@ -96,7 +96,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
         }
 
         [Pure]
-        private IProjectionManager GetCachedManager(Type projectionType)
+        private IProjectionManager GetCachedManager(ProjectionType projectionType)
         {
             Contract.Requires(projectionType != null);
 
@@ -108,7 +108,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
         }
 
         [Pure]
-        private IProjectionEntry GetEntry(Type projectionType)
+        private IProjectionEntry GetEntry(ProjectionType projectionType)
         {
             Contract.Requires(projectionType != null);
             Contract.Ensures(Contract.Result<IProjectionEntry>() != null);

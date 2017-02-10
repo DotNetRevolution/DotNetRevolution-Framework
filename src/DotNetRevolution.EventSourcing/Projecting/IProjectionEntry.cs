@@ -7,7 +7,9 @@ namespace DotNetRevolution.EventSourcing.Projecting
     [ContractClass(typeof(ProjectionEntryContract))]
     public interface IProjectionEntry
     {
-        Type ProjectionType { get; }
+        ProjectionType ProjectionType { get; }
+
+        AggregateRootType AggregateRootType { get; }
 
         Type ProjectionManagerType { get; }
 

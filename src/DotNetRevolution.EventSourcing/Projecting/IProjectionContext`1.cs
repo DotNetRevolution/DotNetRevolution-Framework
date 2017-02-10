@@ -2,9 +2,9 @@
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
-    public interface IProjectionContext<TDomainEvent> : IProjectionContext
+    public interface IProjectionContext<out T> : IProjectionContext
     {
         [Pure]
-        new TDomainEvent DomainEvent { get; }
+        new T Data { get; }
     }
 }

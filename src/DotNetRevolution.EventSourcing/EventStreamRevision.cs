@@ -27,9 +27,9 @@ namespace DotNetRevolution.EventSourcing
 
                 return _version;
             }
-        }        
+        }
 
-        public EventStreamRevision(EventStreamRevisionIdentity identity, EventProviderVersion version)
+        protected EventStreamRevision(EventStreamRevisionIdentity identity, EventProviderVersion version)
         {
             Contract.Requires(identity != null);
             Contract.Requires(version != null);

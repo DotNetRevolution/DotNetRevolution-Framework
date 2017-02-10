@@ -92,6 +92,7 @@
     <Compile Include="Base\Disposable.cs" />
     <Compile Include="Base\ImplicitUseKinds.cs" />
     <Compile Include="Base\ImplicitUseTargets.cs" />
+    <Compile Include="Base\QueueDispatcher.cs" />
     <Compile Include="Caching\AggregateRootCache.cs" />
     <Compile Include="Caching\AggregateRootSynchronizationCache.cs" />
     <Compile Include="Caching\CodeContract\CacheContract.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Domain\DomainEventHandlerContext.cs" />
     <Compile Include="Domain\DomainEventHandlerContextFactory.cs" />
     <Compile Include="Domain\DomainEventHandlerContext`1.cs" />
+    <Compile Include="Domain\IApply.cs" />
     <Compile Include="Domain\IDomainEventHandlerContext.cs" />
     <Compile Include="Domain\IDomainEventHandlerContextFactory.cs" />
     <Compile Include="Domain\IDomainEventHandlerContext`1.cs" />

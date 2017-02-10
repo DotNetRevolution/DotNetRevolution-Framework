@@ -7,7 +7,7 @@ namespace DotNetRevolution.Core.Messaging
     {
         public Guid MessageId { get; }
 
-        public Message(Guid messageId)
+        protected Message(Guid messageId)
         {
             Contract.Requires(messageId != Guid.Empty);
 

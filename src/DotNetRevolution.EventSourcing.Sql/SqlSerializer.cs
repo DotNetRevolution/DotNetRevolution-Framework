@@ -2,11 +2,13 @@
 using DotNetRevolution.Core.Hashing;
 using DotNetRevolution.Core.Serialization;
 using DotNetRevolution.EventSourcing.Snapshotting;
+using DotNetRevolution.EventSourcing.Sql.ReadDomainEvent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using DotNetRevolution.Core.Commanding;
 
 namespace DotNetRevolution.EventSourcing.Sql
 {
@@ -34,7 +36,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             return new ReadOnlyCollection<IDomainEvent>(sqlDomainEvents
                 .OrderBy(x => x.EventProviderVersion)
                 .ThenBy(x => x.Sequence)
-                .Select(x => DeserializeDomainEvent(x.EventTypeId, x.Data))
+                .Select(x => Deserialize<IDomainEvent>(x.EventTypeId, x.Data))
                 .ToList());
         }
 
@@ -51,35 +53,66 @@ namespace DotNetRevolution.EventSourcing.Sql
                 return new Snapshot(deserializedObject);
             }
 
-            throw new SnapshotSerializationException("Could not deserialize snapshot data");
+            throw new EventStoreSerializationException("Could not deserialize snapshot data");
         }
 
-        public IDomainEvent DeserializeDomainEvent(byte[] domainEventTypeId, byte[] data)
+        internal T Deserialize<T>(byte[] data) where T : class
         {
             Contract.Requires(data != null);
             Contract.Requires(data.Length > 0);
-            Contract.Ensures(Contract.Result<IDomainEvent>() != null);
+            Contract.Ensures(Contract.Result<ICommand>() != null);
 
-            // deserialize domain event
-            var deserializedObject = _serializer.Deserialize(_typeFactory.GetType(domainEventTypeId), data, _encoding);
+            // deserialize data
+            var deserializedObject = _serializer.Deserialize(typeof(T), data, _encoding);
 
             // make sure deserialization was successful
             if (deserializedObject == null)
             {
-                throw new DomainEventSerializationException(string.Format("Could not deserialize type with hash {0}", domainEventTypeId));
+                throw new EventStoreSerializationException($"Could not deserialize type {typeof(T).FullName}");
             }
 
-            // make sure deserialized object is a domain event
-            if (deserializedObject is IDomainEvent)
+            var obj = deserializedObject as T;
+
+            // make sure deserialized object is of type T
+            if (obj == null)
             {
-                return deserializedObject as IDomainEvent;
+                // error, throw exception
+                throw new EventStoreSerializationException($"Deserialized object is not of type {typeof(T).FullName}.");
             }
 
-            // error deserializing domain event
-            throw new DomainEventSerializationException("Deserialized object is not a domain event.");
+            return obj;
         }
 
-        public byte[] SerializeObject(object objectToSerialize)
+        internal T Deserialize<T>(byte[] typeId, byte[] data) where T : class
+        {
+            Contract.Requires(typeId != null);
+            Contract.Requires(typeId.Length > 0);
+            Contract.Requires(data != null);
+            Contract.Requires(data.Length > 0);
+            Contract.Ensures(Contract.Result<ICommand>() != null);
+
+            // deserialize data
+            var deserializedObject = _serializer.Deserialize(_typeFactory.GetType(typeId), data, _encoding);
+
+            // make sure deserialization was successful
+            if (deserializedObject == null)
+            {
+                throw new EventStoreSerializationException($"Could not deserialize type with hash {typeId}");
+            }
+
+            var obj = deserializedObject as T;
+
+            // make sure deserialized object is of type T
+            if (obj == null)
+            {
+                // error, throw exception
+                throw new EventStoreSerializationException($"Deserialized object is not of type {typeof(T).FullName}.");
+            }
+
+            return obj;
+        }
+
+        internal byte[] SerializeObject(object objectToSerialize)
         {
             Contract.Requires(objectToSerialize != null);
             Contract.Ensures(Contract.Result<byte[]>() != null);

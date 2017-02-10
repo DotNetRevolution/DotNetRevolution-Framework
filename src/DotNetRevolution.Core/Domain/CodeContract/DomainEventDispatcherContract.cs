@@ -5,9 +5,9 @@ namespace DotNetRevolution.Core.Domain.CodeContract
     [ContractClassFor(typeof(IDomainEventDispatcher))]
     internal abstract class DomainEventDispatcherContract : IDomainEventDispatcher
     {
-        public void UseCatalog(IDomainEventCatalog catalog)
+        public void Publish(params IDomainEventHandlerContext[] contexts)
         {
-            Contract.Requires(catalog != null);
+            Contract.Requires(contexts != null);
         }
 
         public void Publish(params IDomainEvent[] domainEvents)

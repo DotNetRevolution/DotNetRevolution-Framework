@@ -38,7 +38,7 @@ namespace DotNetRevolution.EventSourcing
             var aggregateRoot = _eventStreamProcessor.Process(eventStream);
 
             // set external state tracker
-            aggregateRoot.State.ExternalStateTracker = new EventStreamStateTracker(eventStream, _guidGenerator);
+            aggregateRoot.State.ExternalStateTracker = new EventProviderStateTracker(eventStream.EventProvider, eventStream.LatestVersion, _guidGenerator);
 
             return aggregateRoot;
         }
@@ -51,14 +51,14 @@ namespace DotNetRevolution.EventSourcing
             var command = context.Command;
 
             // get state tracker from aggregate root state
-            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventStreamStateTracker;
+            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventProviderStateTracker;
             Contract.Assume(stateTracker?.Revisions != null);
 
             // make new transaction identity
             TransactionIdentity transactionIdentity = CreateNewTransactionIdentity();
 
             // create new transaction
-            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventStream.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata.AsReadOnlyCollection());
+            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata);
 
             // store transaction
             await _eventStore.CommitAsync(transaction);
@@ -80,7 +80,7 @@ namespace DotNetRevolution.EventSourcing
             var aggregateRoot = _eventStreamProcessor.Process(eventStream);
             
             // set external state tracker
-            aggregateRoot.State.ExternalStateTracker = new EventStreamStateTracker(eventStream, _guidGenerator);
+            aggregateRoot.State.ExternalStateTracker = new EventProviderStateTracker(eventStream.EventProvider, eventStream.LatestVersion, _guidGenerator);
 
             return aggregateRoot;
         }
@@ -94,14 +94,14 @@ namespace DotNetRevolution.EventSourcing
             var command = context.Command;
 
             // get state tracker from aggregate root state
-            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventStreamStateTracker;
+            var stateTracker = aggregateRoot.State.ExternalStateTracker as IEventProviderStateTracker;
             Contract.Assume(stateTracker?.Revisions != null);
 
             // make new transaction identity
             TransactionIdentity transactionIdentity = CreateNewTransactionIdentity();
 
             // create new transaction
-            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventStream.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata);
+            var transaction = new EventProviderTransaction(transactionIdentity, stateTracker.EventProvider, command, aggregateRoot, stateTracker.Revisions, context.Metadata);
 
             // store transaction
             _eventStore.Commit(transaction);

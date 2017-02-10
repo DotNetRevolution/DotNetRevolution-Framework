@@ -1,9 +1,10 @@
-﻿using DotNetRevolution.Core.Domain;
+﻿using DotNetRevolution.Core.Base;
+using DotNetRevolution.Core.Domain;
 using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventProvider : IEventProvider
+    public class EventProvider : ValueObject<EventProvider>, IEventProvider
     {
         public EventProviderIdentity Identity { get; }
 
