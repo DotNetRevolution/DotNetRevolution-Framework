@@ -120,7 +120,7 @@ namespace DotNetRevolution.EventSourcing.Sql
             }
         }
 
-        protected override Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync(AggregateRootType aggregateRootType, int eventProvidersToSkip, int eventProvidersToTake)
+        protected override async Task<ICollection<EventProviderTransactionCollection>> GetTransactionsAsync(AggregateRootType aggregateRootType, int eventProvidersToSkip, int eventProvidersToTake)
         {
             // establish command
             var command = new GetTransactionsByAggregateRootTypeCommand(_serializer, _typeFactory, aggregateRootType, eventProvidersToSkip, eventProvidersToTake);
@@ -129,10 +129,10 @@ namespace DotNetRevolution.EventSourcing.Sql
             using (var conn = new SqlConnection(_connectionString))
             {
                 // connection needs to be open before executing
-                conn.OpenAsync();
+                await conn.OpenAsync();
 
                 // execute
-                return command.ExecuteAsync(conn);
+                return await command.ExecuteAsync(conn);
             }
         }
     }

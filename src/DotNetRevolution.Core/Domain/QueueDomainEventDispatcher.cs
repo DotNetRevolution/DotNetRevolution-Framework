@@ -30,7 +30,10 @@ namespace DotNetRevolution.Core.Domain
 
             if (domainEventQueueItem == null)
             {
-                _domainEventDispatcher.Publish(((QueueItem<IDomainEventHandlerContext>)queueItem).Items);
+                var contextItem = queueItem as QueueItem<IDomainEventHandlerContext>;
+                Contract.Assume(contextItem != null);
+
+                _domainEventDispatcher.Publish(contextItem.Items);
             }
             else
             {

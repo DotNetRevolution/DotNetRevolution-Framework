@@ -295,12 +295,49 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
 
-            var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog)));
+            using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
+            {
+                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+                initializer.Initialize<AccountAggregateRoot>(500);
 
-            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            initializer.Initialize<AccountAggregateRoot>(500);
+                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+            }
+        }
 
-            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+        [TestMethod]
+        public void RebuildProjectionsAsync()
+        {
+            CanGetAggregateRoot();
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
+            {
+                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+                initializer.InitializeAsync<AccountAggregateRoot>().Wait();
+
+                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+            }
+        }
+
+        [TestMethod]
+        public void RebuildProjectionsWithCustomTakeAsync()
+        {
+            CanGetAggregateRoot();
+            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+
+            var projectionCatalog = new ProjectionCatalog();
+            projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
+
+            using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
+            {
+                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
+                initializer.InitializeAsync<AccountAggregateRoot>(500).Wait();
+
+                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+            }
         }
 
         protected override IStateTracker GetStateTracker(DomainEventCollection domainEvents)

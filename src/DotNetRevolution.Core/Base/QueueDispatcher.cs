@@ -8,15 +8,24 @@ namespace DotNetRevolution.Core.Base
 {
     public abstract class QueueDispatcher : Disposable
     {
+        private readonly BlockingCollection<QueueItem> _queue;
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CancellationToken _cancellationToken;
         private readonly Task _worker;
 
-        protected BlockingCollection<QueueItem> Queue { get; }
+        protected BlockingCollection<QueueItem> Queue
+        {
+            get
+            {
+                Contract.Ensures(Contract.Result<BlockingCollection<QueueItem>>() != null);
+
+                return _queue;
+            }
+        }
 
         protected QueueDispatcher()
         {
-            Queue = new BlockingCollection<QueueItem>();
+            _queue = new BlockingCollection<QueueItem>();
 
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
@@ -81,7 +90,7 @@ namespace DotNetRevolution.Core.Base
         {
             Contract.Invariant(_cancellationTokenSource != null);
             Contract.Invariant(_worker != null);
-            Contract.Invariant(Queue != null);
+            Contract.Invariant(_queue != null);
         }
 
         protected class QueueItem

@@ -109,6 +109,7 @@
     <Compile Include="Projecting\CodeContract\ProjectionDispatcherContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionEntryContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionFactoryContract.cs" />
+    <Compile Include="Projecting\CodeContract\ProjectionInitializerContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionManagerContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionManagerFactoryContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionWaiterContract.cs" />

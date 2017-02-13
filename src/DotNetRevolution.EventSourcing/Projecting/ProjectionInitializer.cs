@@ -3,6 +3,7 @@ using DotNetRevolution.Core.Extension;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
@@ -29,7 +30,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
         }
 
         public void Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
-        {
+        {            
             var skip = 0;
 
             ICollection<EventProviderTransactionCollection> transactionCollections;
@@ -43,6 +44,34 @@ namespace DotNetRevolution.EventSourcing.Projecting
                 // dispatch transactions for each collection
                 transactionCollections.ForEach(x => x.Transactions.ForEach(_dispatcher.Dispatch));
             } 
+        }
+
+        public Task InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
+        {
+            return InitializeAsync<TAggregateRoot>(DefaultBatchSize);
+        }
+
+        public async Task InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
+        {
+            var skip = 0;
+
+            ICollection<EventProviderTransactionCollection> transactionCollections;
+
+            // while transaction collections are being returned
+            while ((transactionCollections = await _eventStore.GetTransactionsAsync<TAggregateRoot>(skip, batchSize)).Any())
+            {
+                // increment skip by count of collections
+                skip += transactionCollections.Count;
+
+                // dispatch transactions for each collection
+                transactionCollections.ForEach(x => x.Transactions.ForEach(_dispatcher.Dispatch));
+            }
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariants()
+        {
+            Contract.Invariant(_eventStore != null);
         }
     }
 }

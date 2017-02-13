@@ -16,17 +16,24 @@ namespace DotNetRevolution.EventSourcing.Projecting
 
         public void Dispatch(EventProviderTransaction eventProviderTransaction)
         {
+            Contract.Assume(Queue != null);
+
             Queue.Add(new QueueItem<EventProviderTransaction>(eventProviderTransaction));
         }
 
         public void Dispatch(params EventProviderTransaction[] eventProviderTransactions)
         {
+            Contract.Assume(Queue != null);
+
             Queue.Add(new QueueItem<EventProviderTransaction>(eventProviderTransactions));
         }
 
         protected override void Dispatch(QueueItem queueItem)
         {
-            _projectionDispatcher.Dispatch(((QueueItem<EventProviderTransaction>)queueItem).Items);
+            var item = (QueueItem<EventProviderTransaction>)queueItem;
+            Contract.Assume(item?.Items != null);
+
+            _projectionDispatcher.Dispatch(item.Items);
         }
 
         [ContractInvariantMethod]
