@@ -193,7 +193,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var result = base.CanGetAggregateRoot();
 
-            var waiter = new EventStoreProjectionWaiter(projectionManager);
+            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
             waiter.Wait(result);
 
             //Created createdDomainEvent = null;
@@ -218,7 +218,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var result = base.CanGetAggregateRoot();
 
-            var waiter = new EventStoreProjectionWaiter(projectionManager);
+            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
             waiter.Wait(result);
 
             //Created createdDomainEvent = null;
@@ -264,9 +264,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
             var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            initializer.Initialize<AccountAggregateRoot>();
+            var transaction = initializer.Initialize<AccountAggregateRoot>();
 
-            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
+            waiter.Wait(transaction.Identity);            
         }
 
         [TestMethod]
@@ -281,9 +282,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
             var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            initializer.Initialize<AccountAggregateRoot>(500);
+            var transaction = initializer.Initialize<AccountAggregateRoot>(500);
 
-            Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
+            waiter.Wait(transaction.Identity);
         }
 
         [TestMethod]
@@ -298,9 +300,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.Initialize<AccountAggregateRoot>(500);
+                var transaction = initializer.Initialize<AccountAggregateRoot>(500);
 
-                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
+                waiter.Wait(transaction.Identity);
             }
         }
 
@@ -316,9 +319,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.InitializeAsync<AccountAggregateRoot>().Wait();
+                var transaction = initializer.InitializeAsync<AccountAggregateRoot>().Result;
 
-                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
+                waiter.Wait(transaction.Identity);
             }
         }
 
@@ -334,9 +338,10 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.InitializeAsync<AccountAggregateRoot>(500).Wait();
+                var transaction = initializer.InitializeAsync<AccountAggregateRoot>(500).Result;
 
-                Assert.IsTrue(projectionManager.ProcessedTransactions.Count > 0);
+                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
+                waiter.Wait(transaction.Identity);
             }
         }
 

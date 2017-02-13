@@ -24,18 +24,20 @@ namespace DotNetRevolution.EventSourcing.Projecting
             _dispatcher = dispatcher;
         }
 
-        public void Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
+        public EventProviderTransaction Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
         {
-            Initialize<TAggregateRoot>(DefaultBatchSize);
+            return Initialize<TAggregateRoot>(DefaultBatchSize);
         }
 
-        public void Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
+        public EventProviderTransaction Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
         {            
             var skip = 0;
 
             ICollection<EventProviderTransactionCollection> transactionCollections;
+            EventProviderTransaction lastTransaction = null;
+            EventProviderTransactionCollection lastTransactionCollection;
 
-            // while transaction collections are being returned
+            // while transaction collections are being returned, dispatch
             while ((transactionCollections = _eventStore.GetTransactions<TAggregateRoot>(skip, batchSize)).Any())
             {
                 // increment skip by count of collections
@@ -43,21 +45,31 @@ namespace DotNetRevolution.EventSourcing.Projecting
 
                 // dispatch transactions for each collection
                 transactionCollections.ForEach(x => x.Transactions.ForEach(_dispatcher.Dispatch));
-            } 
+
+                // get last transaction for result
+                lastTransactionCollection = transactionCollections.LastOrDefault();
+                Contract.Assume(lastTransactionCollection?.Transactions != null);
+                
+                lastTransaction = lastTransactionCollection.Transactions.LastOrDefault();
+            }
+
+            return lastTransaction;
         }
 
-        public Task InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
+        public Task<EventProviderTransaction> InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
         {
             return InitializeAsync<TAggregateRoot>(DefaultBatchSize);
         }
 
-        public async Task InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
+        public async Task<EventProviderTransaction> InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
         {
             var skip = 0;
 
             ICollection<EventProviderTransactionCollection> transactionCollections;
+            EventProviderTransaction lastTransaction = null;
+            EventProviderTransactionCollection lastTransactionCollection;
 
-            // while transaction collections are being returned
+            // while transaction collections are being returned, dispatch
             while ((transactionCollections = await _eventStore.GetTransactionsAsync<TAggregateRoot>(skip, batchSize)).Any())
             {
                 // increment skip by count of collections
@@ -65,8 +77,16 @@ namespace DotNetRevolution.EventSourcing.Projecting
 
                 // dispatch transactions for each collection
                 transactionCollections.ForEach(x => x.Transactions.ForEach(_dispatcher.Dispatch));
+
+                // get last transaction for result
+                lastTransactionCollection = transactionCollections.LastOrDefault();
+                Contract.Assume(lastTransactionCollection?.Transactions != null);
+
+                lastTransaction = lastTransactionCollection.Transactions.LastOrDefault();
             }
-        }
+
+            return lastTransaction;
+        }        
 
         [ContractInvariantMethod]
         private void ObjectInvariants()

@@ -19,5 +19,12 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
             
             throw new NotImplementedException();
         }
+
+        public bool Processed(TransactionIdentity transactionIdentity)
+        {
+            Contract.Requires(transactionIdentity != null);
+
+            throw new NotImplementedException();
+        }
     }
 }

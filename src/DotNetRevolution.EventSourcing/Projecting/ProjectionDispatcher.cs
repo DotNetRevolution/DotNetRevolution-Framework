@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using DotNetRevolution.Core.Extension;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
     public class ProjectionDispatcher : IProjectionDispatcher
     {
+        private readonly HashSet<TransactionIdentity> _processedTransactions = new HashSet<TransactionIdentity>();
+        private readonly object _lock = new object();
         private readonly IProjectionManagerFactory _projectionManagerFactory;
-
+        
         public ProjectionDispatcher(IProjectionManagerFactory projectionManagerFactory)
         {
             Contract.Requires(projectionManagerFactory != null);
@@ -29,6 +32,12 @@ namespace DotNetRevolution.EventSourcing.Projecting
                 var eventProviderContexts = CreateProjectionContext(eventProviderTransaction).ToArray();
 
                 SendContextsToProjectionManagers(eventProviderTransaction.EventProvider, managers, eventProviderContexts);
+            }
+
+            lock (_lock)
+            {
+                // save transaction identity to know its been processed
+                _processedTransactions.Add(eventProviderTransaction.Identity);
             }
         }
 
@@ -57,7 +66,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
                         Contract.Assume(eventProviderGroup?.Key != null);
 
                         // create projection contexts grouped by event provider and ordered by revision
-                        var eventProviderContexts = eventProviderGroup.OrderBy(x => x.Revisions.First().Version)
+                        var eventProviderContexts = eventProviderGroup.OrderBy(x => x.Revisions.Select(y => y.Version))
                             .Select(eventProviderTransaction => CreateProjectionContext(eventProviderTransaction))
                             .Aggregate(new List<IProjectionContext>(), (seed, transactionContexts) =>
                             {
@@ -70,9 +79,23 @@ namespace DotNetRevolution.EventSourcing.Projecting
                     }
                 }
             }
+
+            lock (_lock)
+            {
+                // save transaction identity to know its been processed
+                eventProviderTransactions.Select(x => x.Identity).ForEach(x => _processedTransactions.Add(x));
+            }
+        }
+        
+        public bool Processed(TransactionIdentity transactionIdentity)
+        {
+            lock (_lock)
+            {
+                return _processedTransactions.Contains(transactionIdentity);
+            }
         }
 
-        private IEnumerable<IProjectionContext> CreateProjectionContext(EventProviderTransaction eventProviderTransaction)
+        private static IEnumerable<IProjectionContext> CreateProjectionContext(EventProviderTransaction eventProviderTransaction)
         {
             Contract.Requires(eventProviderTransaction != null);
             Contract.Ensures(Contract.Result<IEnumerable<IProjectionContext>>() != null);
@@ -96,26 +119,26 @@ namespace DotNetRevolution.EventSourcing.Projecting
                     // convert snapshot revision to snapshot projection context
                     contexts.Add(new ProjectionContext(eventProviderTransaction.EventProvider,
                         eventProviderTransaction.Identity,
-                        eventProviderTransaction.Command, 
-                        eventProviderTransaction.Metadata, 
-                        revision.Version,
-                        snapshotRevision.Snapshot));
-                }
-
-                Contract.Assume(domainEventRevision != null);
-
-                // revision is domain event revision, go through each domain event and create a projection context
-                foreach (var domainEvent in domainEventRevision.DomainEvents)
-                {
-                    Contract.Assume(domainEvent != null);
-
-                    contexts.Add(new ProjectionContext(eventProviderTransaction.EventProvider,
-                        eventProviderTransaction.Identity,
                         eventProviderTransaction.Command,
                         eventProviderTransaction.Metadata,
                         revision.Version,
-                        domainEvent));
-                }                
+                        snapshotRevision.Snapshot));
+                }
+                else
+                {                    
+                    // revision is domain event revision, go through each domain event and create a projection context
+                    foreach (var domainEvent in domainEventRevision.DomainEvents)
+                    {
+                        Contract.Assume(domainEvent != null);
+
+                        contexts.Add(new ProjectionContext(eventProviderTransaction.EventProvider,
+                            eventProviderTransaction.Identity,
+                            eventProviderTransaction.Command,
+                            eventProviderTransaction.Metadata,
+                            revision.Version,
+                            domainEvent));
+                    }
+                }               
             }
                         
             return contexts;
@@ -139,7 +162,8 @@ namespace DotNetRevolution.EventSourcing.Projecting
         
         [ContractInvariantMethod]
         private void ObjectInvariants()
-        {
+        {            
+            Contract.Invariant(_processedTransactions != null);
             Contract.Invariant(_projectionManagerFactory != null);
         }
     }

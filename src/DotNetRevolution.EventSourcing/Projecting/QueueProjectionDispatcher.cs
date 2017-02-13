@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Base;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
@@ -32,8 +33,27 @@ namespace DotNetRevolution.EventSourcing.Projecting
         {
             var item = (QueueItem<EventProviderTransaction>)queueItem;
             Contract.Assume(item?.Items != null);
+            
+            // if only 1 item in list, call single dispatch override for optimizations
+            if (item.Items.Count() == 1)
+            {
+                // get single transaction
+                var transaction = item.Items.FirstOrDefault();
+                Contract.Assume(transaction != null);
 
-            _projectionDispatcher.Dispatch(item.Items);
+                // dispatch single transaction
+                _projectionDispatcher.Dispatch(transaction);
+            }
+            else
+            {
+                // multiple transactions, call params dispatch override
+                _projectionDispatcher.Dispatch(item.Items);
+            }            
+        }
+
+        public bool Processed(TransactionIdentity transactionIdentity)
+        {
+            return _projectionDispatcher.Processed(transactionIdentity);       
         }
 
         [ContractInvariantMethod]

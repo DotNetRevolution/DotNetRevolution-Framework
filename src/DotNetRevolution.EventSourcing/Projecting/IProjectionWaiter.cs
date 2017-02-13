@@ -13,5 +13,10 @@ namespace DotNetRevolution.EventSourcing.Projecting
         void Wait(ICommandHandlingResult result, TimeSpan timeout);
         Task WaitAsync(ICommandHandlingResult result);
         Task WaitAsync(ICommandHandlingResult result, TimeSpan timeout);
+
+        void Wait(TransactionIdentity transactionIdentity);
+        void Wait(TransactionIdentity transactionIdentity, TimeSpan timeout);
+        Task WaitAsync(TransactionIdentity transactionIdentity);
+        Task WaitAsync(TransactionIdentity transactionIdentity, TimeSpan timeout);
     }
 }

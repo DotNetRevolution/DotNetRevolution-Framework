@@ -7,29 +7,29 @@ namespace DotNetRevolution.EventSourcing.Projecting.CodeContract
     [ContractClassFor(typeof(IProjectionInitializer))]
     internal abstract class ProjectionInitializerContract : IProjectionInitializer
     {
-        void IProjectionInitializer.Initialize<TAggregateRoot>()
+        EventProviderTransaction IProjectionInitializer.Initialize<TAggregateRoot>()
         {
             throw new NotImplementedException();
         }
 
-        void IProjectionInitializer.Initialize<TAggregateRoot>(int batchSize)
+        EventProviderTransaction IProjectionInitializer.Initialize<TAggregateRoot>(int batchSize)
         {
             Contract.Requires(batchSize > 0);
 
             throw new NotImplementedException();
         }
-
-        Task IProjectionInitializer.InitializeAsync<TAggregateRoot>()
+        
+        Task<EventProviderTransaction> IProjectionInitializer.InitializeAsync<TAggregateRoot>()
         {
-            Contract.Ensures(Contract.Result<Task>() != null);
+            Contract.Ensures(Contract.Result<Task<EventProviderTransaction>>() != null);
 
             throw new NotImplementedException();
         }
 
-        Task IProjectionInitializer.InitializeAsync<TAggregateRoot>(int batchSize)
+        Task<EventProviderTransaction> IProjectionInitializer.InitializeAsync<TAggregateRoot>(int batchSize)
         {
             Contract.Requires(batchSize > 0);
-            Contract.Ensures(Contract.Result<Task>() != null);
+            Contract.Ensures(Contract.Result<Task<EventProviderTransaction>>() != null);
 
             throw new NotImplementedException();
         }

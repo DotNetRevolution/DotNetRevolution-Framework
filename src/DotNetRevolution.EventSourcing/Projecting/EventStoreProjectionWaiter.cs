@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,30 +9,58 @@ namespace DotNetRevolution.EventSourcing.Projecting
 {
     public class EventStoreProjectionWaiter : IProjectionWaiter
     {
-        private const string ProjectionTimeoutMessage = "Projection did not process transaction before the timeout period elapsed";
+        private const string ProjectionTimeoutMessage = "Transaction not processed before the timeout period elapsed";
 
-        private readonly IProjectionManager _projectionManager;
+        private readonly IProjectionDispatcher _projectionDispatcher;
 
-        public EventStoreProjectionWaiter(IProjectionManager projectionManager)
+        public EventStoreProjectionWaiter(IProjectionDispatcher projectionDispatcher)
         {
-            Contract.Requires(projectionManager != null);
+            Contract.Requires(projectionDispatcher != null);
 
-            _projectionManager = projectionManager;
+            _projectionDispatcher = projectionDispatcher;
         }
-        
+
+        public void Wait(TransactionIdentity transactionIdentity)
+        {
+            Wait(transactionIdentity, TimeSpan.MaxValue);
+        }
+
         public void Wait(ICommandHandlingResult result)
         {
             Wait(result, TimeSpan.MaxValue);
         }
+        
+        public Task WaitAsync(TransactionIdentity transactionIdentity)
+        {
+            return WaitAsync(transactionIdentity, TimeSpan.MaxValue);
+        }
+
+        public Task WaitAsync(ICommandHandlingResult result)
+        {            
+            return WaitAsync(result, TimeSpan.MaxValue);
+        }
 
         public void Wait(ICommandHandlingResult result, TimeSpan timeout)
         {
+            var eventStoreCommandHandlingResult = result as EventStoreCommandHandlingResult;
+            Contract.Assume(eventStoreCommandHandlingResult?.TransactionIdentity != null);
+
+            Wait(eventStoreCommandHandlingResult.TransactionIdentity, timeout);
+        }
+
+        public Task WaitAsync(ICommandHandlingResult result, TimeSpan timeout)
+        {
+            var eventStoreCommandHandlingResult = result as EventStoreCommandHandlingResult;
+            Contract.Assume(eventStoreCommandHandlingResult?.TransactionIdentity != null);
+
+            return WaitAsync(eventStoreCommandHandlingResult.TransactionIdentity, timeout);
+        }
+
+        public void Wait(TransactionIdentity transactionIdentity, TimeSpan timeout)
+        {
             var stopwatch = Stopwatch.StartNew();
 
-            var eventStoreCommandHandlingResult = result as EventStoreCommandHandlingResult;
-            Contract.Assume(eventStoreCommandHandlingResult != null);
-
-            while (_projectionManager.ProcessedTransactions.FirstOrDefault(x => x == eventStoreCommandHandlingResult.TransactionIdentity) == null)
+            while (_projectionDispatcher.Processed(transactionIdentity) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
@@ -44,19 +71,11 @@ namespace DotNetRevolution.EventSourcing.Projecting
             }
         }
 
-        public Task WaitAsync(ICommandHandlingResult result)
-        {            
-            return WaitAsync(result, TimeSpan.MaxValue);
-        }
-
-        public async Task WaitAsync(ICommandHandlingResult result, TimeSpan timeout)
+        public async Task WaitAsync(TransactionIdentity transactionIdentity, TimeSpan timeout)
         {
             var stopwatch = Stopwatch.StartNew();
 
-            var eventStoreCommandHandlingResult = result as EventStoreCommandHandlingResult;
-            Contract.Assume(eventStoreCommandHandlingResult != null);
-
-            while (_projectionManager.ProcessedTransactions.FirstOrDefault(x => x == eventStoreCommandHandlingResult.TransactionIdentity) == null)
+            while (_projectionDispatcher.Processed(transactionIdentity) == false)
             {
                 if (stopwatch.Elapsed > timeout)
                 {
@@ -70,7 +89,7 @@ namespace DotNetRevolution.EventSourcing.Projecting
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
-            Contract.Invariant(_projectionManager != null);
+            Contract.Invariant(_projectionDispatcher != null);
         }
     }
 }
