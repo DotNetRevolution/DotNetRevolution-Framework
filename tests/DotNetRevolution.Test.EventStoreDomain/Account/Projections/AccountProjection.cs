@@ -1,8 +1,6 @@
 ﻿using DotNetRevolution.EventSourcing.Projecting;
-using System.Diagnostics.Contracts;
 using DotNetRevolution.Test.EventStoreDomain.Account.DomainEvent;
 using System;
-using System.Linq;
 
 namespace DotNetRevolution.Test.EventStoreDomain.Account.Projections
 {
@@ -11,33 +9,38 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account.Projections
         IProject<DebitApplied>,
         IProject<CreditApplied>
     {
+        private Account _state;
+
         public void Project(IProjectionContext<Created> context)
         {
-            //State.Accounts.Add(new Account(context.Data.AccountId, context.Data.Balance));
+            if (_state == null)
+            {
+                _state = new Account(context.Data.AccountId, context.Data.Balance);
+            }
+            else
+            {
+                throw new ApplicationException("Account already created");
+            }
         }
 
         public void Project(IProjectionContext<CreditApplied> context)
         {
-            //var account = State.Accounts.FirstOrDefault(x => x.Id == context.Data.AccountId);
+            if (_state == null)
+            {
+                throw new ApplicationException("Account has not been created");
+            }
 
-            //if (account == null)
-            //{
-            //    throw new ApplicationException("account not found");
-            //}
-
-            //account.Balance = context.Data.NewBalance;
+            _state.Balance = context.Data.NewBalance;
         }
 
         public void Project(IProjectionContext<DebitApplied> context)
         {
-            //var account = State.Accounts.FirstOrDefault(x => x.Id == context.Data.AccountId);
+            if (_state == null)
+            {
+                throw new ApplicationException("Account has not been created");
+            }
 
-            //if (account == null)
-            //{
-            //    throw new ApplicationException("account not found");
-            //}
-
-            //account.Balance = context.Data.NewBalance;
+            _state.Balance = context.Data.NewBalance;
         }
     }
 }

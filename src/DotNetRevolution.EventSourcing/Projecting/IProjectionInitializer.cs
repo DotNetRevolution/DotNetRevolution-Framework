@@ -8,12 +8,12 @@ namespace DotNetRevolution.EventSourcing.Projecting
     [ContractClass(typeof(ProjectionInitializerContract))]
     public interface IProjectionInitializer
     {
-        EventProviderTransaction Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
+        void Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
 
-        EventProviderTransaction Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
+        void Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
 
-        Task<EventProviderTransaction> InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
+        Task InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
 
-        Task<EventProviderTransaction> InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
+        Task InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
     }
 }

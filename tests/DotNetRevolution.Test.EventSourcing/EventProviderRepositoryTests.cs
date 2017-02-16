@@ -138,16 +138,14 @@ namespace DotNetRevolution.Test.EventStourcing
 
         public virtual void CanAddMultipleDomainEventsToSingleEventProviderConcurrently()
         {
-            var command = new Create(SequentialAtEndGuidGenerator.NewGuid(), 100);
+            var accountId = SequentialAtEndGuidGenerator.NewGuid();
+            var command = new Create(accountId, 100);
             var domainEvents = AccountAggregateRoot.Create(command);
 
             domainEvents.AggregateRoot.State.ExternalStateTracker = GetStateTracker(domainEvents);
 
             Repository.Commit(new CommandHandlerContext(command), domainEvents.AggregateRoot as AccountAggregateRoot);
-
-            var account = Repository.GetByIdentity(domainEvents.AggregateRoot.Identity);
-
-            Assert.IsNotNull(account);
+            
             var synchronizer = new AggregateRootSynchronizer(new AggregateRootSynchronizationCache());
             var aggregateRootCache = new AggregateRootCache();
 
@@ -158,8 +156,8 @@ namespace DotNetRevolution.Test.EventStourcing
 
             Parallel.For(0, 20, (i) =>
             {
-                ch.Handle(new CommandHandlerContext(new Deposit(account.Identity, i)));
-                ch1.Handle(new CommandHandlerContext(new Withdraw2(account.Identity, random.Next(1, 10) * i)));
+                ch.Handle(new CommandHandlerContext(new Deposit(accountId, i)));
+                ch1.Handle(new CommandHandlerContext(new Withdraw2(accountId, random.Next(1, 10) * i)));
             });
         }
         

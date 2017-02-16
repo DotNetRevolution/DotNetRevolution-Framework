@@ -68,7 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\EventProvider.sql" />
-    <Build Include="dbo\Tables\EventProviderDescriptor.sql" />
     <Build Include="dbo\Tables\AggregateRootType.sql" />
     <Build Include="dbo\Tables\EventProviderRevision.sql" />
     <Build Include="dbo\Tables\TransactionCommand.sql" />

@@ -3,7 +3,9 @@
 	[EventProviderId] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY NONCLUSTERED,
     [AggregateRootTypeId] BINARY(16) NOT NULL, 	
 	[AggregateRootId] UNIQUEIDENTIFIER NOT NULL,
-    CONSTRAINT [FK_EventProvider_AggregateRootType] FOREIGN KEY ([AggregateRootTypeId]) REFERENCES [dbo].[AggregateRootType]([AggregateRootTypeId])
+	[LatestTransactionId] UNIQUEIDENTIFIER NOT NULL,
+    CONSTRAINT [FK_EventProvider_AggregateRootType] FOREIGN KEY ([AggregateRootTypeId]) REFERENCES [dbo].[AggregateRootType]([AggregateRootTypeId]), 
+    CONSTRAINT [FK_EventProvider_Transaction] FOREIGN KEY ([LatestTransactionId]) REFERENCES [dbo].[Transaction]([TransactionId])
 )
 
 GO

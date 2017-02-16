@@ -43,8 +43,8 @@ BEGIN
 		 WHERE epet.EventProviderEventTypeId IS NULL
 		
 		-- insert transaction
-		INSERT INTO dbo.[Transaction] (TransactionId, [Metadata])
-		VALUES (@transactionId, @metadata)
+		INSERT INTO dbo.[Transaction] (TransactionId, [Metadata], EventProviderDescriptor)
+		VALUES (@transactionId, @metadata, @eventProviderDescriptor)
 			
 		-- insert command
 		INSERT INTO dbo.TransactionCommand (TransactionId, TransactionCommandTypeId, TransactionCommandId, [Data])
@@ -53,21 +53,14 @@ BEGIN
 		BEGIN TRY	
 
 			-- event provider
-			INSERT INTO dbo.EventProvider (EventProviderId, AggregateRootId, AggregateRootTypeId)				
-			SELECT @eventProviderId, @aggregateRootId, @aggregateRootTypeId
-			 WHERE NOT EXISTS (SELECT EventProviderId
-								 FROM dbo.EventProvider
-								WHERE EventProviderId = @eventProviderId)
-								
-			-- event provider descriptor
-			MERGE dbo.EventProviderDescriptor AS target
-			USING (VALUES (@eventProviderId, @eventProviderDescriptor)) AS source (EventProviderId, Descriptor)
+			MERGE dbo.EventProvider AS target
+			USING (VALUES (@eventProviderId, @aggregateRootId, @aggregateRootTypeId, @transactionId)) AS source (EventProviderId, AggregateRootId, AggregateRootTypeId, TransactionId)
 			   ON target.EventProviderId = source.EventProviderId
-			WHEN NOT MATCHED THEN
-				INSERT (EventProviderId, Descriptor) 
-				VALUES (source.EventProviderId, source.Descriptor)
 			WHEN MATCHED THEN
-				UPDATE SET Descriptor = source.Descriptor;
+				UPDATE SET target.LatestTransactionId = source.TransactionId
+			WHEN NOT MATCHED THEN
+				INSERT (EventProviderId, AggregateRootId, AggregateRootTypeId, LatestTransactionId)
+				VALUES (source.EventProviderId, source.AggregateRootId, source.AggregateRootTypeId, source.TransactionId);
 				
 			-- create revision
 			INSERT INTO dbo.[EventProviderRevision] ([EventProviderRevisionId], TransactionId, EventProviderId, EventProviderVersion) 

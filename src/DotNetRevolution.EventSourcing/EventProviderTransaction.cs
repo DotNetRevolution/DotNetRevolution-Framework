@@ -1,13 +1,14 @@
 ﻿using DotNetRevolution.Core.Commanding;
 using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace DotNetRevolution.EventSourcing
 {
-    public class EventProviderTransaction
+    public class EventProviderTransaction : IComparable<EventProviderTransaction>
     {
         private readonly TransactionIdentity _identity;
         private readonly ICommand _command;
@@ -146,6 +147,22 @@ namespace DotNetRevolution.EventSourcing
             Contract.Invariant(_eventProvider != null);
             Contract.Invariant(_descriptor != null);
             Contract.Invariant(_metadata != null);
+        }
+
+        public int CompareTo(EventProviderTransaction other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            var thisMin = Revisions.Min(x => x.Version);
+            Contract.Assume(thisMin != null);
+
+            var otherMin = other.Revisions.Min(x => x.Version);
+            Contract.Assume(otherMin != null);
+
+            return thisMin.CompareTo(otherMin);
         }
     }
 }

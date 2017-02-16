@@ -13,7 +13,6 @@ using System;
 using System.Configuration;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using DotNetRevolution.Core.Metadata;
 
 namespace DotNetRevolution.Test.EventStourcing.Sql
@@ -182,7 +181,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void Project()
         {
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -207,7 +206,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         [TestMethod]
         public void ProjectOnBackground()
         {
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -242,7 +241,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         public void ReadEntireDatabase()
         {
             var skip = 0;
-            var take = 1000;
+            var take = 10000;
             var transactions = GetTransactions<AccountAggregateRoot>(skip, take);
 
             while (transactions.Count > 0)
@@ -256,7 +255,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         public void RebuildProjections()
         {
             CanGetAggregateRoot();
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -264,17 +263,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
             var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            var transaction = initializer.Initialize<AccountAggregateRoot>();
-
-            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
-            waiter.Wait(transaction.Identity);            
+            initializer.Initialize<AccountAggregateRoot>();
         }
 
         [TestMethod]
         public void RebuildProjectionsWithCustomTake()
         {
             CanGetAggregateRoot();
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -282,17 +278,14 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
             var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            var transaction = initializer.Initialize<AccountAggregateRoot>(500);
-
-            var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
-            waiter.Wait(transaction.Identity);
+            initializer.Initialize<AccountAggregateRoot>(500);
         }
 
         [TestMethod]
         public void RebuildProjectionsWithQueueProjectionDispatcher()
         {
             CanGetAggregateRoot();
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -300,10 +293,9 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                var transaction = initializer.Initialize<AccountAggregateRoot>(500);
+                initializer.Initialize<AccountAggregateRoot>(500);
 
-                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
-                waiter.Wait(transaction.Identity);
+                projectionDispatcher.Wait();
             }
         }
 
@@ -311,7 +303,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         public void RebuildProjectionsAsync()
         {
             CanGetAggregateRoot();
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -319,10 +311,9 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                var transaction = initializer.InitializeAsync<AccountAggregateRoot>().Result;
+                initializer.InitializeAsync<AccountAggregateRoot>().Wait();
 
-                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
-                waiter.Wait(transaction.Identity);
+                projectionDispatcher.Wait();
             }
         }
 
@@ -330,7 +321,7 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
         public void RebuildProjectionsWithCustomTakeAsync()
         {
             CanGetAggregateRoot();
-            var projectionManager = new MemoryProjectionManager<AccountProjection>(new MemoryProjectionFactory(typeof(AccountProjection)));
+            var projectionManager = new ProjectionManager(new MemoryProjectionFactory(typeof(AccountProjection)));
 
             var projectionCatalog = new ProjectionCatalog();
             projectionCatalog.Add(new ProjectionEntry(typeof(AccountAggregateRoot), typeof(AccountProjection), projectionManager));
@@ -338,16 +329,15 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
                 var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                var transaction = initializer.InitializeAsync<AccountAggregateRoot>(500).Result;
+                initializer.InitializeAsync<AccountAggregateRoot>(500).Wait();
 
-                var waiter = new EventStoreProjectionWaiter(projectionDispatcher);
-                waiter.Wait(transaction.Identity);
+                projectionDispatcher.Wait();
             }
         }
 
         protected override IStateTracker GetStateTracker(DomainEventCollection domainEvents)
         {
-            var tracker = new EventProviderStateTracker(new EventProvider(_guidGenerator.Create(), domainEvents), EventProviderVersion.Initial, _guidGenerator);
+            var tracker = new EventProviderStateTracker(new EventProvider(_guidGenerator.Create(), domainEvents), EventProviderVersion.New, _guidGenerator);
             tracker.Apply(domainEvents);
 
             return tracker;

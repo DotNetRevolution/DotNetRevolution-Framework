@@ -102,7 +102,6 @@
     <Compile Include="CodeContract\EventStoreContract.cs" />
     <Compile Include="EventProviderNotFoundException.cs" />
     <Compile Include="IEventStream.cs" />
-    <Compile Include="Projecting\CodeContract\AbstractProjectionManagerContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionCatalogContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionContextContract.cs" />
     <Compile Include="Projecting\CodeContract\ProjectionContract.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="Projecting\IProjectionManager.cs" />
     <Compile Include="Projecting\IProjectionManagerFactory.cs" />
     <Compile Include="Projecting\MemoryProjectionFactory.cs" />
-    <Compile Include="Projecting\MemoryProjectionManager.cs" />
     <Compile Include="Projecting\Projection.cs" />
     <Compile Include="Projecting\ProjectionCatalog.cs" />
     <Compile Include="Projecting\ProjectionContext.cs" />

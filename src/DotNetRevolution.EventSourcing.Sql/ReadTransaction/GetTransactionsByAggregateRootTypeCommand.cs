@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,41 +69,73 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
 
             using (var dataReader = await _command.ExecuteReaderAsync())
             {
+                var s1 = new Stopwatch();
+                s1.Start();
                 // execute command
                 ExecuteSqlCommand(dataReader);
+                s1.Stop();
+                Debug.WriteLine($"s1: {s1.Elapsed}: {_revisions.Count}: {_sqlDomainEvents.Count}");
             }
+            var s2 = new Stopwatch();
+            s2.Start();
+            var results = GetResult();
+            s2.Stop();
+            Debug.WriteLine($"s2: {s2.Elapsed}: {results.Count}");
+            return results;
 
-            return GetResult();
         }
 
         private ICollection<EventProviderTransactionCollection> GetResult()
         {
-            var transactionCollections = new Collection<EventProviderTransactionCollection>();
+            var transactionCollectionGroups = _revisions.GroupBy(x => new { x.EventProviderId, x.AggregateRootId }).ToList();
+            
+            var transactionCollections = new List<EventProviderTransactionCollection>(transactionCollectionGroups.Count);
 
             // loop through each event provider creating transactions
-            foreach (var eventProviderGroup in _revisions.GroupBy(x => new { x.EventProviderId, x.AggregateRootId }))
+            Parallel.ForEach(transactionCollectionGroups, eventProviderGroup =>
             {
-                var transactions = new Collection<EventProviderTransaction>();              
-                var eventProvider = new EventProvider(eventProviderGroup.Key.EventProviderId, _aggregateRootType, eventProviderGroup.Key.AggregateRootId);
+                var eventProviderId = eventProviderGroup.Key.EventProviderId;
+                var transactions = new List<EventProviderTransaction>(eventProviderGroup.Select(x => x.TransactionId).Distinct().Count());
+                var eventProvider = new EventProvider(eventProviderId, _aggregateRootType, eventProviderGroup.Key.AggregateRootId);
+
+                lock (transactionCollections)
+                {
+                    transactionCollections.Add(new EventProviderTransactionCollection(eventProvider, transactions));
+                }
+                
+                Guid lastTransactionId = Guid.Empty;
+                var sqlEventProviderRevisions = eventProviderGroup.OrderBy(x => x.EventProviderVersion).ToArray();
+
+                var eventProviderEvents = _sqlDomainEvents.Where(x => x.EventProviderId == eventProviderId).ToArray();
+
+                Collection<EventStreamRevision> revisions = null;
 
                 // loop through each event providers revisions adding transaction to result
-                foreach(var revision in eventProviderGroup)
+                for (var revisionIterator = 0; revisionIterator < sqlEventProviderRevisions.Length; revisionIterator++)
                 {
-                    var revisions = new Collection<EventStreamRevision>();                    
+                    var revision = sqlEventProviderRevisions[revisionIterator];
 
-                    // loop through each event in revision to add to transaction
-                    foreach (var domainEvent in _sqlDomainEvents.Where(x => x.EventProviderRevisionId == revision.EventProviderRevisionId).ToList())
+                    if (lastTransactionId == Guid.Empty || revision.TransactionId != lastTransactionId)
                     {
-                        _sqlDomainEvents.Remove(domainEvent);
-
-                        revisions.Add(new DomainEventRevision(revision.EventProviderRevisionId, revision.EventProviderVersion, _serializer.Deserialize<IDomainEvent>(domainEvent.EventTypeId, domainEvent.Data)));
+                        revisions = new Collection<EventStreamRevision>();
+                        transactions.Add(new EventProviderTransaction(revision.TransactionId, eventProvider, _serializer.Deserialize<ICommand>(revision.CommandTypeId, revision.CommandData), new EventProviderDescriptor(revision.Descriptor), revisions, _serializer.Deserialize<List<Meta>>(revision.Metadata)));
+                        
+                        lastTransactionId = revision.TransactionId;
                     }
 
-                    transactions.Add(new EventProviderTransaction(revision.TransactionId, eventProvider, _serializer.Deserialize<ICommand>(revision.CommandTypeId, revision.CommandData), new EventProviderDescriptor(revision.Descriptor), revisions, _serializer.Deserialize<List<Meta>>(revision.Metadata)));
-                }
+                    var domainEvents = new Collection<IDomainEvent>();
 
-                transactionCollections.Add(new EventProviderTransactionCollection(eventProvider, transactions));
-            }
+                    // loop through each event to add to revision
+                    foreach (var domainEvent in eventProviderEvents
+                        .Where(x => x.EventProviderRevisionId == revision.EventProviderRevisionId)
+                        .OrderBy(x => x.Sequence))
+                    {
+                        domainEvents.Add(_serializer.Deserialize<IDomainEvent>(domainEvent.EventTypeId, domainEvent.Data));
+                    }
+
+                    revisions.Add(new DomainEventRevision(revision.EventProviderRevisionId, revision.EventProviderVersion, domainEvents));
+                }
+            });
             
             return transactionCollections;
         }
@@ -150,9 +183,10 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
             {
                 // add sql domain event to collection
                 _sqlDomainEvents.Add(new SqlDomainEvent(dataReader.GetGuid(0),
-                    dataReader.GetInt32(1),
-                    (byte[])dataReader[2],
-                    (byte[])dataReader[3]));
+                    dataReader.GetGuid(1),
+                    dataReader.GetInt32(2),
+                    (byte[])dataReader[3],
+                    (byte[])dataReader[4]));
             }
         }
 

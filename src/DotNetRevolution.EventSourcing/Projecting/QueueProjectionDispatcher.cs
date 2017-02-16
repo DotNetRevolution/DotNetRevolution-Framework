@@ -1,6 +1,7 @@
 ﻿using DotNetRevolution.Core.Base;
+using System;
 using System.Diagnostics.Contracts;
-using System.Linq;
+using System.Threading;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
@@ -13,6 +14,11 @@ namespace DotNetRevolution.EventSourcing.Projecting
             Contract.Requires(projectionDispatcher != null);
 
             _projectionDispatcher = projectionDispatcher;
+        }
+
+        public bool Processed(TransactionIdentity transactionIdentity)
+        {
+            return _projectionDispatcher.Processed(transactionIdentity);
         }
 
         public void Dispatch(EventProviderTransaction eventProviderTransaction)
@@ -29,31 +35,21 @@ namespace DotNetRevolution.EventSourcing.Projecting
             Queue.Add(new QueueItem<EventProviderTransaction>(eventProviderTransactions));
         }
 
+        public void Wait()
+        {
+            while (Queue.Count > 0)
+            {
+                Thread.Sleep(10);
+            }
+        }
+
         protected override void Dispatch(QueueItem queueItem)
         {
             var item = (QueueItem<EventProviderTransaction>)queueItem;
             Contract.Assume(item?.Items != null);
             
-            // if only 1 item in list, call single dispatch override for optimizations
-            if (item.Items.Count() == 1)
-            {
-                // get single transaction
-                var transaction = item.Items.FirstOrDefault();
-                Contract.Assume(transaction != null);
-
-                // dispatch single transaction
-                _projectionDispatcher.Dispatch(transaction);
-            }
-            else
-            {
-                // multiple transactions, call params dispatch override
-                _projectionDispatcher.Dispatch(item.Items);
-            }            
-        }
-
-        public bool Processed(TransactionIdentity transactionIdentity)
-        {
-            return _projectionDispatcher.Processed(transactionIdentity);       
+            // call projection dispatcher to dispatch items
+            _projectionDispatcher.Dispatch(item.Items);
         }
 
         [ContractInvariantMethod]

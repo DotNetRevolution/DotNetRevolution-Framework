@@ -79,5 +79,10 @@ namespace DotNetRevolution.Test.EventStoreDomain.Account
         {
             _methodInvoker.InvokeMethodFor(this, command);
         }
+
+        public override string ToString()
+        {
+            return $"{Identity.Value}: Balance: {State.Balance}";
+        }
     }
 }

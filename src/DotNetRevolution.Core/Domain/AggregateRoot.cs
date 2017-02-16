@@ -21,7 +21,7 @@ namespace DotNetRevolution.Core.Domain
 
         public override string ToString()
         {
-            return $"{GetType().FullName}:{Identity}";
+            return $"{GetType().FullName}:{Identity.Value}";
         }
 
         public abstract void Execute(ICommand command);

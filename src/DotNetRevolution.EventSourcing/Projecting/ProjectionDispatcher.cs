@@ -10,7 +10,6 @@ namespace DotNetRevolution.EventSourcing.Projecting
     public class ProjectionDispatcher : IProjectionDispatcher
     {
         private readonly HashSet<TransactionIdentity> _processedTransactions = new HashSet<TransactionIdentity>();
-        private readonly object _lock = new object();
         private readonly IProjectionManagerFactory _projectionManagerFactory;
         
         public ProjectionDispatcher(IProjectionManagerFactory projectionManagerFactory)
@@ -33,16 +32,24 @@ namespace DotNetRevolution.EventSourcing.Projecting
 
                 SendContextsToProjectionManagers(eventProviderTransaction.EventProvider, managers, eventProviderContexts);
             }
-
-            lock (_lock)
-            {
-                // save transaction identity to know its been processed
-                _processedTransactions.Add(eventProviderTransaction.Identity);
-            }
+            
+            // save transaction identity to know its been processed
+            _processedTransactions.Add(eventProviderTransaction.Identity);
         }
 
         public void Dispatch(params EventProviderTransaction[] eventProviderTransactions)
         {
+            // call single Dispatch for efficiency
+            if (eventProviderTransactions.Length == 1)
+            {
+                var eventProviderTransaction = eventProviderTransactions[0];
+                Contract.Assume(eventProviderTransaction != null);
+
+                Dispatch(eventProviderTransaction);
+
+                return;
+            }
+
             // group transactions by aggregate root type
             var groupedTransactionsByAggregateRootType = eventProviderTransactions.GroupBy(x => x.EventProvider.AggregateRootType);
 
@@ -64,35 +71,29 @@ namespace DotNetRevolution.EventSourcing.Projecting
                     foreach (var eventProviderGroup in groupedEventProviderTransactions)
                     {
                         Contract.Assume(eventProviderGroup?.Key != null);
-
+                        
                         // create projection contexts grouped by event provider and ordered by revision
-                        var eventProviderContexts = eventProviderGroup.OrderBy(x => x.Revisions.Select(y => y.Version))
+                        var eventProviderContexts = eventProviderGroup.OrderBy(x => x)
                             .Select(eventProviderTransaction => CreateProjectionContext(eventProviderTransaction))
                             .Aggregate(new List<IProjectionContext>(), (seed, transactionContexts) =>
-                            {
-                                seed.AddRange(transactionContexts);
-                                return seed;
-                            });
+                                {
+                                    seed.AddRange(transactionContexts);
+                                    return seed;
+                                });
                         Contract.Assume(eventProviderContexts != null);
 
                         SendContextsToProjectionManagers(eventProviderGroup.Key, managers, eventProviderContexts.ToArray());
                     }
                 }
             }
-
-            lock (_lock)
-            {
-                // save transaction identity to know its been processed
-                eventProviderTransactions.Select(x => x.Identity).ForEach(x => _processedTransactions.Add(x));
-            }
+             
+            // save transaction identity to know its been processed
+            eventProviderTransactions.Select(x => x.Identity).ForEach(x => _processedTransactions.Add(x));
         }
         
         public bool Processed(TransactionIdentity transactionIdentity)
         {
-            lock (_lock)
-            {
-                return _processedTransactions.Contains(transactionIdentity);
-            }
+            return _processedTransactions.Contains(transactionIdentity);
         }
 
         private static IEnumerable<IProjectionContext> CreateProjectionContext(EventProviderTransaction eventProviderTransaction)
