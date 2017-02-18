@@ -5,15 +5,16 @@ using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
-    [ContractClass(typeof(ProjectionInitializerContract))]
-    public interface IProjectionInitializer
+    [ContractClass(typeof(ProjectionInitializerContract<>))]
+    public interface IProjectionInitializer<TAggregateRoot>
+        where TAggregateRoot : class, IAggregateRoot
     {
-        void Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
+        void Initialize();
 
-        void Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
+        void Initialize(int batchSize);
 
-        Task InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot;
+        Task InitializeAsync();
 
-        Task InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot;
+        Task InitializeAsync(int batchSize);
     }
 }

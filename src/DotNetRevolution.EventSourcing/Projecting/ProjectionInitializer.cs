@@ -1,5 +1,6 @@
 ﻿using DotNetRevolution.Core.Domain;
 using DotNetRevolution.Core.Extension;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -7,12 +8,17 @@ using System.Threading.Tasks;
 
 namespace DotNetRevolution.EventSourcing.Projecting
 {
-    public class ProjectionInitializer : IProjectionInitializer
+    public class ProjectionInitializer<TAggregateRoot> : IProjectionInitializer<TAggregateRoot>
+        where TAggregateRoot : class, IAggregateRoot
     {
         private const int DefaultBatchSize = 100;
 
         private readonly IProjectionDispatcher _dispatcher;
         private readonly IEventStore _eventStore;
+
+        private object _skipLock = new object();
+        private int _skip = 0;                
+        private int _batchSize = DefaultBatchSize;
         
         public ProjectionInitializer(IEventStore eventStore,
                                      IProjectionDispatcher dispatcher)
@@ -21,57 +27,86 @@ namespace DotNetRevolution.EventSourcing.Projecting
             Contract.Requires(dispatcher != null);
 
             _eventStore = eventStore;
-            _dispatcher = dispatcher;
+            _dispatcher = dispatcher;            
         }
         
-        public void Initialize<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
+        public void Initialize()
         {
-            Initialize<TAggregateRoot>(DefaultBatchSize);
+            Initialize(DefaultBatchSize);
         }
 
-        public void Initialize<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
+        public void Initialize(int batchSize)
         {                    
-            var skip = 0;
+            _skip = 0;
+            _batchSize = batchSize;
 
-            ICollection<EventProviderTransactionCollection> transactionCollections;            
-                        
-            // while transaction collections are being returned, dispatch
-            while ((transactionCollections = _eventStore.GetTransactions<TAggregateRoot>(skip, batchSize)).Any())
+            InitializeAsync(batchSize).Wait();
+        }
+        
+        public Task InitializeAsync()
+        {
+            return InitializeAsync(DefaultBatchSize);
+        }
+
+        public Task InitializeAsync(int batchSize)
+        {
+            _skip = 0;
+            _batchSize = batchSize;
+
+            var processorCount = Environment.ProcessorCount;
+            Contract.Assume(processorCount > 0);
+
+            var tasks = new Task[processorCount];
+
+            for (var i = 0; i < processorCount; i++)
             {
-                // increment skip by count of collections
-                skip += transactionCollections.Count;
-
-                // dispatch transactions for each collection
-                transactionCollections.ForEach(x => _dispatcher.Dispatch(x.Transactions.ToArray()));
+                tasks[i] = Task.Run(DoSomethingAsync);
             }
-        }
+            
+            var combinedTasks = Task.WhenAll(tasks);
+            Contract.Assume(combinedTasks != null);
 
-        public Task InitializeAsync<TAggregateRoot>() where TAggregateRoot : class, IAggregateRoot
+            return combinedTasks;
+        }    
+        
+        private async Task DoSomethingAsync()
         {
-            return InitializeAsync<TAggregateRoot>(DefaultBatchSize);
-        }
-
-        public async Task InitializeAsync<TAggregateRoot>(int batchSize) where TAggregateRoot : class, IAggregateRoot
-        {
-            var skip = 0;
-
             ICollection<EventProviderTransactionCollection> transactionCollections;
+            int skip;
+
+            skip = GetNextStartingNumber();
 
             // while transaction collections are being returned, dispatch
-            while ((transactionCollections = await _eventStore.GetTransactionsAsync<TAggregateRoot>(skip, batchSize)).Any())
+            while ((transactionCollections = await _eventStore.GetTransactionsAsync<TAggregateRoot>(skip, _batchSize)).Any())
             {
-                // increment skip by count of collections
-                skip += transactionCollections.Count;
+                skip = GetNextStartingNumber();
 
                 // dispatch transactions for each collection
                 transactionCollections.ForEach(x => _dispatcher.Dispatch(x.Transactions.ToArray()));
             }
-        }        
+        }
+
+        private int GetNextStartingNumber()
+        {
+            int skip;
+
+            lock (_skipLock)
+            {
+                skip = _skip;
+
+                // increment skip by batch size
+                _skip += _batchSize;
+            }
+
+            return skip;
+        }
 
         [ContractInvariantMethod]
         private void ObjectInvariants()
         {
             Contract.Invariant(_eventStore != null);
+            Contract.Invariant(_skip >= 0);
+            Contract.Invariant(_batchSize > 0);
         }
     }
 }

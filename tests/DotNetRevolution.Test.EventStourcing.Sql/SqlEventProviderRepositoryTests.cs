@@ -262,8 +262,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
-            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            initializer.Initialize<AccountAggregateRoot>();
+            var initializer = new ProjectionInitializer<AccountAggregateRoot>(EventStore, projectionDispatcher);
+            initializer.Initialize();
         }
 
         [TestMethod]
@@ -277,8 +277,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             var projectionDispatcher = new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog));
 
-            var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-            initializer.Initialize<AccountAggregateRoot>(500);
+            var initializer = new ProjectionInitializer<AccountAggregateRoot>(EventStore, projectionDispatcher);
+            initializer.Initialize(500);
         }
 
         [TestMethod]
@@ -292,8 +292,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
-                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.Initialize<AccountAggregateRoot>(500);
+                var initializer = new ProjectionInitializer<AccountAggregateRoot>(EventStore, projectionDispatcher);
+                initializer.Initialize(500);
 
                 projectionDispatcher.Wait();
             }
@@ -310,8 +310,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
-                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.InitializeAsync<AccountAggregateRoot>().Wait();
+                var initializer = new ProjectionInitializer<AccountAggregateRoot>(EventStore, projectionDispatcher);
+                initializer.InitializeAsync().Wait();
 
                 projectionDispatcher.Wait();
             }
@@ -328,8 +328,8 @@ namespace DotNetRevolution.Test.EventStourcing.Sql
 
             using (var projectionDispatcher = new QueueProjectionDispatcher(new ProjectionDispatcher(new ProjectionManagerFactory(projectionCatalog))))
             {
-                var initializer = new ProjectionInitializer(EventStore, projectionDispatcher);
-                initializer.InitializeAsync<AccountAggregateRoot>(500).Wait();
+                var initializer = new ProjectionInitializer<AccountAggregateRoot>(EventStore, projectionDispatcher);
+                initializer.InitializeAsync(500).Wait();
 
                 projectionDispatcher.Wait();
             }

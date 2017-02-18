@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,78 +67,104 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
             _command.Connection = conn;
 
             using (var dataReader = await _command.ExecuteReaderAsync())
-            {
-                var s1 = new Stopwatch();
-                s1.Start();
+            {                
                 // execute command
-                ExecuteSqlCommand(dataReader);
-                s1.Stop();
-                Debug.WriteLine($"s1: {s1.Elapsed}: {_revisions.Count}: {_sqlDomainEvents.Count}");
+                ExecuteSqlCommand(dataReader);             
             }
-            var s2 = new Stopwatch();
-            s2.Start();
-            var results = GetResult();
-            s2.Stop();
-            Debug.WriteLine($"s2: {s2.Elapsed}: {results.Count}");
-            return results;
 
+            return GetResult();
         }
 
         private ICollection<EventProviderTransactionCollection> GetResult()
         {
-            var transactionCollectionGroups = _revisions.GroupBy(x => new { x.EventProviderId, x.AggregateRootId }).ToList();
+            var transactionCollectionGroups = _revisions.GroupBy(x => new { x.EventProviderId, x.AggregateRootId }).ToArray();
             
-            var transactionCollections = new List<EventProviderTransactionCollection>(transactionCollectionGroups.Count);
+            var transactionCollections = new EventProviderTransactionCollection[transactionCollectionGroups.Length];
 
             // loop through each event provider creating transactions
-            Parallel.ForEach(transactionCollectionGroups, eventProviderGroup =>
+            for(var eventProviderGroupIndex = 0; eventProviderGroupIndex < transactionCollections.Length; eventProviderGroupIndex++)
             {
-                var eventProviderId = eventProviderGroup.Key.EventProviderId;
-                var transactions = new List<EventProviderTransaction>(eventProviderGroup.Select(x => x.TransactionId).Distinct().Count());
-                var eventProvider = new EventProvider(eventProviderId, _aggregateRootType, eventProviderGroup.Key.AggregateRootId);
+                // get current event provider group
+                var eventProviderGroup = transactionCollectionGroups[eventProviderGroupIndex];
 
-                lock (transactionCollections)
-                {
-                    transactionCollections.Add(new EventProviderTransactionCollection(eventProvider, transactions));
-                }
+                // create transaction array for event provider
+                var transactions = new EventProviderTransaction[eventProviderGroup.Select(x => x.TransactionId).Distinct().Count()];
+
+                // filter our event provider's domain events
+                var eventProviderEvents = _sqlDomainEvents
+                    .Where(x => x.EventProviderId == eventProviderGroup.Key.EventProviderId)
+                    .ToArray();
+
+                // order revisions by version then group by transaction
+                var eventProviderTransactions = eventProviderGroup
+                    .OrderBy(x => x.EventProviderVersion)
+                    .GroupBy(x => x.TransactionId)
+                    .ToArray();
+
+                // create event provider
+                var eventProvider = new EventProvider(eventProviderGroup.Key.EventProviderId, _aggregateRootType, eventProviderGroup.Key.AggregateRootId);
+
+                // add new event provider transaction collection to result
+                transactionCollections[eventProviderGroupIndex] = new EventProviderTransactionCollection(eventProvider, transactions); 
                 
-                Guid lastTransactionId = Guid.Empty;
-                var sqlEventProviderRevisions = eventProviderGroup.OrderBy(x => x.EventProviderVersion).ToArray();
-
-                var eventProviderEvents = _sqlDomainEvents.Where(x => x.EventProviderId == eventProviderId).ToArray();
-
-                Collection<EventStreamRevision> revisions = null;
-
-                // loop through each event providers revisions adding transaction to result
-                for (var revisionIterator = 0; revisionIterator < sqlEventProviderRevisions.Length; revisionIterator++)
+                // go through each transaction adding revisions and domain events
+                for (var eventProviderTransactionIterator = 0; eventProviderTransactionIterator < eventProviderTransactions.Length; eventProviderTransactionIterator++)
                 {
-                    var revision = sqlEventProviderRevisions[revisionIterator];
-
-                    if (lastTransactionId == Guid.Empty || revision.TransactionId != lastTransactionId)
-                    {
-                        revisions = new Collection<EventStreamRevision>();
-                        transactions.Add(new EventProviderTransaction(revision.TransactionId, eventProvider, _serializer.Deserialize<ICommand>(revision.CommandTypeId, revision.CommandData), new EventProviderDescriptor(revision.Descriptor), revisions, _serializer.Deserialize<List<Meta>>(revision.Metadata)));
-                        
-                        lastTransactionId = revision.TransactionId;
-                    }
-
-                    var domainEvents = new Collection<IDomainEvent>();
-
-                    // loop through each event to add to revision
-                    foreach (var domainEvent in eventProviderEvents
-                        .Where(x => x.EventProviderRevisionId == revision.EventProviderRevisionId)
-                        .OrderBy(x => x.Sequence))
-                    {
-                        domainEvents.Add(_serializer.Deserialize<IDomainEvent>(domainEvent.EventTypeId, domainEvent.Data));
-                    }
-
-                    revisions.Add(new DomainEventRevision(revision.EventProviderRevisionId, revision.EventProviderVersion, domainEvents));
+                    transactions[eventProviderTransactionIterator] = CreateEventProviderTransaction(eventProvider,
+                        eventProviderEvents,
+                        eventProviderTransactions[eventProviderTransactionIterator].ToArray());
                 }
-            });
+            }
             
             return transactionCollections;
         }
-        
+
+        private EventProviderTransaction CreateEventProviderTransaction(EventProvider eventProvider, SqlDomainEvent[] eventProviderEvents, SqlRevision[] eventProviderRevisions)
+        {
+            // create array for transactions revisions
+            var revisions = new EventStreamRevision[eventProviderRevisions.Count()];
+
+            SqlRevision revision = null;
+
+            // loop through each revision adding domain events
+            for (var revisionIterator = 0; revisionIterator < eventProviderRevisions.Length; revisionIterator++)
+            {
+                // get current revision
+                revision = eventProviderRevisions[revisionIterator];
+                
+                // add revision to revision collection
+                revisions[revisionIterator] = new DomainEventRevision(revision.EventProviderRevisionId,
+                    revision.EventProviderVersion,
+                    GetRevisionDomainEvents(eventProviderEvents, revision));
+            }
+
+            // return new event provider transaction
+            return new EventProviderTransaction(revision.TransactionId, eventProvider, _serializer.Deserialize<ICommand>(revision.CommandTypeId, revision.CommandData), new EventProviderDescriptor(revision.Descriptor), revisions, _serializer.Deserialize<List<Meta>>(revision.Metadata));
+        }
+
+        private IDomainEvent[] GetRevisionDomainEvents(SqlDomainEvent[] eventProviderEvents, SqlRevision revision)
+        {
+            // get domain events for this revision ordered by sequence
+            var revisionEvents = eventProviderEvents
+                                        .Where(x => x.EventProviderRevisionId == revision.EventProviderRevisionId)
+                                        .OrderBy(x => x.Sequence)
+                                        .ToArray();
+
+            var domainEvents = new IDomainEvent[revisionEvents.Length];
+
+            // loop through each event to add to revision
+            for (var revisionEventIterator = 0; revisionEventIterator < revisionEvents.Length; revisionEventIterator++)
+            {
+                // get current domain event
+                var domainEvent = revisionEvents[revisionEventIterator];
+
+                // deserialize domain event and add to collection
+                domainEvents[revisionEventIterator] = _serializer.Deserialize<IDomainEvent>(domainEvent.EventTypeId, domainEvent.Data);
+            }
+
+            return domainEvents;
+        }
+
         private SqlCommand CreateSqlCommand(AggregateRootType aggregateRootType, int skip, int take)
         {
             var sqlCommand = new SqlCommand("[dbo].[GetTransactionsByAggregateRootType]");

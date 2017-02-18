@@ -37,6 +37,8 @@ namespace DotNetRevolution.EventSourcing.Projecting
 
         public void Wait()
         {
+            Contract.Assume(Queue != null);
+
             while (Queue.Count > 0)
             {
                 Thread.Sleep(10);
