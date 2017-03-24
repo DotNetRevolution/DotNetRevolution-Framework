@@ -52,8 +52,12 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
 
             using (var dataReader = _command.ExecuteReader())
             {
-                // execute command
-                ExecuteSqlCommand(dataReader);
+                // check if any transactions read
+                if (dataReader.HasRows)
+                {
+                    // execute command
+                    ExecuteSqlCommand(dataReader);
+                }
             }
 
             return GetResult();
@@ -67,9 +71,13 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
             _command.Connection = conn;
 
             using (var dataReader = await _command.ExecuteReaderAsync())
-            {                
-                // execute command
-                ExecuteSqlCommand(dataReader);             
+            {
+                // check if any transactions read
+                if (dataReader.HasRows)
+                {
+                    // execute command
+                    await ExecuteSqlCommandAsync(dataReader);
+                }
             }
 
             return GetResult();
@@ -182,12 +190,6 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
         {
             Contract.Requires(dataReader != null);
             
-            // no transactions read
-            if (dataReader.HasRows == false)
-            {
-                return;
-            }
-
             ReadRevisions(dataReader);
 
             // move reader to next result set
@@ -202,16 +204,28 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
             }
         }
 
+        private async Task ExecuteSqlCommandAsync(SqlDataReader dataReader)
+        {            
+            await ReadRevisionsAsync(dataReader);
+
+            // move reader to next result set
+            if (dataReader.NextResult())
+            {
+                await ReadEventsAsync(dataReader);
+            }
+            else
+            {
+                // no events returned
+                throw new InvalidOperationException("No event result returned.");
+            }
+        }
+
         private void ReadEvents(SqlDataReader dataReader)
         {
             while (dataReader.Read())
             {
                 // add sql domain event to collection
-                _sqlDomainEvents.Add(new SqlDomainEvent(dataReader.GetGuid(0),
-                    dataReader.GetGuid(1),
-                    dataReader.GetInt32(2),
-                    (byte[])dataReader[3],
-                    (byte[])dataReader[4]));
+                AddEvent(dataReader);
             }
         }
 
@@ -219,16 +233,46 @@ namespace DotNetRevolution.EventSourcing.Sql.ReadTransaction
         {
             while (dataReader.Read())
             {
-                _revisions.Add(new SqlRevision(dataReader.GetGuid(0),                    
-                    dataReader.GetGuid(1),
-                    dataReader.GetString(2),
-                    dataReader.GetGuid(3),
-                    dataReader.GetInt32(4),
-                    dataReader.GetGuid(5),
-                    (byte[])dataReader[6],                    
-                    (byte[])dataReader[7],
-                    (byte[])dataReader[8]));
+                AddRevision(dataReader);
             }
+        }
+        private async Task ReadEventsAsync(SqlDataReader dataReader)
+        {
+            while (await dataReader.ReadAsync())
+            {
+                // add sql domain event to collection
+                AddEvent(dataReader);
+            }
+        }
+
+        private async Task ReadRevisionsAsync(SqlDataReader dataReader)
+        {
+            while (await dataReader.ReadAsync())
+            {
+                AddRevision(dataReader);
+            }
+        }
+
+        private void AddEvent(SqlDataReader dataReader)
+        {
+            _sqlDomainEvents.Add(new SqlDomainEvent(dataReader.GetGuid(0),
+                                dataReader.GetGuid(1),
+                                dataReader.GetInt32(2),
+                                (byte[])dataReader[3],
+                                (byte[])dataReader[4]));
+        }
+
+        private void AddRevision(SqlDataReader dataReader)
+        {
+            _revisions.Add(new SqlRevision(dataReader.GetGuid(0),
+                                dataReader.GetGuid(1),
+                                dataReader.GetString(2),
+                                dataReader.GetGuid(3),
+                                dataReader.GetInt32(4),
+                                dataReader.GetGuid(5),
+                                (byte[])dataReader[6],
+                                (byte[])dataReader[7],
+                                (byte[])dataReader[8]));
         }
     }
 }

@@ -1,30 +1,37 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 
 namespace DotNetRevolution.Core.Logging
 {
     public class ColoredConsoleLogger : ConsoleLogger
     {
+        private static object ConsoleLock = new object();
+
         public override void Log(LogEntryLevel logEntryLevel, string message)
         {
-            using (SetConsoleColor(logEntryLevel))
-            {
-                base.Log(logEntryLevel, message);
-            }
+            Log(logEntryLevel, () => base.Log(logEntryLevel, message));
         }
-
+        
         public override void Log(LogEntryLevel logEntryLevel, string message, Exception exception)
         {
-            using (SetConsoleColor(logEntryLevel))
-            {
-                base.Log(logEntryLevel, message, exception);
-            }
+            Log(logEntryLevel, () => base.Log(logEntryLevel, message, exception));
         }
 
         public override void Log(LogEntryLevel logEntryLevel, Exception exception)
         {
-            using (SetConsoleColor(logEntryLevel))
+            Log(logEntryLevel, () => base.Log(logEntryLevel, exception));
+        }
+
+        private void Log(LogEntryLevel logEntryLevel, Action action)
+        {
+            Contract.Requires(action != null);
+
+            lock (ConsoleLock)
             {
-                base.Log(logEntryLevel, exception);
+                using (SetConsoleColor(logEntryLevel))
+                {
+                    action();
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace DotNetRevolution.Core.Querying
 {
@@ -18,9 +19,18 @@ namespace DotNetRevolution.Core.Querying
             where TResult : class
         {
             IQueryHandler handler = GetHandler(query);
+
             return HandleQuery(query, handler);
         }
-        
+
+        public Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query) 
+            where TResult : class
+        {
+            IQueryHandler handler = GetHandler(query);
+
+            return HandleQueryAsync(query, handler);
+        }
+
         private IQueryHandler GetHandler<TResult>(IQuery<TResult> query) 
             where TResult : class
         {
@@ -49,7 +59,25 @@ namespace DotNetRevolution.Core.Querying
             try
             {
                 // handle query
-                return (TResult) handler.Handle(query);
+                return handler.Handle(query);
+            }
+            catch (Exception e)
+            {
+                // re-throw exception as a query handling exception
+                throw new QueryHandlingException(query, e, "Exception occurred in query handler, check inner exception for details.");
+            }
+        }
+
+        private Task<TResult> HandleQueryAsync<TResult>(IQuery<TResult> query, IQueryHandler handler) where TResult : class
+        {
+            Contract.Requires(handler != null);
+            Contract.Requires(query != null);
+            Contract.Ensures(Contract.Result<TResult>() != null);
+
+            try
+            {
+                // handle query
+                return handler.HandleAsync(query);
             }
             catch (Exception e)
             {

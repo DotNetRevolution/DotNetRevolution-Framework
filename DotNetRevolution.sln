@@ -65,6 +65,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Website", "Website", "{4CCDB999-4125-46AA-AEDF-8A86F6D1AA35}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auditor", "Auditor", "{2D930C53-1116-428F-B5AE-E8B1389CC3E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Auditor.WebApi", "src\DotNetRevolution.EventSourcing.Auditor.WebApi\DotNetRevolution.EventSourcing.Auditor.WebApi.csproj", "{37A28442-1ED3-4B66-B27D-6DBD95D850AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Auditor.WebApi.Tests", "tests\DotNetRevolution.EventSourcing.Auditor.WebApi.Tests\DotNetRevolution.EventSourcing.Auditor.WebApi.Tests.csproj", "{C570DAE3-07BA-48CB-BBB2-5A9027F29C98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Auditor.Query", "src\DotNetRevolution.EventSourcing.Auditor.Query\DotNetRevolution.EventSourcing.Auditor.Query.csproj", "{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRevolution.EventSourcing.Auditor.Sql", "src\DotNetRevolution.EventSourcing.Auditor.Sql\DotNetRevolution.EventSourcing.Auditor.Sql.csproj", "{C75F6493-3495-4952-B6E0-D2DFC6EC73E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +175,22 @@ Global
 		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F661F588-FDF5-49ED-87F8-B20433D8CF31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37A28442-1ED3-4B66-B27D-6DBD95D850AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37A28442-1ED3-4B66-B27D-6DBD95D850AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37A28442-1ED3-4B66-B27D-6DBD95D850AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37A28442-1ED3-4B66-B27D-6DBD95D850AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C570DAE3-07BA-48CB-BBB2-5A9027F29C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C570DAE3-07BA-48CB-BBB2-5A9027F29C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C570DAE3-07BA-48CB-BBB2-5A9027F29C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C570DAE3-07BA-48CB-BBB2-5A9027F29C98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C75F6493-3495-4952-B6E0-D2DFC6EC73E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75F6493-3495-4952-B6E0-D2DFC6EC73E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75F6493-3495-4952-B6E0-D2DFC6EC73E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75F6493-3495-4952-B6E0-D2DFC6EC73E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -193,5 +219,10 @@ Global
 		{7713CF62-A3F8-452B-BC54-F1E95BE2E46B} = {4CCDB999-4125-46AA-AEDF-8A86F6D1AA35}
 		{F661F588-FDF5-49ED-87F8-B20433D8CF31} = {4CCDB999-4125-46AA-AEDF-8A86F6D1AA35}
 		{4CCDB999-4125-46AA-AEDF-8A86F6D1AA35} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{2D930C53-1116-428F-B5AE-E8B1389CC3E1} = {143E43E5-1A24-42B4-A010-2391E44C6D9E}
+		{37A28442-1ED3-4B66-B27D-6DBD95D850AD} = {2D930C53-1116-428F-B5AE-E8B1389CC3E1}
+		{C570DAE3-07BA-48CB-BBB2-5A9027F29C98} = {2D930C53-1116-428F-B5AE-E8B1389CC3E1}
+		{A9850AC3-8BAD-4BBF-8B0A-8AB2B7256DA9} = {2D930C53-1116-428F-B5AE-E8B1389CC3E1}
+		{C75F6493-3495-4952-B6E0-D2DFC6EC73E7} = {2D930C53-1116-428F-B5AE-E8B1389CC3E1}
 	EndGlobalSection
 EndGlobal
